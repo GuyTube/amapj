@@ -2,4 +2,4 @@
 /logs/
 /.classpath
 /.project
-/WebContent/META-INF/.gitignore
+/WebContent/META-INF/context.xml
