@@ -4,3 +4,6 @@
 /.project
 /WebContent/META-INF/context.xml
 /.settings/
+/db/data/amap1.properties
+/db/data/master.properties
+/db/data/master.script
