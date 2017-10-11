@@ -120,6 +120,13 @@ public class MenuInfo
 		menus.add(new MenuDescription(MenuList.CONTRATS_AMAPIEN,  ContratsAmapienListPart.class , RoleList.REFERENT ));
 		menus.add(new MenuDescription(MenuList.LIVRAISON_AMAPIEN,  LivraisonAmapienView.class , RoleList.REFERENT ));
 		menus.add(new MenuDescription(MenuList.CONTRAT_ARCHIVE,  ArchivageContratListPart.class , RoleList.REFERENT ));
+		menus.add(new MenuDescription(MenuList.UTILISATEUR, UtilisateurListPart.class, RoleList.REFERENT ));
+		menus.add(new MenuDescription(MenuList.PRODUCTEUR, ProducteurListPart.class, RoleList.REFERENT));
+		menus.add(new MenuDescription(MenuList.TABLEAU_DE_BORD, TableauDeBordView.class, RoleList.REFERENT));
+		menus.add(new MenuDescription(MenuList.IMPORT_DONNEES, ImportDonneesView.class, RoleList.REFERENT));
+		menus.add(new MenuDescription(MenuList.ETIQUETTE, EditionSpeListPart.class, RoleList.REFERENT ));
+		menus.add(new MenuDescription(MenuList.BILAN_COTISATION, BilanCotisationView.class, RoleList.REFERENT , ModuleList.GESTION_COTISATION));
+		menus.add(new MenuDescription(MenuList.RECEPTION_COTISATION, ReceptionCotisationView.class, RoleList.REFERENT , ModuleList.GESTION_COTISATION));
 		
 		// Partie permanence
 		menus.add(new MenuDescription(MenuList.PERIODE_PERMANENCE, PeriodePermanenceListPart.class , RoleList.REFERENT , ModuleList.PLANNING_DISTRIBUTION ).setCategorie("PERMANENCES"));
@@ -127,14 +134,7 @@ public class MenuInfo
 		menus.add(new MenuDescription(MenuList.ROLE_PERMANENCE, PermanenceRoleListPart.class , RoleList.REFERENT , ModuleList.PLANNING_DISTRIBUTION ));
 		
 		// Partie tésorier
-		menus.add(new MenuDescription(MenuList.UTILISATEUR, UtilisateurListPart.class, RoleList.TRESORIER ).setCategorie("TRESORIER"));
-		menus.add(new MenuDescription(MenuList.PRODUCTEUR, ProducteurListPart.class, RoleList.TRESORIER));
-		menus.add(new MenuDescription(MenuList.TABLEAU_DE_BORD, TableauDeBordView.class, RoleList.TRESORIER));
-		menus.add(new MenuDescription(MenuList.BILAN_COTISATION, BilanCotisationView.class, RoleList.TRESORIER , ModuleList.GESTION_COTISATION));
-		menus.add(new MenuDescription(MenuList.RECEPTION_COTISATION, ReceptionCotisationView.class, RoleList.TRESORIER , ModuleList.GESTION_COTISATION));
-		menus.add(new MenuDescription(MenuList.IMPORT_DONNEES, ImportDonneesView.class, RoleList.TRESORIER));
 		menus.add(new MenuDescription(MenuList.LISTE_TRESORIER, DroitsTresorierListPart.class, RoleList.TRESORIER));
-		menus.add(new MenuDescription(MenuList.ETIQUETTE, EditionSpeListPart.class, RoleList.TRESORIER ));
 		
 		// Partie adminitrateur
 		menus.add(new MenuDescription(MenuList.PARAMETRES, ParametresView.class, RoleList.ADMIN).setCategorie("ADMIN"));
