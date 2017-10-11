@@ -73,9 +73,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 	
 	private Label montantTotalPaiement;
 	
-	private String message = 	"Une proposition de paiement a été calculée et est affichée ci dessous.<br/>"+
-								"Vous pouvez modifier cette proposition en saisissant directement les montants en face de chaque mois<br/>"+
-								"Le dernier mois est calculé automatiquement pour ajuster le contrat<br/><br/>";
+	private String message = 	"Une proposition de paiement a été calculée et est affichée ci dessous.<br/><br/>";
 
 	/**
 	 * 
@@ -283,21 +281,7 @@ abstract public class PopupCurrencyVector extends CorePopup
 			ok.addStyleName("primary");
 		}
 		else
-		{
-			if (param.nbLig > 2)
-			{
-				Button copierButton = addButton("Copier la 1ère ligne partout", new Button.ClickListener()
-				{
-
-					@Override
-					public void buttonClick(ClickEvent event)
-					{
-						handleCopier();
-					}
-				});
-				setButtonAlignement(copierButton, Alignment.TOP_LEFT);
-			}
-			
+		{			
 			Button cancelButton = addButton("Annuler", new Button.ClickListener()
 			{
 
@@ -500,12 +484,9 @@ abstract public class PopupCurrencyVector extends CorePopup
 				shortCutManager.registerTextField(tf);
 				cells.add(tf);
 				
-				// Si derniere ligne : on desactive la saisie , sauf si pas de recalcul
-				if ((lig==param.nbLig-1) && (param.computeLastLine==true) )
-				{
-					tf.setEnabled(false);
-					lastLineTextField = tf;
-				}
+				// UPDATE: On désactive toujours la saisie du montant
+				tf.setEnabled(false);
+				lastLineTextField = tf;
 			}
 
 		}
