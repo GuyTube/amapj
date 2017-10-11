@@ -113,7 +113,10 @@ public class LoginPart
 		FormPopup.open(new PopupSaisieEmail());
 	}
 	
-	
+	protected void handleInscripPwd()
+	{
+		FormPopup.open(new PopupInscription());
+	}
 	/**
 	 * Zone de saisie du password 
 	 *
@@ -215,6 +218,12 @@ public class LoginPart
     		layout.addComponent(lostPwd);
     		layout.setComponentAlignment(lostPwd, Alignment.BOTTOM_LEFT);
     		
+    		Button inscrire = new Button("S'incrire ?");
+    		inscrire.addStyleName("link");
+    		inscrire.addStyleName("perdu");
+    		layout.addComponent(inscrire);
+    		layout.setComponentAlignment(inscrire, Alignment.BOTTOM_RIGHT);
+    		
     		
     		
     		lostPwd.addClickListener(new ClickListener()
@@ -225,8 +234,21 @@ public class LoginPart
     				handleLostPwd();
     			}
     		});
-            return p;
-        }
+    		
+    		
+    		inscrire.addClickListener(new ClickListener()
+    		{
+    			@Override
+    			public void buttonClick(ClickEvent event)
+    			{
+    				handleInscripPwd();
+    			}
+    		});
+    		
+            return p;          
+            
+    }
+		
 
  
         @Override
