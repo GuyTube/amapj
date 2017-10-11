@@ -112,8 +112,10 @@ public class LoginPart
 	{
 		FormPopup.open(new PopupSaisieEmail());
 	}
-	
-	protected void handleInscripPwd()
+	/**
+	 * Gestion de l'appui sur inscrivez-vous
+	 */
+	protected void handleSignUp()
 	{
 		FormPopup.open(new PopupInscription());
 	}
@@ -243,12 +245,12 @@ public class LoginPart
     		});
     		
     		
-    		inscrire.addClickListener(new ClickListener()
+    		signUp.addClickListener(new ClickListener()
     		{
     			@Override
     			public void buttonClick(ClickEvent event)
     			{
-    				handleInscripPwd();
+    				handleSignUp();
     			}
     		});
     		
