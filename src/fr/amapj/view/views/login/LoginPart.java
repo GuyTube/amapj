@@ -113,7 +113,10 @@ public class LoginPart
 		FormPopup.open(new PopupSaisieEmail());
 	}
 	
-	
+	protected void handleInscripPwd()
+	{
+		FormPopup.open(new PopupInscription());
+	}
 	/**
 	 * Zone de saisie du password 
 	 *
@@ -229,6 +232,7 @@ public class LoginPart
     		
     		layout.addComponent(pan);
     		
+    		
     		lostPwd.addClickListener(new ClickListener()
     		{
     			@Override
@@ -237,8 +241,21 @@ public class LoginPart
     				handleLostPwd();
     			}
     		});
-            return p;
-        }
+    		
+    		
+    		inscrire.addClickListener(new ClickListener()
+    		{
+    			@Override
+    			public void buttonClick(ClickEvent event)
+    			{
+    				handleInscripPwd();
+    			}
+    		});
+    		
+            return p;          
+            
+    }
+		
 
  
         @Override
