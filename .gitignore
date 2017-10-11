@@ -2,3 +2,4 @@
 /logs/
 /.classpath
 /.project
+/WebContent/META-INF/.gitignore
