@@ -208,14 +208,26 @@ public class LoginPart
     		layout.addComponent(loginButton);
     		layout.setComponentAlignment(loginButton, Alignment.MIDDLE_CENTER);
     		
-    		
+    		//Horizontal layout inside vertical to place 2 button
+    		Panel pan = new Panel();
+			pan.setWidth("100%");
+			
+            HorizontalLayout hLayout = new HorizontalLayout();
+            hLayout.setSpacing(true);
+            hLayout.setMargin(true);
+            hLayout.setSizeFull();
+            
+            pan.setContent(hLayout);
+            
     		Button lostPwd = new Button("Mot de passe perdu ?");
-    		lostPwd.addStyleName("link");
-    		lostPwd.addStyleName("perdu");
-    		layout.addComponent(lostPwd);
-    		layout.setComponentAlignment(lostPwd, Alignment.BOTTOM_LEFT);
+    		hLayout.addComponent(lostPwd);
+    		hLayout.setComponentAlignment(lostPwd, Alignment.BOTTOM_LEFT);
     		
+    		Button signUp = new Button("Inscrivez-vous.");
+    		hLayout.addComponent(signUp);
+    		hLayout.setComponentAlignment(signUp, Alignment.BOTTOM_RIGHT);
     		
+    		layout.addComponent(pan);
     		
     		lostPwd.addClickListener(new ClickListener()
     		{
