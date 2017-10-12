@@ -162,8 +162,10 @@ public class UtilisateurService
 		u.setLibAdr1(utilisateurDTO.libAdr1);
 		u.setCodePostal(utilisateurDTO.codePostal);
 		u.setVille(utilisateurDTO.ville);
+		u.setPassword(utilisateurDTO.password.trim());
 
 		em.persist(u);
+		em.flush();
 		
 		UtilisateurInfo res = new UtilisateurInfo();
 		res.id = u.getId();
@@ -171,7 +173,6 @@ public class UtilisateurService
 		
 		if (generatePassword==false)
 		{
-			u.setPassword(utilisateurDTO.password.trim());
 			return res;
 		}
 
