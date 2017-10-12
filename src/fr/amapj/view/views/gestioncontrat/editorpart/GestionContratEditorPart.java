@@ -71,7 +71,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 
 	static public enum Step
 	{
-		INFO_GENERALES, DATE_LIVRAISON, DATE_FIN_INSCRIPTION , CHOIX_PRODUITS, DETAIL_PAIEMENT;	
+		INFO_GENERALES, DATE_LIVRAISON, DATE_FIN_INSCRIPTION , CHOIX_PRODUITS, TYPE_PAIEMENT , DETAIL_PAIEMENT;	
 	}
 	
 	
@@ -82,6 +82,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 		add(Step.DATE_LIVRAISON, ()->drawDateLivraison(),()->checkDateLivraison());
 		add(Step.DATE_FIN_INSCRIPTION, ()->drawFinInscription());
 		add(Step.CHOIX_PRODUITS, ()->drawChoixProduits());
+		add(Step.TYPE_PAIEMENT , ()->drawTypePaiement());
 		add(Step.DETAIL_PAIEMENT , ()->drawDetailPaiement());
 	}
 	
@@ -164,10 +165,10 @@ public class GestionContratEditorPart extends WizardFormPopup
 	
 	private String checkInfoGenerales()
 	{
-		if ((modeleContrat.nature==NatureContrat.CARTE_PREPAYEE) && (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON))
+		/*if ((modeleContrat.nature==NatureContrat.CARTE_PREPAYEE) && (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON))
 		{
 			return "Il n'est pas possible de faire un contrat Carte prépayée avec une seule date de livraison";
-		}
+		}*/
 		return null;
 	}
 	
@@ -236,7 +237,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 	
 	protected void drawFinInscription()
 	{
-		if (modeleContrat.nature==NatureContrat.CARTE_PREPAYEE)
+		/*if (modeleContrat.nature==NatureContrat.CARTE_PREPAYEE)
 		{
 			//
 			modeleContrat.dateFinInscription = null;
@@ -252,7 +253,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 					+ "son contrat pour cette livraison jusqu'au mercredi soir minuit", ContentMode.HTML);
 		}
 		else
-		{	
+		{*/	
 			// Titre
 			setStepTitle("la date de fin des inscriptions");
 			
@@ -264,7 +265,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 			addDateField("Date de fin des inscriptions", "dateFinInscription",notNull,dateRange);
 			
 			addLabel("Cette date doit obligatoirement être avant la date de la première livraison", ContentMode.HTML);
-		}
+		//}
 	}
 	
 	
@@ -312,6 +313,32 @@ public class GestionContratEditorPart extends WizardFormPopup
 		addColumn("prix", "Prix du produit", FieldType.CURRENCY, null,new ColumnNotNull<LigneContratDTO>(e->e.prix));	
 		
 	}
+
+
+	
+	
+	
+
+	private void drawTypePaiement()
+	{
+		/*if (modeleContrat.nature==NatureContrat.CARTE_PREPAYEE)
+		{
+			// Titre
+			setStepTitle("Contrat Carte prépayée - gestion du paiement");
+						
+			addLabel("Votre contrat est de type Carte prépayée, il n'y a pas de gestion des paiements possible pour le moment. Vous pouvez juste définir un message avec les indications sur le paiement sur la page suivante.", ContentMode.HTML);
+			
+			modeleContrat.gestionPaiement = GestionPaiement.NON_GERE;
+		}
+		else
+		{*/		
+			setStepTitle("genéralités sur le paiement");
+			
+			IValidator notNull = new NotNullValidator();
+			
+			addComboEnumField("Gestion des paiements", "gestionPaiement",notNull);
+		//}
+	}
 	
 	
 	
@@ -325,7 +352,8 @@ public class GestionContratEditorPart extends WizardFormPopup
 		IValidator len_0_255 = new StringLengthValidator(0, 255);
 
 		
-
+		if (modeleContrat.gestionPaiement==GestionPaiement.GESTION_STANDARD)
+		{	
 			addTextField("Ordre du chèque", "libCheque",len_0_255);
 			
 			if (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON)
@@ -344,6 +372,13 @@ public class GestionContratEditorPart extends WizardFormPopup
 				p = addDateField("Date du dernier paiement", "dernierCheque",notNull);
 				p.setValue(proposeDateDernierPaiement()); 
 			}
+		}
+		else
+		{
+			TextField f = (TextField) addTextField("Texte affiché dans la fenêtre paiement", "textPaiement",len_0_2048);
+			f.setMaxLength(2048);
+			f.setHeight(5, Unit.CM);
+		}
 	}
 
 	
