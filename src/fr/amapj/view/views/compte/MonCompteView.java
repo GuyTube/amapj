@@ -64,6 +64,7 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 	
 	TextField nom;
 	TextField prenom;
+	TextField nom_cheque;
 	TextField mail;
 	TextField pwd;
 	
@@ -111,8 +112,9 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
         section.addStyleName("colored");
         form1.addComponent(section);
 		
-		nom = addTextField("Votre nom ",form1);
 		prenom = addTextField("Votre prénom ",form1);
+		nom = addTextField("Votre nom ",form1);
+		nom_cheque = addTextField("Votre nom sur le chèque", form1); 
 		
 		
 		// Bloc Adresse mail  
@@ -154,12 +156,7 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 	{
 		String newValue = pwd.getValue();
 		new PasswordManager().setUserPassword(u.id,newValue);
-	}
-	
-	
-	
-	
-	
+	}	
 	
 	private void handleSaveChangerCoordonnees()
 	{
@@ -188,8 +185,9 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 	{
 		u = new MonCompteService().getUtilisateurInfo();
 		
-		setValue(nom,u.getNom());
 		setValue(prenom,u.getPrenom());
+		setValue(nom,u.getNom());
+		setValue(nom_cheque, u.getNomCheque());
 		setValue(mail,u.getEmail());
 		setValue(pwd,"***********");
 		setValue(numTel1,u.getNumTel1());
