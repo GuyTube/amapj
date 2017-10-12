@@ -325,10 +325,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 		IValidator len_0_255 = new StringLengthValidator(0, 255);
 
 		
-<<<<<<< HEAD
-=======
 		
->>>>>>> CRUDContrat
 			addTextField("Ordre du chèque", "libCheque",len_0_255);
 			
 			if (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON)
