@@ -82,7 +82,6 @@ public class GestionContratEditorPart extends WizardFormPopup
 		add(Step.DATE_LIVRAISON, ()->drawDateLivraison(),()->checkDateLivraison());
 		add(Step.DATE_FIN_INSCRIPTION, ()->drawFinInscription());
 		add(Step.CHOIX_PRODUITS, ()->drawChoixProduits());
-//		add(Step.TYPE_PAIEMENT , ()->drawTypePaiement());
 		add(Step.DETAIL_PAIEMENT , ()->drawDetailPaiement());
 	}
 	
@@ -313,32 +312,6 @@ public class GestionContratEditorPart extends WizardFormPopup
 		addColumn("prix", "Prix du produit", FieldType.CURRENCY, null,new ColumnNotNull<LigneContratDTO>(e->e.prix));	
 		
 	}
-
-
-	
-	
-	
-
-//	private void drawTypePaiement()
-//	{
-//		if (modeleContrat.nature==NatureContrat.CARTE_PREPAYEE)
-//		{
-//			// Titre
-//			setStepTitle("Contrat Carte prépayée - gestion du paiement");
-//						
-//			addLabel("Votre contrat est de type Carte prépayée, il n'y a pas de gestion des paiements possible pour le moment. Vous pouvez juste définir un message avec les indications sur le paiement sur la page suivante.", ContentMode.HTML);
-//			
-//			modeleContrat.gestionPaiement = GestionPaiement.NON_GERE;
-//		}
-//		else
-//		{		
-//			setStepTitle("genéralités sur le paiement");
-//			
-//			IValidator notNull = new NotNullValidator();
-//			
-//			addComboEnumField("Gestion des paiements", "gestionPaiement",notNull);
-//		}
-//	}
 	
 	
 	
@@ -352,8 +325,6 @@ public class GestionContratEditorPart extends WizardFormPopup
 		IValidator len_0_255 = new StringLengthValidator(0, 255);
 
 		
-//		if (modeleContrat.gestionPaiement==GestionPaiement.GESTION_STANDARD)
-//		{	
 			addTextField("Ordre du chèque", "libCheque",len_0_255);
 			
 			if (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON)
@@ -372,13 +343,6 @@ public class GestionContratEditorPart extends WizardFormPopup
 				p = addDateField("Date du dernier paiement", "dernierCheque",notNull);
 				p.setValue(proposeDateDernierPaiement()); 
 			}
-//		}
-//		else
-//		{
-//			TextField f = (TextField) addTextField("Texte affiché dans la fenêtre paiement", "textPaiement",len_0_2048);
-//			f.setMaxLength(2048);
-//			f.setHeight(5, Unit.CM);
-//		}
 	}
 
 	
