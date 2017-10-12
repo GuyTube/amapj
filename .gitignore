@@ -1,0 +1,6 @@
+/build/
+/logs/
+/.classpath
+/.project
+/WebContent/META-INF/context.xml
+/.settings/
