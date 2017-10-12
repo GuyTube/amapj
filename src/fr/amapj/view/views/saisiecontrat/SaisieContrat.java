@@ -136,10 +136,10 @@ public class SaisieContrat
 		}
 		
 		// Si c'est un contrat carte prépayée : ca depend de l'utilisateur 
-		if (data.contratDTO.nature==NatureContrat.CARTE_PREPAYEE)
+		/*if (data.contratDTO.nature==NatureContrat.CARTE_PREPAYEE)
 		{
 			return computeCartePrepayee();
-		}
+		}*/
 		
 		// Si c'est un contrat abonnement : ca depend de l'utilisateur 
 		if (data.contratDTO.nature==NatureContrat.ABONNEMENT)

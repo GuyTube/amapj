@@ -164,10 +164,10 @@ public class GestionContratEditorPart extends WizardFormPopup
 	
 	private String checkInfoGenerales()
 	{
-		if ((modeleContrat.nature==NatureContrat.CARTE_PREPAYEE) && (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON))
+		/*if ((modeleContrat.nature==NatureContrat.CARTE_PREPAYEE) && (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON))
 		{
 			return "Il n'est pas possible de faire un contrat Carte prépayée avec une seule date de livraison";
-		}
+		}*/
 		return null;
 	}
 	
@@ -236,7 +236,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 	
 	protected void drawFinInscription()
 	{
-		if (modeleContrat.nature==NatureContrat.CARTE_PREPAYEE)
+		/*if (modeleContrat.nature==NatureContrat.CARTE_PREPAYEE)
 		{
 			//
 			modeleContrat.dateFinInscription = null;
@@ -252,7 +252,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 					+ "son contrat pour cette livraison jusqu'au mercredi soir minuit", ContentMode.HTML);
 		}
 		else
-		{	
+		{*/	
 			// Titre
 			setStepTitle("la date de fin des inscriptions");
 			
@@ -264,7 +264,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 			addDateField("Date de fin des inscriptions", "dateFinInscription",notNull,dateRange);
 			
 			addLabel("Cette date doit obligatoirement être avant la date de la première livraison", ContentMode.HTML);
-		}
+		//}
 	}
 	
 	
@@ -325,6 +325,10 @@ public class GestionContratEditorPart extends WizardFormPopup
 		IValidator len_0_255 = new StringLengthValidator(0, 255);
 
 		
+<<<<<<< HEAD
+=======
+		
+>>>>>>> CRUDContrat
 			addTextField("Ordre du chèque", "libCheque",len_0_255);
 			
 			if (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON)

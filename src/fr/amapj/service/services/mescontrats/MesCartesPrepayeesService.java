@@ -54,10 +54,10 @@ public class MesCartesPrepayeesService
 	 */
 	public CartePrepayeeDTO computeCartePrepayee(ModeleContrat mc, EntityManager em,Date now)
 	{
-		if (mc.nature!=NatureContrat.CARTE_PREPAYEE)
+		/*if (mc.nature!=NatureContrat.CARTE_PREPAYEE)
 		{
 			return null;
-		}
+		}*/
 		
 		
 		CartePrepayeeDTO dto = new CartePrepayeeDTO();
