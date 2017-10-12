@@ -134,7 +134,7 @@ public class MenuInfo
 		menus.add(new MenuDescription(MenuList.ROLE_PERMANENCE, PermanenceRoleListPart.class , RoleList.REFERENT , ModuleList.PLANNING_DISTRIBUTION ));
 		
 		// Partie tésorier
-		menus.add(new MenuDescription(MenuList.LISTE_TRESORIER, DroitsTresorierListPart.class, RoleList.TRESORIER));
+		menus.add(new MenuDescription(MenuList.LISTE_TRESORIER, DroitsTresorierListPart.class, RoleList.TRESORIER).setCategorie("REFERENT"));
 		
 		// Partie adminitrateur
 		menus.add(new MenuDescription(MenuList.PARAMETRES, ParametresView.class, RoleList.ADMIN).setCategorie("ADMIN"));

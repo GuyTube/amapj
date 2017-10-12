@@ -79,16 +79,7 @@ public enum MenuList
 	
 	CONTRAT_ARCHIVE("Contrats archivés",FontAwesome.ARCHIVE),
 	
-	
-	// Partie permanence
-	
-	PERIODE_PERMANENCE("Périodes de permanence",FontAwesome.CALENDAR_O) ,
-	
-	DETAIL_PERIODE_PERMANENCE("Gestion des inscriptions aux permanences",FontAwesome.CALENDAR_O) ,
-	
-	ROLE_PERMANENCE("Rôles de permanence",FontAwesome.CALENDAR_O) ,
-	
-	// Partie trésorier
+	// ancienne fonction tresorier ajoute a l'adherent
 	
 	UTILISATEUR("Gestion des utilisateurs",FontAwesome.USERS) , 
 	
@@ -102,9 +93,19 @@ public enum MenuList
 	
 	IMPORT_DONNEES("Import des données",FontAwesome.CLOUD_DOWNLOAD),
 	
-	LISTE_TRESORIER("Liste des trésoriers",FontAwesome.GRADUATION_CAP),
-	
 	ETIQUETTE("Editions spécifiques",FontAwesome.PRINT),
+	
+	// Partie permanence
+	
+	PERIODE_PERMANENCE("Périodes de permanence",FontAwesome.CALENDAR_O) ,
+	
+	DETAIL_PERIODE_PERMANENCE("Gestion des inscriptions aux permanences",FontAwesome.CALENDAR_O) ,
+	
+	ROLE_PERMANENCE("Rôles de permanence",FontAwesome.CALENDAR_O) ,
+	
+	// Partie trésorier
+	
+	LISTE_TRESORIER("Liste des trésoriers",FontAwesome.GRADUATION_CAP),
 	
 	
 	// Partie admnistrateur

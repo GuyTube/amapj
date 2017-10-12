@@ -113,7 +113,6 @@ public class MenuDescription
 			
 		case GESTION_COTISATION:
 			return param.etatGestionCotisation.equals(EtatModule.ACTIF);
-			//return true;
 
 		default:
 			throw new AmapjRuntimeException("Erreur de programmation");
