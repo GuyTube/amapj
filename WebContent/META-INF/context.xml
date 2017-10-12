@@ -3,7 +3,7 @@
  <Parameter name="dbms" value="hi"  />
  
  <Parameter name="dbms.hi.type" value="hsql_internal"  />
- <Parameter name="dbms.hi.dir" value="/Users/alicebarralon/Documents/dev-amapj/workspace/amapj/db/data"  />
+ <Parameter name="dbms.hi.dir" value="/Users/vfauroux/eclipse-workspace/git/amapj/db/data"  />
  <Parameter name="dbms.hi.port" value="9005"  />
  
  <!-- /Users/alicebarralon/Documents/dev-amapj/workspace/amapj -->
@@ -11,7 +11,7 @@
  <Parameter name="master.dbms" value="hi"  />
  <Parameter name="master.name" value="master"  />
 
-  <Parameter name="logDir" value="/Users/alicebarralon/Documents/dev-amapj/workspace/amapj/logs/"  />
+  <Parameter name="logDir" value="/Users/vfauroux/eclipse-workspace/git/amapj/logs/"  />
  
 <!-- Permet de desactiver la serialisation des sessions-->
 <Manager pathname="" />
