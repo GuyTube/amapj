@@ -62,12 +62,16 @@ public class Utilisateur  implements Identifiable
 	@Column(length = 100)
 	private String nom;
 	
-	@Size(min = 0, max = 150)
+	@Size(min = 1, max = 100)
+	@Column(length = 100)
+	private String nomCheque;
+	
+	@Size(min = 1, max = 150)
 	@Column(length = 150)
 	// Contient l'adresse e mail
 	private String email;
 	
-	@Size(min = 0, max = 150)
+	@Size(min = 1, max = 150)
 	@Column(length = 150)
 	// Contient le password encrypté
 	private String password;
@@ -95,12 +99,11 @@ public class Utilisateur  implements Identifiable
 	
 	// Liste des élements d'informations générales
 	
-	
-	@Size(min = 0, max = 25)
+	@Size(min = 1, max = 10)
 	// numéro de  téléphone 1
 	private String numTel1;
 	
-	@Size(min = 0, max = 25)
+	@Size(min = 0, max = 10)
 	// numéro de  téléphone 2
 	private String numTel2;
 	
@@ -110,7 +113,7 @@ public class Utilisateur  implements Identifiable
 	@Size(min = 0, max = 150)
 	private String codePostal;
 
-	@Size(min = 0, max = 150)
+	@Size(min = 1, max = 150)
 	private String ville;
 	
 	
@@ -164,6 +167,14 @@ public class Utilisateur  implements Identifiable
 	public void setNom(String nom)
 	{
 		this.nom = nom;
+	}
+
+	public String getNomCheque() {
+		return nomCheque;
+	}
+
+	public void setNomCheque(String nomCheque) {
+		this.nomCheque = nomCheque;
 	}
 
 	public String getEmail()

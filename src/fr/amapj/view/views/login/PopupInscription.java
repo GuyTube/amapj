@@ -1,11 +1,16 @@
 package fr.amapj.view.views.login;
 
+import java.util.Collection;
+
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
+import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.service.services.authentification.PasswordManager;
+import fr.amapj.service.services.utilisateur.UtilisateurDTO;
+import fr.amapj.service.services.utilisateur.UtilisateurService;
 import fr.amapj.view.engine.notification.NotificationHelper;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
 
@@ -64,16 +69,22 @@ public class PopupInscription extends FormPopup {
 
 	protected void performSauvegarder()
 	{
-//		String email = (String) item.getItemProperty("email").getValue();
-//		String msg = new PasswordManager().sendMailForResetPassword(email);
-//		if (msg==null)
-//		{
-//			Notification.show("Votre compte à bien été créé. Vous pouvez maintenant vous connecter.", Type.WARNING_MESSAGE);
-//		}
-//		else
-//		{
-//			NotificationHelper.displayNotification(msg);
-//		}
+		UtilisateurService us = new UtilisateurService();
+		
+		UtilisateurDTO userDTO = new UtilisateurDTO();
+		
+		userDTO.setNom((String)item.getItemProperty("nom").getValue());
+		userDTO.setNomCheque((String)item.getItemProperty("nom_paiement").getValue());
+		userDTO.setPrenom((String)item.getItemProperty("prenom").getValue());
+		userDTO.setEmail((String)item.getItemProperty("email").getValue());
+		userDTO.setNumTel1((String)item.getItemProperty("mobile").getValue());
+		userDTO.setNumTel2((String)item.getItemProperty("fixe").getValue());
+		userDTO.setLibAdr1((String)item.getItemProperty("adresse").getValue());
+		userDTO.setVille((String)item.getItemProperty("ville").getValue());
+		userDTO.setPassword((String)item.getItemProperty("password").getValue());
+		
+		us.createNewUser(userDTO, false, false);
+		
 	}
 
 }

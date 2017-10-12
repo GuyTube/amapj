@@ -82,6 +82,7 @@ public class UtilisateurService
 		dto.roles = new AccessManagementService().getRoleAsString(em,u);
 		dto.email = u.getEmail();
 		dto.etatUtilisateur = u.getEtatUtilisateur();
+		dto.nomCheque = u.getNomCheque();
 		
 		dto.numTel1 = u.getNumTel1();
 		dto.numTel2 = u.getNumTel2();
@@ -105,6 +106,7 @@ public class UtilisateurService
 		u.setNom(dto.nom);
 		u.setPrenom(dto.prenom);
 		u.setEmail(dto.email);
+		u.setNomCheque(dto.nomCheque);
 		
 		u.setNumTel1(dto.numTel1);
 		u.setNumTel2(dto.numTel2);
@@ -148,10 +150,12 @@ public class UtilisateurService
 		String nom = utilisateurDTO.nom.trim();
 		String prenom = utilisateurDTO.prenom.trim();
 		String email = utilisateurDTO.email.trim().toLowerCase();
+		String nomCheque = utilisateurDTO.nomCheque.trim();
 		
 		Utilisateur u = new Utilisateur();
 		u.setNom(nom);
 		u.setPrenom(prenom);
+		u.setNomCheque(nomCheque);
 		u.setEmail(email);
 		u.setNumTel1(utilisateurDTO.numTel1);
 		u.setNumTel2(utilisateurDTO.numTel2);
@@ -167,6 +171,7 @@ public class UtilisateurService
 		
 		if (generatePassword==false)
 		{
+			u.setPassword(utilisateurDTO.password.trim());
 			return res;
 		}
 

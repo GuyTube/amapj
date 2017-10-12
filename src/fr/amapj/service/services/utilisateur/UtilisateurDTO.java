@@ -36,6 +36,8 @@ public class UtilisateurDTO implements TableItem
 	
 	public String nom;
 	
+	public String nomCheque;
+	
 	public String roles;
 	
 	public String email;
@@ -51,6 +53,8 @@ public class UtilisateurDTO implements TableItem
 	public String codePostal;
 
 	public String ville;
+	
+	public String password;
 
 	public Long getId()
 	{
@@ -80,6 +84,14 @@ public class UtilisateurDTO implements TableItem
 	public void setNom(String nom)
 	{
 		this.nom = nom;
+	}
+
+	public String getNomCheque() {
+		return nomCheque;
+	}
+
+	public void setNomCheque(String nomCheque) {
+		this.nomCheque = nomCheque;
 	}
 
 	public String getEmail()
@@ -161,8 +173,13 @@ public class UtilisateurDTO implements TableItem
 	{
 		this.roles = roles;
 	}
-	
-	
-	
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 	
 }
