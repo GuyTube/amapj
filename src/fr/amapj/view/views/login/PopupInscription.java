@@ -69,6 +69,7 @@ public class PopupInscription extends FormPopup {
 
 	protected void performSauvegarder()
 	{
+		
 		UtilisateurService us = new UtilisateurService();
 		
 		UtilisateurDTO userDTO = new UtilisateurDTO();
@@ -84,6 +85,9 @@ public class PopupInscription extends FormPopup {
 		userDTO.setPassword((String)item.getItemProperty("password").getValue());
 		
 		us.createNewUser(userDTO, false, false);
+		
+		Notification.show("Félicitation, vous êtes inscrit", Type.WARNING_MESSAGE);
+		
 		
 	}
 
