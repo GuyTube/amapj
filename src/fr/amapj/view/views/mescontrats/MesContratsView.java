@@ -221,7 +221,7 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 			hl.setWidth("100%");
 			
 			VerticalLayout vl = new VerticalLayout();
-			Label lab = new Label(c.nom);
+			Label lab = new Label(c.nom.concat(" ").concat(String.valueOf(c.getMontantTotal()).concat("€")));
 			lab.addStyleName(LABEL_TITRECONTRAT);
 			vl.addComponent(lab);
 						
@@ -248,7 +248,6 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 				b.setWidth("100%");
 				vl2.addComponent(b);
 			}
-			
 			
 			Button v = addButtonVoir("Voir",c);
 			v.addStyleName(BUTTON_PRINCIPAL);
