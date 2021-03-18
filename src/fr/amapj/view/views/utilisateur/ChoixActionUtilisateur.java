@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,21 +20,25 @@
  */
  package fr.amapj.view.views.utilisateur;
 
+import fr.amapj.service.services.utilisateur.UtilisateurDTO;
 import fr.amapj.view.engine.popup.swicthpopup.SwitchPopup;
 
 /**
  * Permet de choisir ce que l'on veut modifier
  * dans le contrat : l'entete, les dates ou les produits
  */
-@SuppressWarnings("serial")
 public class ChoixActionUtilisateur extends SwitchPopup
 {
 
+	private UtilisateurDTO dto;
+
 	/**
+	 * @param dto 
 	 * 
 	 */
-	public ChoixActionUtilisateur()
+	public ChoixActionUtilisateur(UtilisateurDTO dto)
 	{
+		this.dto = dto;
 		popupTitle = "Autres actions sur les utilisateurs";
 		setWidth(50);
 
@@ -45,6 +49,18 @@ public class ChoixActionUtilisateur extends SwitchPopup
 	{
 		line1 = "Veuillez indiquer ce que vous souhaitez faire :";
 
+		if (dto!=null)
+		{
+			addLine("Supprimer l'utilisateur "+dto.nom+" "+dto.prenom, new PopupSuppressionUtilisateur(dto));
+			addSeparator();
+		}
+		
+		addLine("Rendre actif les utilisateurs en masse", new PopupRendreActifUtilisateurMasse(true));
+		addLine("Rendre inactif les utilisateurs en masse", new PopupRendreActifUtilisateurMasse(false));
+		
+		
+		addSeparator();
+		
 		addLine("Envoyer un e mail de bienvenue avec un mot de passe pour tous les utilisateurs sans mot de passe ", new PopupEnvoiPasswordMasse());
 
 	}

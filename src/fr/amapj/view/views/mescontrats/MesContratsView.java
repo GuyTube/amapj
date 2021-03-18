@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -38,11 +39,16 @@ import fr.amapj.service.services.mescontrats.ContratDTO;
 import fr.amapj.service.services.mescontrats.MesContratsDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.service.services.session.SessionManager;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
+import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.template.FrontOfficeView;
 import fr.amapj.view.engine.tools.BaseUiTools;
+import fr.amapj.view.views.saisiecontrat.ContratAboManager;
+import fr.amapj.view.views.saisiecontrat.ContratAboManager.ContratAbo;
+import fr.amapj.view.views.saisiecontrat.PopupSaisieJoker;
+import fr.amapj.view.views.saisiecontrat.PopupSaisieJokerOnly;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
 
@@ -51,9 +57,8 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
  * Page permettant à l'utilisateur de gérer ses contrats
  * 
  */
-public class MesContratsView extends FrontOfficeView implements  PopupSuppressionListener
+public class MesContratsView extends FrontOfficeView implements  PopupListener
 {
-	
 	
 	static public String LABEL_RUBRIQUE = "rubrique";
 	static public String LABEL_TITRECONTRAT = "titrecontrat";
@@ -65,8 +70,6 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 	VerticalLayout layout = null;
 	public MesContratsDTO mesContratsDTO;
 	
-	public MesContratsViewAdhesionPart adhesionPart;
-
 	@Override
 	public String getMainStyleName()
 	{
@@ -78,8 +81,7 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 	 */
 	@Override
 	public void enter()
-	{
-		adhesionPart = new MesContratsViewAdhesionPart(this);	
+	{	
 		refresh();
 	}
 
@@ -112,9 +114,30 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 		return b;
 	}
 	
+	private Button addButtonJoker(String str,final ContratDTO c)
+	{
+		Button b = new Button(str);
+		b.addClickListener(e -> handleJoker(c.modeleContratId,c.contratId));
+		return b;
+	}
 	
+	
+	private void handleJoker(Long modeleContratId, Long contratId)
+	{
+		ContratDTO dto = new MesContratsService().loadContrat(modeleContratId, contratId);
+		boolean isRegulier = new ContratAboManager().isRegulier(dto);
+		if (isRegulier==false)
+		{
+			String msg = "Vous ne pouvez pas modifier vos jokers car ceux ci ont été modifiés par le référent.";
+			MessagePopup p = new MessagePopup("Impossible de continuer",ContentMode.HTML,ColorStyle.RED,msg);
+			MessagePopup.open(p);
+			return;
+		}
 
-
+		ContratAbo abo = new ContratAboManager().computeContratAbo(dto);
+		PopupSaisieJoker.open(new PopupSaisieJokerOnly(abo, dto));
+		
+	}
 
 	private Button addButtonSupprimer(String str,final ContratDTO c)
 	{
@@ -127,15 +150,10 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 	protected void handleSupprimer(final ContratDTO c)
 	{
 		String text = "Etes vous sûr de vouloir supprimer le contrat de "+c.nom+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,c.contratId);
-		SuppressionPopup.open(confirmPopup, this);		
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,c.contratId,e->new MesContratsService().deleteContrat(e));
+		confirmPopup.open(this);		
 	}
 	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new MesContratsService().deleteContrat(idItemToSuppress);
-	}
 	
 
 	protected void handleInscription(ContratDTO c,ModeSaisie modeSaisie)
@@ -153,10 +171,7 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 		
 		layout = this;
 		layout.removeAllComponents();
-		
-		// Information sur le renouvellement de l'adhésion
-		adhesionPart.addAhesionInfo(layout);
-		
+			
 		// Le titre
 		addLabel(layout,"Les nouveaux contrats disponibles");
 		
@@ -249,6 +264,14 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 				vl2.addComponent(b);
 			}
 			
+			if (c.isJoker)
+			{
+				Button b = addButtonJoker("Gérer jokers",c);
+				b.setWidth("100%");
+				vl2.addComponent(b);
+			}
+			
+			
 			
 			Button v = addButtonVoir("Voir",c);
 			v.addStyleName(BUTTON_PRINCIPAL);
@@ -327,8 +350,12 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 			{
 				str = str+"Ce contrat est modifiable jusqu'au "+df.format(c.dateFinInscription)+ " minuit.";
 			}
-			else
+			else if (c.isJoker)
 			{
+				str = str+"Ce contrat n'est plus modifiable, mais vous pouvez éventuellement ajuster vos jokers.";
+			}
+			else
+			{	
 				str = str+"Ce contrat n'est plus modifiable.";
 			}
 		}
@@ -371,7 +398,7 @@ public class MesContratsView extends FrontOfficeView implements  PopupSuppressio
 		else
 		{
 			Date datLimit = DateUtils.addDays(nextDateLivModifiable, -(c.cartePrepayee.cartePrepayeeDelai+1));
-			str = str+"Vous pouvez modifier votre livraison du "+df.format(nextDateLivModifiable)+" jusqu'au "+df.format(datLimit)+ " minuit.";
+			str = str+"La livraison du "+df.format(nextDateLivModifiable)+" est modifiable ( modification possible jusqu'au "+df.format(datLimit)+ " minuit).";
 		}
 		
 		

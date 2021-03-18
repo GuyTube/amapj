@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,6 +24,8 @@
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.FontIcon;
 
+import fr.amapj.model.models.acces.RoleList;
+
 /**
  * Contient la liste des Menus disponibles dans l'application
  * 
@@ -39,7 +41,11 @@ public enum MenuList
 	
 	MES_PAIEMENTS("Mes paiements",FontAwesome.EURO),
 	
+	MES_ADHESIONS("Mes adhésions",FontAwesome.CERTIFICATE),
+	
 	MON_COMPTE("Mon compte",FontAwesome.USER),
+	
+	VISITE_AMAP("Visite AMAP",FontAwesome.DELICIOUS),
 	
 	LISTE_PRODUCTEUR_REFERENT("Producteurs / Référents",FontAwesome.LEAF),
 	
@@ -77,7 +83,7 @@ public enum MenuList
 	
 	LIVRAISON_AMAPIEN("Livraisons d'un amapien",FontAwesome.CUTLERY) ,
 	
-	CONTRAT_ARCHIVE("Contrats archivés",FontAwesome.ARCHIVE),
+	SYNTHESE_MULTI_CONTRAT("Synthèses multi contrats",FontAwesome.BAR_CHART_O),
 	
 	
 	// Partie permanence
@@ -94,11 +100,9 @@ public enum MenuList
 	
 	PRODUCTEUR("Gestion des producteurs",FontAwesome.LEAF) ,
 	
-	TABLEAU_DE_BORD("Tableau de bord",FontAwesome.BAR_CHART_O),
+	BILAN_COTISATION("Bilan des adhésions",FontAwesome.TABLE) ,
 	
-	BILAN_COTISATION("Bilan des cotisations",FontAwesome.TABLE) ,
-	
-	RECEPTION_COTISATION("Réception des cotisations",FontAwesome.CHECK_SQUARE_O) ,
+	RECEPTION_COTISATION("Réception des adhésions",FontAwesome.CHECK_SQUARE_O) ,
 	
 	IMPORT_DONNEES("Import des données",FontAwesome.CLOUD_DOWNLOAD),
 	
@@ -106,6 +110,15 @@ public enum MenuList
 	
 	ETIQUETTE("Editions spécifiques",FontAwesome.PRINT),
 	
+	// Partie archives
+	
+	CONTRAT_ARCHIVE("Contrats archivés",FontAwesome.ARCHIVE),
+	
+	PRODUCTEUR_ARCHIVE("Producteurs archivés",FontAwesome.ARCHIVE),
+	
+	UTILISATEUR_ARCHIVE("Utilisateurs archivés",FontAwesome.ARCHIVE),
+	
+	GESTION_ARCHIVE("Gestion des archives",FontAwesome.ARCHIVE),  
 	
 	// Partie admnistrateur
 	

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,13 +23,13 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.TextArea;
 
 import fr.amapj.common.CollectionUtils;
+import fr.amapj.common.SafeHtmlUtils;
 import fr.amapj.service.services.appinstance.AppInstanceDTO;
 import fr.amapj.service.services.appinstance.AppInstanceService;
 import fr.amapj.service.services.appinstance.SqlRequestDTO;

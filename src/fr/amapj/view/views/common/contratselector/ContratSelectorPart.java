@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -59,11 +59,13 @@ public class ContratSelectorPart
 
 	/**
 	 * 
+	 * si producteurActifOnly = true : il y a uniquement les producteurs actifs
+	 * si producteurActifOnly = false : il y a tous les producteurs (actifs et inactifs)
 	 */
-	public ContratSelectorPart(PopupListener listener)
+	public ContratSelectorPart(PopupListener listener,boolean producteurActifOnly)
 	{
 		this.listener = listener;
-		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(), SessionManager.getUserId());
+		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(), SessionManager.getUserId(),producteurActifOnly);
 		onlyOneProducteur = (allowedProducteurs.size()==1);
 	}
 
@@ -183,7 +185,7 @@ public class ContratSelectorPart
 			for (ModeleContrat mc : mcs)
 			{
 				contratBox.addItem(mc.getId());
-				contratBox.setItemCaption(mc.getId(), mc.getNom());	
+				contratBox.setItemCaption(mc.getId(), mc.nom);	
 			}
 			
 			// Si il y a un seul contrat : on le selectionne tout de suite

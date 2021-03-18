@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -57,7 +57,7 @@ public class UtilisateurUtil
 	 */
 	static public boolean canSendMailTo(Utilisateur u)
 	{
-		return canSendMailTo(u.getEmail());
+		return canSendMailTo(u.email);
 	}
 	
 	/**
@@ -131,7 +131,7 @@ public class UtilisateurUtil
 			{
 				warning = "<b>Utilisateur sans e mail !</b>";
 			}
-			buf.append(" - " + utilisateur.getNom() + " " + utilisateur.getPrenom() + warning + "<br/>");
+			buf.append(" - " + utilisateur.nom + " " + utilisateur.prenom + warning + "<br/>");
 		}
 		buf.append("<br/>");
 
@@ -140,7 +140,7 @@ public class UtilisateurUtil
 		{
 			if (UtilisateurUtil.canSendMailTo(utilisateur))
 			{
-				buf.append(utilisateur.getEmail() + ";");
+				buf.append(utilisateur.email + ";");
 			}
 		}
 		return buf.toString();
@@ -176,12 +176,12 @@ public class UtilisateurUtil
 			if (UtilisateurUtil.canSendMailTo(utilisateur))
 			{
 				res.nbUtilisateurAvecEmail++;
-				res.utilisateurAvecEmail = res.utilisateurAvecEmail + utilisateur.getEmail()+";";
+				res.utilisateurAvecEmail = res.utilisateurAvecEmail + utilisateur.email+";";
 			}
 			else
 			{
 				res.nbUtilisateurSansEmail++;
-				res.utilisateurSansEmail =  res.utilisateurSansEmail + utilisateur.getNom() + " " + utilisateur.getPrenom()+";";
+				res.utilisateurSansEmail =  res.utilisateurSansEmail + utilisateur.nom + " " + utilisateur.prenom+";";
 			}
 		}
 		return res;

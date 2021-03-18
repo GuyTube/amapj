@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -351,6 +351,15 @@ abstract public class AbstractImporter<T extends TableItem> implements Receiver 
 	
 	
 	
+	/**
+	 * Doit être utilisé pour les tests unitaires 
+	 * Retourne la liste des messages d'erreurs
+	 */
+	public List<String> unitTest() throws IOException
+	{
+		processFile();
+		return errorMessage;
+	}
 	
 	
 	

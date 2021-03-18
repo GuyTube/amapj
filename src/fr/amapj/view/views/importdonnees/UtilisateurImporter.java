@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -42,7 +42,7 @@ public class UtilisateurImporter extends AbstractImporter<UtilisateurDTO>
 	@Override
 	public List<UtilisateurDTO> getAllDataInDatabase()
 	{
-		List<UtilisateurDTO> existing = new UtilisateurService().getAllUtilisateurs(true);
+		List<UtilisateurDTO> existing = new UtilisateurService().getAllUtilisateurs(null);
 		return existing;
 	}
 

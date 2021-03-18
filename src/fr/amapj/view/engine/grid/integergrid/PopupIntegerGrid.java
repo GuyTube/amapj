@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -64,6 +64,8 @@ abstract public class PopupIntegerGrid extends CorePopup
 	protected IntegerGridParam param = new IntegerGridParam();
 
 	private ShortCutManager shortCutManager;
+	
+	private Label labelMessageSpecifiqueBottom;
 
 	/**
 	 * 
@@ -178,30 +180,38 @@ abstract public class PopupIntegerGrid extends CorePopup
 		prixTotal.setWidth("100px");
 		footer1.addComponent(prixTotal);
 		
-		
 		// Construction globale
 		mainLayout.addComponent(table);
 		mainLayout.addComponent(footer0);
 		mainLayout.addComponent(footer1);
 		
+		// Message spécifique en bas de popup
+		if (param.messageSpecifiqueBottom != null)
+		{
+			labelMessageSpecifiqueBottom = new Label(param.messageSpecifiqueBottom);
+			labelMessageSpecifiqueBottom.addStyleName("popup-integer-grid-message");
+			mainLayout.addComponent(labelMessageSpecifiqueBottom);
+		}
+
 	}
 		
 	protected void createButtonBar()
 	{
 		if (param.readOnly)
 		{
-			Button ok = addDefaultButton("Continuer ...", e->handleContinuer());
+			addButtonBlank();
+			addDefaultButton("Continuer ...", e->handleContinuer());
 		}
 		else
 		{
 			if ((param.buttonCopyFirstLine==true) && (param.nbLig > 1))
 			{
-				Button copierButton = addButton("Copier la 1ère ligne partout", e->	handleCopier());
-				setButtonAlignement(copierButton, Alignment.TOP_LEFT);
+				addButton("Copier la 1ère ligne partout", e->	handleCopier());
 			}
 
+			addButtonBlank();
 			
-			Button cancelButton = addButton("Annuler", e->handleAnnuler());
+			addButton("Annuler", e->handleAnnuler());
 			
 			Button saveButton = addDefaultButton("Continuer ...", e->handleSauvegarder());
 			saveButton.addStyleName("primary");
@@ -541,5 +551,26 @@ abstract public class PopupIntegerGrid extends CorePopup
 			}
 		}
 	}
+	
+	protected void updateLabelMessageSpecifiqueBottom(String msg)
+	{
+		labelMessageSpecifiqueBottom.setValue(msg);
+	}
+	
+	protected void updateFirstCol(int lineNumber,String msg)
+	{
+		Item item = table.getItem(new Integer(lineNumber));
+		Label label = (Label) item.getItemProperty(new Integer(-1)).getValue();
+		label.setValue(msg);
+	}
 
+	/**
+	 * Cette methode doit etre appele apres la modification de la matrice de prix pour affichage correct du prix total  
+	 */
+	protected void updatePrixTotal()
+	{
+		param.initialize();
+		displayMontantTotal();
+	}
+	
 }

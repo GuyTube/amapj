@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,6 +22,7 @@
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.ComboBox;
 
 import fr.amapj.model.models.permanence.periode.NaturePeriodePermanence;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceUtilisateurDTO;
@@ -88,6 +89,10 @@ public class PeriodePermanenceVisualiserPart extends WizardFormPopup
 		
 		//
 		addComboEnumField("Nature de la période", "nature").setReadOnly(true);
+		
+		ComboBox box = addComboEnumField("Régle d'inscription sur une date", "regleInscription");
+		box.setReadOnly(true);
+		box.setWidth("600px");
 
 	
 		//

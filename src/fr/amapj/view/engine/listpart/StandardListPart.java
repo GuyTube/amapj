@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property;
@@ -47,7 +48,9 @@ import com.vaadin.ui.TextField;
 
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.template.ListPartView;
+import fr.amapj.view.engine.tools.BaseUiTools;
 import fr.amapj.view.engine.tools.TableItem;
 import fr.amapj.view.engine.tools.TableTools;
 
@@ -151,7 +154,7 @@ abstract public class StandardListPart<T extends TableItem> extends ListPartView
 	}
 	
 	
-	public void addButton(String label,ButtonType type, ListPartButtonListener listener)
+	public void addButton(String label,ButtonType type, Runnable listener)
 	{
 		Button newButton = new Button(label);
 		newButton.addClickListener(new Button.ClickListener()
@@ -160,7 +163,44 @@ abstract public class StandardListPart<T extends TableItem> extends ListPartView
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				listener.handleButtonPressed();
+				listener.run();
+			}
+		});
+		
+		//
+		ButtonHandler handler = new ButtonHandler();
+		handler.button = newButton;
+		handler.type = type;
+		buttons.add(handler);
+	}
+	
+	
+	
+	public void addButton(String label,ButtonType type, Function<T, CorePopup> popupSupplier)
+	{
+		Button newButton = new Button(label);
+		newButton.addClickListener(new Button.ClickListener()
+		{
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				T t = null;
+				if (multiSelect)
+				{
+					Set s = (Set) cdesTable.getValue();
+					if (s.size()==1)
+					{
+						t = (T) s.iterator().next();
+					}
+				}
+				else
+				{
+					t = (T) cdesTable.getValue();
+				}
+				
+				CorePopup popup = popupSupplier.apply(t);
+				popup.open(()->onPopupClose());
 			}
 		});
 		
@@ -236,34 +276,19 @@ abstract public class StandardListPart<T extends TableItem> extends ListPartView
 				}
 			}
 		});
-
-		HorizontalLayout toolbar = new HorizontalLayout();
-		toolbar.addStyleName("buttonbar");
-		
+	
+		// Dessin du titre 
 		Label title2 = new Label(getTitle());
 		title2.setSizeUndefined();
 		title2.addStyleName("title");	
-		
-		drawButton();
-		
-		for (ButtonHandler handler : buttons) 
-		{
-			toolbar.addComponent(handler.button);	
-		}
-		
-		if (searchField!=null)
-		{
-			toolbar.addComponent(searchField);
-			toolbar.setWidth("100%");
-			toolbar.setExpandRatio(searchField, 1);
-			toolbar.setComponentAlignment(searchField, Alignment.TOP_RIGHT);
-		}
-
-		
-	
 		addComponent(title2);
+		
+		// Dessin du selecteur si besoin
 		addSelectorComponent();
-		addComponent(toolbar);
+		
+		// Dessin de la barre des boutons
+		drawButtonBar();
+		
 		addExtraComponent();
 		addComponent(cdesTable);
 		setExpandRatio(cdesTable, 1);
@@ -273,6 +298,40 @@ abstract public class StandardListPart<T extends TableItem> extends ListPartView
 	}
 
 
+	/**
+	 * Suivant la taille de l'écran, le dessin de la barre est différent
+	 */
+	private void drawButtonBar() 
+	{
+		HorizontalLayout gtool = new HorizontalLayout();
+		gtool.setWidth("100%");
+		
+		HorizontalLayout toolbar = new HorizontalLayout();
+		toolbar.addStyleName("wrapping");
+		gtool.addComponent(toolbar);
+		gtool.setExpandRatio(toolbar, 1f);
+		
+	
+		drawButton();
+		
+		for (ButtonHandler handler : buttons) 
+		{
+			toolbar.addComponent(handler.button);	
+		}
+		
+		if (searchField!=null)
+		{
+			if (BaseUiTools.isWidthBelow(960))
+			{
+				toolbar.addComponent(searchField);
+			}
+			else
+			{
+				gtool.addComponent(searchField);	
+			}
+		}
+		addComponent(gtool);
+	}
 
 	private void updateFilters()
 	{

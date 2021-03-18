@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,12 +23,15 @@
 import java.util.List;
 
 import fr.amapj.model.engine.Identifiable;
+import fr.amapj.model.models.fichierbase.EtatProducteur;
 import fr.amapj.model.models.fichierbase.Producteur;
-import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.service.services.searcher.SearcherService;
-import fr.amapj.service.services.utilisateur.UtilisateurService;
+import fr.amapj.service.services.producteur.ProducteurService;
 import fr.amapj.view.engine.searcher.SearcherDefinition;
 
+/**
+ * Searcher de tous les producteurs actifs 
+ *
+ */
 public class SDProducteur implements SearcherDefinition
 {
 	@Override
@@ -40,7 +43,7 @@ public class SDProducteur implements SearcherDefinition
 	@Override
 	public List<? extends Identifiable> getAllElements(Object params)
 	{
-		return new SearcherService().getAllElements(Producteur.class);
+		return new ProducteurService().getAll(EtatProducteur.ACTIF);
 	}
 
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.amapj.common.CollectionUtils;
+import fr.amapj.model.models.fichierbase.EtatUtilisateur;
 import fr.amapj.service.services.edgenerator.excel.EGListeAdherent;
 import fr.amapj.service.services.edgenerator.excel.EGListeAdherent.Type;
 import fr.amapj.service.services.parametres.ParametresService;
@@ -111,7 +112,7 @@ public class ListeAdherentsView extends StandardListPart<UtilisateurDTO>
 	@Override
 	protected List<UtilisateurDTO> getLines() 
 	{
-		List<UtilisateurDTO> us = new UtilisateurService().getAllUtilisateurs(false);
+		List<UtilisateurDTO> us = new UtilisateurService().getAllUtilisateurs(EtatUtilisateur.ACTIF);
 		
 		for (UtilisateurDTO u : us)
 		{
@@ -147,7 +148,7 @@ public class ListeAdherentsView extends StandardListPart<UtilisateurDTO>
 	
 	public String getAllEmails()
 	{
-		List<UtilisateurDTO> us = new UtilisateurService().getAllUtilisateurs(false);
+		List<UtilisateurDTO> us = new UtilisateurService().getAllUtilisateurs(EtatUtilisateur.ACTIF);
 		
 		// On supprime tous les utilisateurs sans e mail 
 		us.removeIf(u-> UtilisateurUtil.canSendMailTo(u.email)==false);

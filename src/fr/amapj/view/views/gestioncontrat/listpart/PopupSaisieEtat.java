@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,11 +21,10 @@
  package fr.amapj.view.views.gestioncontrat.listpart;
 
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.OptionGroup;
+import com.vaadin.ui.TextField;
 
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.model.models.contrat.modele.EtatModeleContrat;
-import fr.amapj.service.services.archivage.ArchivageContratService;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratSummaryDTO;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
@@ -38,11 +37,8 @@ public class PopupSaisieEtat extends WizardFormPopup
 {
 	private ModeleContratSummaryDTO mcDto;
 	
-	private OptionGroup group;
-	
 	private EtatModeleContrat selectedValue;
-	
-	
+
 	static public enum Step
 	{
 		SAISIE , CONFIRMATION;	
@@ -52,10 +48,12 @@ public class PopupSaisieEtat extends WizardFormPopup
 	@Override
 	protected void configure()
 	{
-		add(Step.SAISIE,()->addSaisie(),()->checkSaisie());
+		add(Step.SAISIE,()->addSaisie());
 		add(Step.CONFIRMATION, ()->addConfirmation());
 	}
 	
+	
+
 	@Override
 	protected Class getEnumClass()
 	{
@@ -76,25 +74,7 @@ public class PopupSaisieEtat extends WizardFormPopup
 	protected void addSaisie()
 	{
 		String intro = computeIntro();
-		addLabel(intro, ContentMode.HTML);
-		
-		
-		
-		addLabel("Veuillez maintenant choisir le nouvel état de votre contrat", ContentMode.HTML);
-		
-		
-		group = new OptionGroup();
-		group.setHtmlContentAllowed(true);
-		
-		addLine(EtatModeleContrat.CREATION);
-		
-		addLine(EtatModeleContrat.ACTIF);
-		
-		addLine(EtatModeleContrat.ARCHIVE);
-		
-		form.addComponent(group);
-		
-			
+		addLabel(intro, ContentMode.HTML);	
 	}
 
 	private String computeIntro()
@@ -108,8 +88,11 @@ public class PopupSaisieEtat extends WizardFormPopup
 			break;
 
 		case ACTIF:
-			str = str +"Il est donc visible par tous les amapiens.";
+			str = str +"Il est donc visible par tous les amapiens. Si vous le passez à l'état CREATION, alors il ne sera plus visible par les amapiens";
 			break;
+			
+		default:
+			throw new AmapjRuntimeException("etat="+mcDto.etat);
 		}
 		
 		str = str +"<br/><br/>";
@@ -118,112 +101,28 @@ public class PopupSaisieEtat extends WizardFormPopup
 	}
 	
 	
-	static public class Line
-	{
-		public EtatModeleContrat etat;
-		
-		public Line(EtatModeleContrat etat)
-		{
-			this.etat = etat;
-		}
-		
-		public String toString()
-		{
-			return etat+"<br/><br/>";
-		}
-		
-	}
-
-
-	private void addLine(EtatModeleContrat etatToDisplay)
-	{
-		Line line = new Line(etatToDisplay);
-		group.addItem(line);
-		
-		if (etatToDisplay==mcDto.etat)
-		{
-			group.setItemEnabled(line, false);
-		}
-	}
-	
-	
-	private String checkSaisie()
-	{
-		selectedValue = ((Line) group.getValue()).etat;
-		
-		if (selectedValue==null)
-		{
-			return "Vous devez saisir une valeur";
-		}
-			
-		switch (mcDto.etat)
-		{
-		case CREATION:
-			return checkFromCreationTo(selectedValue);
-
-		case ACTIF:
-			return checkFromActifTo(selectedValue);
-
-		default:
-			throw new AmapjRuntimeException("mcDto.etat="+mcDto.etat);
-		}
-		
-		
-	}
-	
-	
-
-
-	private String checkFromCreationTo(EtatModeleContrat etatModeleContrat)
-	{
-		switch (etatModeleContrat)
-		{
-		// CREATION vers ACTIF : toujours possible 
-		case ACTIF:
-			return null;
-		
-		// CREATION vers ARCHIVE : toujours  impossible 
-		case ARCHIVE:
-			return "Vous ne pouvez pas passer un contrat de l'état CREATION vers ARCHIVE. Il doit d'abord passer par l'état ACTIF";
-		
-		default:
-			throw new AmapjRuntimeException("etatModeleContrat="+etatModeleContrat);
-		}
-		
-	}
-
-
-	private String checkFromActifTo(EtatModeleContrat etatModeleContrat)
-	{
-		switch (etatModeleContrat)
-		{
-		// ACTIF vers CREATION : toujours possible 
-		case CREATION:
-			return null;
-		
-		// ACTIF vers ARCHIVE : possible apres verification 
-		case ARCHIVE:
-			String str = new ArchivageContratService().checkIfArchivable(mcDto.id);
-			if (str!=null)
-			{
-				str = "Vous ne pouvez pas archiver ce contrat.<br/><br/>"+str;
-			}
-			return str;
-		
-		default:
-			throw new AmapjRuntimeException("etatModeleContrat="+etatModeleContrat);
-		}
-	}
-
 	
 	private void addConfirmation()
 	{
+		selectedValue = computeNewEtat();
 		String str = "Vous allez passer votre contrat du statut "+mcDto.etat+" au statut "+selectedValue+".<br/><br/>Cliquez sur Sauvegardez pour confirmer cette modification, ou Annuler pour ne rien faire.";
-		
 		addLabel(str, ContentMode.HTML);
 	}
 	
-	
+	private EtatModeleContrat computeNewEtat() 
+	{
+		switch (mcDto.etat)
+		{
+		case CREATION:
+			return EtatModeleContrat.ACTIF;
+
+		case ACTIF:
+			return EtatModeleContrat.CREATION;
+			
+		default:
+			throw new AmapjRuntimeException("etat="+mcDto.etat);
+		}
+	}
 
 	protected void performSauvegarder()
 	{

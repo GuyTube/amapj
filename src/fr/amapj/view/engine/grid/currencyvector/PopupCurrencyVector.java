@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -73,9 +73,6 @@ abstract public class PopupCurrencyVector extends CorePopup
 	
 	private Label montantTotalPaiement;
 	
-	private String message = 	"Une proposition de paiement a été calculée et est affichée ci dessous.<br/>"+
-								"Vous pouvez modifier cette proposition en saisissant directement les montants en face de chaque mois<br/>"+
-								"Le dernier mois est calculé automatiquement pour ajuster le contrat<br/><br/>";
 
 	/**
 	 * 
@@ -109,10 +106,11 @@ abstract public class PopupCurrencyVector extends CorePopup
 			mainLayout.addComponent(messageSpeLabel);
 		}
 		
-		
-		if ((param.readOnly==false) && (param.computeLastLine==true))
+		if (param.messageSpecifique3 != null)
 		{
-			mainLayout.addComponent(new Label(message, ContentMode.HTML));
+			Label messageSpeLabel = new Label(param.messageSpecifique3,ContentMode.HTML);
+			messageSpeLabel.addStyleName("popup-currency-vector-message");
+			mainLayout.addComponent(messageSpeLabel);
 		}
 		
 		if (param.avoirInitial!=0)
@@ -271,55 +269,23 @@ abstract public class PopupCurrencyVector extends CorePopup
 	{
 		if (param.readOnly)
 		{
-			Button ok = addDefaultButton("OK", new Button.ClickListener()
-			{
-
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleAnnuler();
-				}
-			});
+			addButtonBlank();
+			Button ok = addDefaultButton("OK", e->handleAnnuler());
 			ok.addStyleName("primary");
 		}
 		else
 		{
 			if (param.nbLig > 2)
 			{
-				Button copierButton = addButton("Copier la 1ère ligne partout", new Button.ClickListener()
-				{
-
-					@Override
-					public void buttonClick(ClickEvent event)
-					{
-						handleCopier();
-					}
-				});
-				setButtonAlignement(copierButton, Alignment.TOP_LEFT);
+				addButton("Copier la 1ère ligne partout", e->handleCopier());
 			}
 			
-			Button cancelButton = addButton("Annuler", new Button.ClickListener()
-			{
-
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleAnnuler();
-				}
-			});
-
-			Button saveButton = addDefaultButton("Sauvegarder", new Button.ClickListener()
-			{
-
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					handleSauvegarder();
-				}
-			});
-			saveButton.addStyleName("primary");
-
+			addButtonBlank();
 			
+			addButton("Annuler", e->handleAnnuler());
+
+			Button saveButton = addDefaultButton("Sauvegarder", e->	handleSauvegarder());
+			saveButton.addStyleName("primary");
 		}
 
 	}

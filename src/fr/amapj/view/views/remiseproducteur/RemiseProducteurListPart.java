@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -34,12 +34,11 @@ import fr.amapj.service.services.remiseproducteur.RemiseProducteurService;
 import fr.amapj.view.engine.excelgenerator.TelechargerPopup;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
@@ -50,7 +49,7 @@ import fr.amapj.view.views.common.contratselector.ContratSelectorPart;
  * Gestion des remises 
  */
 @SuppressWarnings("serial")
-public class RemiseProducteurListPart extends StandardListPart<RemiseDTO> implements PopupSuppressionListener 
+public class RemiseProducteurListPart extends StandardListPart<RemiseDTO>
 {
 	private ContratSelectorPart contratSelectorPart;
 
@@ -79,7 +78,7 @@ public class RemiseProducteurListPart extends StandardListPart<RemiseDTO> implem
 	protected void addSelectorComponent()
 	{
 		// Partie choix du contrat
-		contratSelectorPart = new ContratSelectorPart(this);
+		contratSelectorPart = new ContratSelectorPart(this,true);
 		HorizontalLayout toolbar1 = contratSelectorPart.getChoixContratComponent();
 		
 		addComponent(toolbar1);
@@ -153,18 +152,10 @@ public class RemiseProducteurListPart extends StandardListPart<RemiseDTO> implem
 
 	private void handleSupprimer()
 	{
-		
 		RemiseDTO remiseDTO = getSelectedLine();
 		String text = "Etes vous sûr de vouloir supprimer la remise de "+remiseDTO.moisRemise+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,remiseDTO.id,true);
-		SuppressionPopup.open(confirmPopup, this);	
-		
-	}
-	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new RemiseProducteurService().deleteRemise(idItemToSuppress);
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,remiseDTO.id,true,e->new RemiseProducteurService().deleteRemise(e));
+		confirmPopup.open(this);		
 	}
 
 
@@ -203,21 +194,31 @@ public class RemiseProducteurListPart extends StandardListPart<RemiseDTO> implem
 		
 		for (PaiementRemiseDTO paiement : remiseDTO.paiements)
 		{
-			String txt = paiement.nomUtilisateur+" "+paiement.prenomUtilisateur+" - "+new CurrencyTextFieldConverter().convertToString(paiement.montant)+" € ";
-			if (paiement.commentaire1!=null)
-			{
-				txt = txt+" - "+paiement.commentaire1;
-			}
-			if (paiement.commentaire2!=null)
-			{
-				txt = txt+" - "+paiement.commentaire2;
-			}
-			txt = txt+"<br/>";
-			buf.append(txt);
+			String text = paiement.nomUtilisateur+" "+paiement.prenomUtilisateur+" - "+new CurrencyTextFieldConverter().convertToString(paiement.montant)+" € ";
+			text = add(text,paiement.commentaire1);
+			text = add(text,paiement.commentaire2);
+			text = add(text,paiement.commentaire3);
+			text = add(text,paiement.commentaire4);
+			
+			
+			text = text+"<br/>";
+			buf.append(text);
 		}
 		
 		
 		return buf.toString();
+	}
+	
+	private String  add(String text, String commentaire) 
+	{
+		if (commentaire!=null)
+		{
+			return text+" - "+commentaire;
+		}
+		else
+		{
+			return text;
+		}
 	}
 
 	

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -59,6 +59,9 @@ public class ChoixActionModificationPeriodePermanence extends SwitchPopup
 		addSeparator();
 		
 		addLine("Positionner les rôles pour toutes les dates en masse", new PopupUpdateAllRole(idPeriodePermanence));
+		addSeparator();
+		
+		addLine("Modifier les régles d'inscriptions sur une date", new PopupRegleInscriptionPeriodePermanence(idPeriodePermanence));
 	}
 
 }

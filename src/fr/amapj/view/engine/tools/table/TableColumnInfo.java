@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,7 +20,6 @@
  */
  package fr.amapj.view.engine.tools.table;
 
-import fr.amapj.service.engine.generator.CoreGenerator;
 import fr.amapj.view.engine.searcher.SearcherDefinition;
 import fr.amapj.view.engine.tools.table.complex.ComplexTableBuilder.CallBack;
 import fr.amapj.view.engine.tools.table.complex.ComplexTableBuilder.ToGenerator;
@@ -45,8 +44,11 @@ public class TableColumnInfo<T>
 	public ToGenerator<T> generator;
 	
 	public SearcherDefinition searcher;
+	
+	// Pour les combo box
+	public Class<? extends Enum> enumClazz;
 
-	public TableColumnInfo(String title, String property,boolean editable,int width,TableColumnType type, ToValue<T> toVal,CallBack<T> onClic,ToGenerator<T> generator,SearcherDefinition searcher)
+	public TableColumnInfo(String title, String property,boolean editable,int width,TableColumnType type, ToValue<T> toVal,CallBack<T> onClic,ToGenerator<T> generator,SearcherDefinition searcher, Class<? extends Enum> enumClazz)
 	{
 		super();
 		this.title = title;
@@ -58,6 +60,7 @@ public class TableColumnInfo<T>
 		this.onClic = onClic;
 		this.generator = generator;
 		this.searcher = searcher;
+		this.enumClazz = enumClazz;
 	}
 	
 	

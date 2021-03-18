@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,13 +23,13 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.vaadin.data.Container;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.VerticalLayout;
 
+import fr.amapj.common.SafeHtmlUtils;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 
 /**
@@ -110,6 +110,7 @@ abstract public class SwitchPopup extends CorePopup
 
 	protected void createButtonBar()
 	{
+		addButtonBlank();
 		addButton("Annuler", e->handleAnnuler());
 		addDefaultButton("Continuer ...", e->handleContinuer());
 	}

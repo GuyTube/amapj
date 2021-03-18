@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -19,6 +19,8 @@
  * 
  */
  package fr.amapj.service.services.utilisateur;
+
+import java.util.Date;
 
 import fr.amapj.model.models.fichierbase.EtatUtilisateur;
 import fr.amapj.view.engine.tools.TableItem;
@@ -41,6 +43,10 @@ public class UtilisateurDTO implements TableItem
 	public String email;
 	
 	public EtatUtilisateur etatUtilisateur;
+	
+	public Date dateCreation;
+	
+	public Date dateModification;
 	
 	public String numTel1;
 	
@@ -160,6 +166,26 @@ public class UtilisateurDTO implements TableItem
 	public void setRoles(String roles)
 	{
 		this.roles = roles;
+	}
+
+	public Date getDateCreation() 
+	{
+		return dateCreation;
+	}
+
+	public void setDateCreation(Date dateCreation) 
+	{
+		this.dateCreation = dateCreation;
+	}
+
+	public Date getDateModification() 
+	{
+		return dateModification;
+	}
+
+	public void setDateModification(Date dateModification) 
+	{
+		this.dateModification = dateModification;
 	}
 	
 	

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -58,7 +58,7 @@ public class PopupSaisieParametres extends WizardFormPopup
 	 */
 	public PopupSaisieParametres(ParametresDTO dto)
 	{
-		setWidth(80);
+		setWidth(95);
 		popupTitle = "Modification des paramètres";
 
 		this.dto = dto;
@@ -117,6 +117,9 @@ public class PopupSaisieParametres extends WizardFormPopup
 		addTextField("Adresse mail qui sera en copie de tous les mails envoyés par le logiciel", "mailCopyTo");
 		
 		addTextField("Adresse mail du destinataire des sauvegardes quotidiennes", "backupReceiver");
+		
+		RichTextArea f =  addRichTextAeraField("Texte ajouté en bas des mails envoyés", "sendingMailFooter");
+		f.setHeight(4, Unit.CM);
 		
 	}
 	

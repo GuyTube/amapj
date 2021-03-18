@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,8 +20,13 @@
  */
  package fr.amapj.view.engine.popup.formpopup.fieldlink;
 
+import java.util.Arrays;
+
+import org.vaadin.openesignforms.ckeditor.CKEditorTextField;
+
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
 import fr.amapj.model.models.param.ChoixOuiNon;
@@ -32,6 +37,8 @@ import fr.amapj.view.engine.searcher.Searcher;
 /**
  * Permet de créer un lien classique entre un choix OUI/NON et la saisie dans un searcher
  * et la présence eventuelle d'un texte à saisir 
+ * 
+ * TODO supprimer cette classe et la remplacer par FieldLink  
  *
  */
 public class ClassicFieldLink
@@ -42,6 +49,12 @@ public class ClassicFieldLink
 	public Searcher searcher;
 	
 	public TextField textField;
+	
+	public TextField textField2;
+	
+	public TextArea textArea;
+	
+	public CKEditorTextField ckEditor;
 
 	// Sera appliqué sur le searcher
 	NotNullValidatorConditionnal notNull;
@@ -59,7 +72,7 @@ public class ClassicFieldLink
 	public void doLink()
 	{
 		//
-		notNull.noCheckIf(box, ChoixOuiNon.NON);
+		notNull.checkIf(box, Arrays.asList(ChoixOuiNon.OUI),"Choix OUI/NON"); // TODO 
 		
 		//
 		box.addValueChangeListener(e->valueChanged(e));
@@ -71,6 +84,20 @@ public class ClassicFieldLink
 		if (textField!=null)
 		{
 			textField.setEnabled(box.getValue()==ChoixOuiNon.OUI);
+		}
+		if (textField2!=null)
+		{
+			textField2.setEnabled(box.getValue()==ChoixOuiNon.OUI);
+		}
+		
+		if (textArea!=null)
+		{
+			textArea.setEnabled(box.getValue()==ChoixOuiNon.OUI);
+		}
+		if (ckEditor!=null)
+		{
+			// Attention : il y a un bug dans le wrapper ckeditor, le setEnabled ne fonctionne pas
+			ckEditor.setViewWithoutEditor(!(box.getValue()==ChoixOuiNon.OUI));
 		}
 		
 		
@@ -99,6 +126,34 @@ public class ClassicFieldLink
 				textField.setValue("");
 			}
 		}
+		
+		if (textField2!=null)
+		{
+			textField2.setEnabled(choix==ChoixOuiNon.OUI);
+			if (choix==ChoixOuiNon.NON)
+			{
+				textField2.setValue("");
+			}
+		}
+		
+		if (textArea!=null)
+		{
+			textArea.setEnabled(choix==ChoixOuiNon.OUI);
+			if (choix==ChoixOuiNon.NON)
+			{
+				textArea.setValue("");
+			}
+		}
+		if (ckEditor!=null)
+		{
+			// Attention : il y a un bug dans le wrapper ckeditor, le setEnabled ne fonctionne pas
+			ckEditor.setViewWithoutEditor(!(choix==ChoixOuiNon.OUI));
+			if (choix==ChoixOuiNon.NON)
+			{
+				ckEditor.setValue("");
+			}
+		}
+		
 	}
 	
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -163,6 +163,27 @@ public class EnumSearcher
 		}
 				
 		comboBox.setValue(enumeration);
+		
+		return comboBox;
+	}
+	
+	
+	/**
+	 * Permet de créer une combo box permettant de choisir parmi une liste de Enum
+	 * pour etre utilisé dans les tableaux
+	 *  
+	 */
+	static public <T extends Enum<T>> ComboBox createEnumSearcher(String title,Class<? extends Enum> enumClazz)
+	{
+		ComboBox comboBox = new ComboBox(title);
+		
+		EnumSet<T> enums = EnumSet.allOf(enumClazz);
+		for (T en : enums)
+		{
+			String caption = en.toString();	
+			comboBox.addItem(en);
+			comboBox.setItemCaption(en, caption);
+		}
 		
 		return comboBox;
 	}

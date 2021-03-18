@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -95,14 +95,10 @@ public class RemiseEditorPart extends WizardFormPopup
 		{
 			String montant = new CurrencyTextFieldConverter().convertToString(paiement.montant)+" €";
 			text = text+paiement.nomUtilisateur+" "+paiement.prenomUtilisateur+" - Montant = "+montant;
-			if (paiement.commentaire1!=null)
-			{
-				text = text+" - "+paiement.commentaire1;
-			}
-			if (paiement.commentaire2!=null)
-			{
-				text = text+" - "+paiement.commentaire2;
-			}
+			text = add(text,paiement.commentaire1);
+			text = add(text,paiement.commentaire2);
+			text = add(text,paiement.commentaire3);
+			text = add(text,paiement.commentaire4);
 			text=text+"<br/>";
 		}
 		
@@ -111,6 +107,18 @@ public class RemiseEditorPart extends WizardFormPopup
 	}
 	
 	
+	private String  add(String text, String commentaire) 
+	{
+		if (commentaire!=null)
+		{
+			return text+" - "+commentaire;
+		}
+		else
+		{
+			return text;
+		}
+	}
+
 	private void addFieldConfirmation()
 	{
 		// Titre

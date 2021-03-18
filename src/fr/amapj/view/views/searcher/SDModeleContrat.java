@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -46,7 +46,7 @@ public class SDModeleContrat implements SearcherDefinition
 	public String toString(Identifiable identifiable)
 	{
 		ModeleContrat u = (ModeleContrat) identifiable;
-		return u.getNom();
+		return u.nom;
 	}
 	
 

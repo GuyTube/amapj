@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,6 +22,7 @@
 
 import java.util.List;
 
+import fr.amapj.model.models.fichierbase.EtatUtilisateur;
 import fr.amapj.service.services.edgenerator.excel.EGListeAdherent;
 import fr.amapj.service.services.edgenerator.excel.EGListeAdherent.Type;
 import fr.amapj.service.services.utilisateur.UtilisateurDTO;
@@ -30,9 +31,8 @@ import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
-import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.tools.DateTimeToStringConverter;
+import fr.amapj.view.views.common.amapientelecharger.TelechargerAmapien;
 import fr.amapj.view.views.compte.PopupSaisiePassword;
 
 
@@ -41,7 +41,7 @@ import fr.amapj.view.views.compte.PopupSaisiePassword;
  *
  */
 @SuppressWarnings("serial")
-public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implements PopupSuppressionListener
+public class UtilisateurListPart extends StandardListPart<UtilisateurDTO>
 {
 
 	public UtilisateurListPart()
@@ -62,9 +62,10 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 	{
 		addButton("Créer un nouvel utilisateur", ButtonType.ALWAYS, ()->handleAjouter());
 		addButton("Modifier", ButtonType.EDIT_MODE, ()->handleEditer());
-		addButton("Supprimer", ButtonType.EDIT_MODE, ()->handleSupprimer());
+		addButton("Voir", ButtonType.EDIT_MODE, ()->handleVoir());
 		addButton("Changer le mot de passe", ButtonType.EDIT_MODE, ()->handleChangerPassword());
-		addButton("Activer/Désactiver", ButtonType.EDIT_MODE, ()->handleChangeState());
+		addButton("Archiver", ButtonType.EDIT_MODE, ()->handleChangeState());
+		addButton("Télécharger", ButtonType.EDIT_MODE, ()->handleTelecharger());
 		addButton("Autre...", ButtonType.ALWAYS, ()->handleMore());
 
 		addSearchField("Rechercher par nom ou prénom");
@@ -73,7 +74,7 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 	@Override
 	protected void addExtraComponent() 
 	{
-		addComponent(LinkCreator.createLink(new EGListeAdherent(Type.AVEC_INACTIF)));
+		addComponent(LinkCreator.createLink(new EGListeAdherent(Type.STD)));
 		
 	}
 
@@ -81,11 +82,14 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 	protected void drawTable() 
 	{
 		// Titre des colonnes
-		cdesTable.setVisibleColumns(new String[] { "nom", "prenom" ,"roles","etatUtilisateur" });
+		cdesTable.setVisibleColumns(new String[] { "nom", "prenom" ,"roles","etatUtilisateur" ,"dateCreation"});
 		cdesTable.setColumnHeader("nom","Nom");
 		cdesTable.setColumnHeader("prenom","Prenom");
 		cdesTable.setColumnHeader("roles","Role");
 		cdesTable.setColumnHeader("etatUtilisateur","Etat");
+		cdesTable.setColumnHeader("dateCreation","Date création");
+		
+		cdesTable.setConverter("dateCreation", new DateTimeToStringConverter());
 	}
 
 
@@ -93,7 +97,7 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 	@Override
 	protected List<UtilisateurDTO> getLines() 
 	{
-		return new UtilisateurService().getAllUtilisateurs(true);
+		return new UtilisateurService().getAllUtilisateurs(EtatUtilisateur.ACTIF);
 	}
 
 
@@ -120,7 +124,7 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 	private void handleChangeState()
 	{
 		UtilisateurDTO dto = getSelectedLine();
-		FormPopup.open(new PopupSaisieEtatUtilisateur(dto),this);
+		FormPopup.open(new PopupUtilisateurArchiver(dto),this);
 	}
 	
 
@@ -131,28 +135,28 @@ public class UtilisateurListPart extends StandardListPart<UtilisateurDTO> implem
 	
 	private void handleMore()
 	{
-		ChoixActionUtilisateur.open(new ChoixActionUtilisateur(), this);
+		UtilisateurDTO dto = getSelectedLine();
+		ChoixActionUtilisateur.open(new ChoixActionUtilisateur(dto), this);
 	}
 
 
 	protected void handleEditer()
 	{
 		UtilisateurDTO dto = getSelectedLine();
-		ModificationUtilisateurEditorPart.open(new ModificationUtilisateurEditorPart(dto), this);
+		ModificationUtilisateurEditorPart.open(new ModificationUtilisateurEditorPart(dto.id), this);
 	}
-
-	protected void handleSupprimer()
+	
+	protected void handleTelecharger()
 	{
 		UtilisateurDTO dto = getSelectedLine();
-		String text = "Etes vous sûr de vouloir supprimer l'utilisateur "+dto.nom+" "+dto.prenom+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
-		SuppressionPopup.open(confirmPopup, this);		
+		TelechargerAmapien.handleTelecharger(dto.id, this);
 	}
 	
 	
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
+	protected void handleVoir()
 	{
-		new UtilisateurService().deleteUtilisateur(idItemToSuppress);
-	}	
-	
+		UtilisateurDTO dto = getSelectedLine();
+		PopupUtilisateurVoirPart.open(new PopupUtilisateurVoirPart(dto.id), this);
+	}
+
 }

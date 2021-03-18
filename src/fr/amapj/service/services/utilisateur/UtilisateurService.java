@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,11 +21,17 @@
  package fr.amapj.service.services.utilisateur;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
+import fr.amapj.common.CollectionUtils;
+import fr.amapj.common.DateUtils;
+import fr.amapj.common.FormatUtils;
 import fr.amapj.common.LongUtils;
 import fr.amapj.common.RandomUtils;
 import fr.amapj.model.engine.transaction.DbRead;
@@ -33,15 +39,26 @@ import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
 import fr.amapj.model.models.acces.RoleList;
 import fr.amapj.model.models.fichierbase.EtatUtilisateur;
+import fr.amapj.model.models.fichierbase.Produit;
 import fr.amapj.model.models.fichierbase.Utilisateur;
+import fr.amapj.model.models.permanence.periode.PeriodePermanenceUtilisateur;
+import fr.amapj.model.models.permanence.reel.PermanenceCell;
 import fr.amapj.service.engine.tools.DbToDto;
 import fr.amapj.service.services.access.AccessManagementService;
+import fr.amapj.service.services.archivage.tools.SuppressionState;
+import fr.amapj.service.services.archivage.tools.SuppressionState.SStatus;
 import fr.amapj.service.services.authentification.PasswordManager;
+import fr.amapj.service.services.gestioncotisation.GestionCotisationService;
+import fr.amapj.service.services.gestioncotisation.PeriodeCotisationUtilisateurDTO;
 import fr.amapj.service.services.mailer.MailerMessage;
 import fr.amapj.service.services.mailer.MailerService;
 import fr.amapj.service.services.notification.DeleteNotificationService;
+import fr.amapj.service.services.notification.PermanenceNotificationService;
+import fr.amapj.service.services.parametres.ParametresArchivageDTO;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
+import fr.amapj.service.services.permanence.periode.PeriodePermanenceService;
+import fr.amapj.service.services.permanence.periode.SmallPeriodePermanenceDTO;
 import fr.amapj.service.services.utilisateur.envoimail.EnvoiMailDTO;
 import fr.amapj.service.services.utilisateur.envoimail.EnvoiMailUtilisateurDTO;
 import fr.amapj.service.services.utilisateur.envoimail.StatusEnvoiMailDTO;
@@ -62,12 +79,14 @@ public class UtilisateurService
 	/**
 	 * Permet de charger la liste de tous les utilisateurs
 	 * dans une transaction en lecture
+	 * 
+	 * si etat = null, alors on charge tous les utilisateurs, quelque soit leur etat
 	 */
 	@DbRead
-	public List<UtilisateurDTO> getAllUtilisateurs(boolean includeInactif)
+	public List<UtilisateurDTO> getAllUtilisateurs(EtatUtilisateur etat)
 	{
 		EntityManager em = TransactionHelper.getEm();
-		List<Utilisateur> us = getUtilisateurs(includeInactif);
+		List<Utilisateur> us = getUtilisateurs(etat);
 		return DbToDto.transform(us, (Utilisateur u) ->createUtilisateurDto(em, u));
 	}
 
@@ -77,19 +96,29 @@ public class UtilisateurService
 		UtilisateurDTO dto = new UtilisateurDTO();
 		
 		dto.id = u.getId();
-		dto.nom = u.getNom();
-		dto.prenom = u.getPrenom();
+		dto.nom = u.nom;
+		dto.prenom = u.prenom;
 		dto.roles = new AccessManagementService().getRoleAsString(em,u);
-		dto.email = u.getEmail();
-		dto.etatUtilisateur = u.getEtatUtilisateur();
+		dto.email = u.email;
+		dto.etatUtilisateur = u.etatUtilisateur;
+		dto.dateCreation = u.dateCreation;
+		dto.dateModification = u.dateModification;
 		
-		dto.numTel1 = u.getNumTel1();
-		dto.numTel2 = u.getNumTel2();
-		dto.libAdr1 = u.getLibAdr1();
-		dto.codePostal = u.getCodePostal();
-		dto.ville = u.getVille();
+		dto.numTel1 = u.numTel1;
+		dto.numTel2 = u.numTel2;
+		dto.libAdr1 = u.libAdr1;
+		dto.codePostal = u.codePostal;
+		dto.ville = u.ville;
 		
 		return dto;
+	}
+	
+	@DbRead
+	public UtilisateurDTO loadUtilisateurDto(Long idUtilisateur)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		Utilisateur u = em.find(Utilisateur.class, idUtilisateur);
+		return createUtilisateurDto(em, u);
 	}
 
 
@@ -102,15 +131,16 @@ public class UtilisateurService
 		EntityManager em = TransactionHelper.getEm();
 		
 		Utilisateur u = em.find(Utilisateur.class, dto.id);
-		u.setNom(dto.nom);
-		u.setPrenom(dto.prenom);
-		u.setEmail(dto.email);
+		u.nom = dto.nom;
+		u.prenom = dto.prenom;
+		u.email = dto.email;
+		u.dateModification = DateUtils.getDate();
 		
-		u.setNumTel1(dto.numTel1);
-		u.setNumTel2(dto.numTel2);
-		u.setLibAdr1(dto.libAdr1);
-		u.setCodePostal(dto.codePostal);
-		u.setVille(dto.ville);
+		u.numTel1 = dto.numTel1;
+		u.numTel2 = dto.numTel2;
+		u.libAdr1 = dto.libAdr1;
+		u.codePostal = dto.codePostal;
+		u.ville = dto.ville;
 		
 	}
 
@@ -124,7 +154,8 @@ public class UtilisateurService
 		EntityManager em = TransactionHelper.getEm();
 		
 		Utilisateur u = em.find(Utilisateur.class, id);
-		u.setEtatUtilisateur(newValue);
+		u.etatUtilisateur = newValue;
+		u.dateModification = DateUtils.getDate();
 	}
 	
 	
@@ -150,14 +181,15 @@ public class UtilisateurService
 		String email = utilisateurDTO.email.trim().toLowerCase();
 		
 		Utilisateur u = new Utilisateur();
-		u.setNom(nom);
-		u.setPrenom(prenom);
-		u.setEmail(email);
-		u.setNumTel1(utilisateurDTO.numTel1);
-		u.setNumTel2(utilisateurDTO.numTel2);
-		u.setLibAdr1(utilisateurDTO.libAdr1);
-		u.setCodePostal(utilisateurDTO.codePostal);
-		u.setVille(utilisateurDTO.ville);
+		u.nom = nom;
+		u.prenom = prenom;
+		u.email = email;
+		u.dateCreation = DateUtils.getDate();
+		u.numTel1 = utilisateurDTO.numTel1;
+		u.numTel2 = utilisateurDTO.numTel2;
+		u.libAdr1 = utilisateurDTO.libAdr1;
+		u.codePostal = utilisateurDTO.codePostal;
+		u.ville = utilisateurDTO.ville;
 
 		em.persist(u);
 		
@@ -180,7 +212,7 @@ public class UtilisateurService
 		if (sendMail==true)
 		{
 			ParametresDTO param = new ParametresService().getParametres();
-			String link = param.getUrl()+"?username="+u.getEmail();
+			String link = param.getUrl()+"?username="+u.email;
 		
 			StringBuffer buf = new StringBuffer();
 			buf.append("<h2>"+param.nomAmap+"</h2>");
@@ -241,6 +273,12 @@ public class UtilisateurService
 			throw new UnableToSuppressException("Cet utilisateur posséde "+r+" contrats.");
 		}
 		
+		List<PeriodeCotisationUtilisateurDTO> ps = new GestionCotisationService().getPeriodeCotisation(id);
+		if (ps.size()>0)
+		{
+			throw new UnableToSuppressException("Cet utilisateur est indiqué comme cotisant sur les périodes de cotisation suivantes :"+CollectionUtils.asStdString(ps, e->e.periodeNom));
+		}
+		
 		List<RoleList> rs = new AccessManagementService().getUserRole(u, em);
 		checkRole(rs,RoleList.ADMIN);
 		checkRole(rs,RoleList.TRESORIER);
@@ -248,6 +286,8 @@ public class UtilisateurService
 		checkRole(rs,RoleList.REFERENT);
 		
 		new DeleteNotificationService().deleteAllNotificationDoneUtilisateur(em, u);
+		
+		new PeriodePermanenceService().deleteUtilisateur(em,u);
 		
 		em.remove(u);
 	}
@@ -271,21 +311,30 @@ public class UtilisateurService
 		return LongUtils.toInt(q.getSingleResult());
 	}
 	
-	
+	// 
+	@DbRead
+	public int countContrat(Long idUtilisateur)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		Utilisateur u = em.find(Utilisateur.class, idUtilisateur);
+		return countContrat(u,em);
+	}
 	
 	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES UTILISATEURS POUR LE SEARCHER
 	
 	/**
 	 * Permet de charger la liste de tous les utilisateurs
 	 * dans une transaction en lecture
+	 * 
+	 * si etat = null, alors on charge tous les utilisateurs, quelque soit leur etat
 	 */
 	@DbRead
-	public List<Utilisateur> getUtilisateurs(boolean includeInactif)
+	public List<Utilisateur> getUtilisateurs(EtatUtilisateur etat)
 	{
 		EntityManager em = TransactionHelper.getEm();
 		
 		Query q;
-		if (includeInactif)
+		if (etat==null)
 		{
 			q = em.createQuery("select u from Utilisateur u " +
 					"order by u.nom,u.prenom");
@@ -295,7 +344,7 @@ public class UtilisateurService
 			q = em.createQuery("select u from Utilisateur u " +
 					"where u.etatUtilisateur=:etat " +
 					"order by u.nom,u.prenom");
-				q.setParameter("etat", EtatUtilisateur.ACTIF);
+				q.setParameter("etat", etat);
 		}
 		List<Utilisateur> us = q.getResultList();
 		return us;
@@ -396,7 +445,7 @@ public class UtilisateurService
 	{
 		EntityManager em = TransactionHelper.getEm();
 		Utilisateur utilisateur = em.find(Utilisateur.class, idUtilisateur);
-		String email=utilisateur.getEmail();
+		String email=utilisateur.email;
 		return email;
 	}
 
@@ -439,7 +488,25 @@ public class UtilisateurService
 		
 	}
 	
+	/**
+	 *
+	 */
+	@DbRead
+	public String prettyString(Long idUtilisateur)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		if (idUtilisateur==null)
+		{
+			return "";
+		}
+		
+		Utilisateur p = em.find(Utilisateur.class, idUtilisateur);
+		return p.nom+" "+p.prenom;
+	}
 	
 	
+	
+
 
 }

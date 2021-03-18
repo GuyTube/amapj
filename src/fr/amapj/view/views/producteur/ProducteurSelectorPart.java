@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -55,12 +55,13 @@ public class ProducteurSelectorPart
 	private boolean isCompactMode;
 
 	/**
-	 * 
+	 * si actifOnly = true : il y a uniquement les producteurs actifs
+	 * si actifOnly = false : il y a tous les producteurs (actifs et inactifs)
 	 */
-	public ProducteurSelectorPart(PopupListener listener)
+	public ProducteurSelectorPart(PopupListener listener,boolean actifOnly)
 	{
 		this.listener = listener;
-		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(),SessionManager.getUserId());
+		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(),SessionManager.getUserId(),actifOnly);
 		isCompactMode = BaseUiTools.isCompactMode();
 	}
 

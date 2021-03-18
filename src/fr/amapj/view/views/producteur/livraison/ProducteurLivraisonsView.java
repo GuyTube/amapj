@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -81,7 +81,7 @@ public class ProducteurLivraisonsView extends FrontOfficeView implements PopupLi
 	@Override
 	public void enter()
 	{
-		producteurSelector = new ProducteurSelectorPart(this);
+		producteurSelector = new ProducteurSelectorPart(this,true);
 		
 		addComponent(producteurSelector.getChoixProducteurComponent());
 

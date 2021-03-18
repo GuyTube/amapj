@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -32,7 +32,7 @@ public class SDPeriodeCotisation implements SearcherDefinition
 	@Override
 	public String getTitle()
 	{
-		return "Période de cotisation";
+		return "Période d'adhesion";
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class SDPeriodeCotisation implements SearcherDefinition
 	public String toString(Identifiable identifiable)
 	{
 		PeriodeCotisation u = (PeriodeCotisation) identifiable;
-		return u.getNom();
+		return u.nom;
 	}
 	
 

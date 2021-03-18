@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -107,8 +107,8 @@ public class PopupModifRoleUtilisateur extends WizardFormPopup
 			}
 		}	
 		
-		// On vérifie ensuite qu'il n'y a pas de doublons
-		return dto.findDoublons();
+		// On vérifie ensuite que les regles d'inscriptions sont bien respectées
+		return dto.checkRegleInscription();
 	}
 	
 	

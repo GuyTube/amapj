@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -25,23 +25,22 @@ import java.util.List;
 import com.vaadin.ui.Table.Align;
 
 import fr.amapj.model.engine.IdentifiableUtil;
+import fr.amapj.model.models.acces.RoleList;
+import fr.amapj.model.models.contrat.modele.EtatModeleContrat;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.service.services.access.AccessManagementService;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratSummaryDTO;
-import fr.amapj.service.services.mescontrats.ContratDTO;
-import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.formpopup.FormPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.popup.swicthpopup.DirectSwitchPopup;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.views.common.contrattelecharger.TelechargerContrat;
 import fr.amapj.view.views.gestioncontrat.editorpart.ChoixModifEditorPart;
 import fr.amapj.view.views.gestioncontrat.editorpart.GestionContratEditorPart;
+import fr.amapj.view.views.gestioncontrat.editorpart.ModeleContratVisualiserPart;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
 
@@ -50,7 +49,7 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
  * Gestion des modeles de contrats : création, diffusion, ...
  *
  */
-public class GestionContratListPart extends StandardListPart<ModeleContratSummaryDTO> implements PopupSuppressionListener
+public class GestionContratListPart extends StandardListPart<ModeleContratSummaryDTO>
 {	
 	private List<Producteur> allowedProducteurs;	
 	
@@ -58,7 +57,7 @@ public class GestionContratListPart extends StandardListPart<ModeleContratSummar
 	public GestionContratListPart()
 	{
 		super(ModeleContratSummaryDTO.class,false);
-		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(),SessionManager.getUserId());
+		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(),SessionManager.getUserId(),true);
 	}
 	
 	
@@ -72,13 +71,15 @@ public class GestionContratListPart extends StandardListPart<ModeleContratSummar
 	@Override
 	protected void drawButton() 
 	{
-		addButton("Créer",ButtonType.ALWAYS,()-> handleAjouter());
-		addButton("Créer à partir de ...", ButtonType.EDIT_MODE,()->handleCreerFrom());
-		addButton("Modifier",ButtonType.EDIT_MODE,()->handleEditer());
+		addButton("Créer",ButtonType.ALWAYS,e-> new GestionContratEditorPart(null,allowedProducteurs));
+		addButton("Créer à partir de ...", ButtonType.EDIT_MODE,e->new GestionContratEditorPart(e.id,allowedProducteurs));
+		addButton("Voir",ButtonType.EDIT_MODE,e->new ModeleContratVisualiserPart(e.id));
+		addButton("Modifier",ButtonType.EDIT_MODE,e->new ChoixModifEditorPart(e.id));
 		addButton("Tester",ButtonType.EDIT_MODE, ()->handleTester());
-		addButton("Supprimer",ButtonType.EDIT_MODE, ()->handleSupprimer());
 		addButton("Télécharger ...",ButtonType.EDIT_MODE,()->handleTelecharger());
-		addButton("Changer l'état",ButtonType.EDIT_MODE, ()->handleChangeState());
+		addButton("Changer l'état",ButtonType.EDIT_MODE, e->new PopupSaisieEtat(e));
+		addButton("Archiver",ButtonType.EDIT_MODE, e->new PopupContratArchiver(e));
+		addButton("Autre",ButtonType.ALWAYS, ()->handleAutre());
 			
 		addSearchField("Rechercher par nom ou producteur");		
 	}
@@ -112,7 +113,7 @@ public class GestionContratListPart extends StandardListPart<ModeleContratSummar
 	@Override
 	protected List<ModeleContratSummaryDTO> getLines() 
 	{
-		return new GestionContratService().getModeleContratInfo();
+		return new GestionContratService().getModeleContratInfo(EtatModeleContrat.CREATION,EtatModeleContrat.ACTIF);
 	}
 
 
@@ -122,65 +123,53 @@ public class GestionContratListPart extends StandardListPart<ModeleContratSummar
 		return new String[] {  "etat" , "nomProducteur" , "dateDebut" };
 	}
 	
+	@Override
 	protected String[] getSearchInfos()
 	{
 		return new String[] { "nom" , "nomProducteur" };
 	}
 	
 	
-	protected void handleTelecharger()
+	private void handleTelecharger()
 	{
 		ModeleContratSummaryDTO mcDto = getSelectedLine();
 		TelechargerContrat.displayPopupTelechargerContrat(mcDto.id, null, this);
 	}
-
-
-	protected void handleChangeState()
-	{
-		ModeleContratSummaryDTO mcDto = getSelectedLine();
-		FormPopup.open(new PopupSaisieEtat(mcDto),this);
-	}
-
-	protected void handleAjouter()
-	{
-		GestionContratEditorPart.open(new GestionContratEditorPart(null,allowedProducteurs),this);
-	}
-
-	protected void handleCreerFrom()
-	{
-		ModeleContratSummaryDTO mcDto = getSelectedLine();
-		GestionContratEditorPart.open(new GestionContratEditorPart(mcDto.id,allowedProducteurs),this);
-	}
-
-
+	
 	private void handleTester()
 	{
 		ModeleContratSummaryDTO mcDto = getSelectedLine();
-		
-		SaisieContrat.saisieContrat(mcDto.id,null,null,"Mode Test",ModeSaisie.FOR_TEST,this);
-		
+		SaisieContrat.saisieContrat(mcDto.id,null,null,"Mode Test",ModeSaisie.FOR_TEST,this);	
 	}
-
-
-	protected void handleEditer()
+	
+	private void handleAutre()
 	{
-		Long id =  getSelectedLine().getId();
-		ChoixModifEditorPart.open(new ChoixModifEditorPart(id),this);
+		ModeleContratSummaryDTO dto =  getSelectedLine();
+		
+		DirectSwitchPopup popup = new DirectSwitchPopup("Autres actions possibles sur les modeles de contrats",60);
+			
+		popup.setLine1("Veuillez indiquer ce que vous souhaitez faire :");
+
+		if (isEditAllowed())
+		{
+			popup.addLine("Supprimer ce modéle de contrat", handleSupprimer(dto));
+		}
+		
+		List<RoleList> roles = SessionManager.getUserRoles();
+		if ( (roles.contains(RoleList.ADMIN)) ||  (roles.contains(RoleList.TRESORIER)) )
+		{
+			popup.addLine("Saisir en masse les périodes de cotisations pour tous les modéles de contrats", new SaisieEnMassePeriodeCotisation());
+		}
+			
+		popup.open(this);
 	}
-
-	protected void handleSupprimer()
+	
+	
+	private SuppressionPopup handleSupprimer(ModeleContratSummaryDTO mcDTO)
 	{
-		ModeleContratSummaryDTO mcDTO =  getSelectedLine();
 		String text = "Etes vous sûr de vouloir supprimer le contrat vierge "+mcDTO.nom+" de "+mcDTO.nomProducteur+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,mcDTO.id);
-		SuppressionPopup.open(confirmPopup, this);		
-	}
-	
-	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new GestionContratService().deleteContrat(idItemToSuppress);
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,mcDTO.id,e->new GestionContratService().deleteContrat(e));
+		return confirmPopup;	
 	}
 
 

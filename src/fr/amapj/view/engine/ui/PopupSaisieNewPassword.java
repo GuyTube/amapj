@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -69,7 +69,7 @@ public class PopupSaisieNewPassword extends FormPopup
 		
 		
 		Date datLimit = DateUtils.addDays(fr.amapj.common.DateUtils.getDate(), -1);
-		if (u.getResetPasswordDate().before(datLimit))
+		if (u.resetPasswordDate.before(datLimit))
 		{
 			addLabel("Votre demande est trop ancienne", ContentMode.TEXT);
 			return ;

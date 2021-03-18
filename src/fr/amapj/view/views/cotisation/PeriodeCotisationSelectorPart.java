@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -66,7 +66,7 @@ public class PeriodeCotisationSelectorPart
 		toolbar1.addStyleName("periode-selectorpart");
 	
 		
-		Label pLabel = new Label("Période de cotisation");
+		Label pLabel = new Label("Période d'adhésion");
 		pLabel.addStyleName("periode");
 		pLabel.setSizeUndefined();
 		

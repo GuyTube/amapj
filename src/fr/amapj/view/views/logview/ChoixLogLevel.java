@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -79,24 +79,10 @@ public class ChoixLogLevel extends CorePopup
 
 	protected void createButtonBar()
 	{
-		addDefaultButton("Sauvegarder", new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleContinuer();
-			}
-		});
-				
+		addButtonBlank();
 		
-		addButton("Annuler", new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleAnnuler();
-			}
-		});
+		addDefaultButton("Sauvegarder", e->handleContinuer());
+		addButton("Annuler", e->handleAnnuler());
 	}
 	
 	

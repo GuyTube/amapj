@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -26,16 +26,15 @@ import fr.amapj.service.services.editionspe.EditionSpeDTO;
 import fr.amapj.service.services.editionspe.EditionSpeService;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 
 
 /**
  * Gestion des étiquettes
  *
  */
-public class EditionSpeListPart extends StandardListPart<EditionSpeDTO> implements PopupSuppressionListener
+public class EditionSpeListPart extends StandardListPart<EditionSpeDTO> implements PopupListener
 {
 
 	public EditionSpeListPart()
@@ -118,15 +117,7 @@ public class EditionSpeListPart extends StandardListPart<EditionSpeDTO> implemen
 	{
 		EditionSpeDTO dto = getSelectedLine();
 		String text = "Etes vous sûr de vouloir supprimer l'édition spécifique "+dto.nom+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
-		SuppressionPopup.open(confirmPopup, this);		
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id,e->new EditionSpeService().delete(e));
+		confirmPopup.open(this);	
 	}
-	
-	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new EditionSpeService().delete(idItemToSuppress);
-	}
-
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -40,7 +40,7 @@ public class PEMesContratsEditorPart extends WizardFormPopup
 
 	public enum Step
 	{
-		IMPRESSION_CONTRAT , ADHESION ;
+		IMPRESSION_CONTRAT ;
 	}
 
 	/**
@@ -61,7 +61,6 @@ public class PEMesContratsEditorPart extends WizardFormPopup
 	protected void configure()
 	{
 		add(Step.IMPRESSION_CONTRAT,()->addFieldImpressionContrat());
-		add(Step.ADHESION,()->addFieldAdhesion());
 	}
 
 	private void addFieldImpressionContrat()
@@ -86,18 +85,6 @@ public class PEMesContratsEditorPart extends WizardFormPopup
 		addLabel(msg, ContentMode.HTML);
 		
 	}
-	
-	
-
-	private void addFieldAdhesion()
-	{
-		// Titre
-		setStepTitle("Adhesion");
-		
-		addComboEnumField("L'amapien peut imprimer son bulletin d'adhésion ", "canPrintAdhesion", new NotNullValidator());		
-	}
-
-
 	
 
 	@Override

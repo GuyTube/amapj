@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -95,6 +95,7 @@ abstract public class CorePopup
 		
 		// Construction de la barre de boutons
 		popupButtonBarLayout = new HorizontalLayout();
+		popupButtonBarLayout.setWidth("100%");
 		popupButtonBarLayout.setMargin(false);
 		popupButtonBarLayout.addStyleName("buttonbar");
 		createButtonBar();
@@ -123,7 +124,6 @@ abstract public class CorePopup
 			mainLayout.addComponent(contentLayout);
 			
 			//
-			popupButtonBarLayout.setWidth(null);
 			mainLayout.addComponent(popupButtonBarLayout);
 			mainLayout.setComponentAlignment(popupButtonBarLayout, Alignment.MIDDLE_RIGHT);
 			
@@ -151,7 +151,6 @@ abstract public class CorePopup
 			
 			
 			//
-			popupButtonBarLayout.setWidth(null);
 			mainLayout.addComponent(popupButtonBarLayout);
 			mainLayout.setComponentAlignment(popupButtonBarLayout, Alignment.MIDDLE_RIGHT);
 			
@@ -238,10 +237,16 @@ abstract public class CorePopup
 		return saveButton;
 	}
 	
-	protected void setButtonAlignement(Button b, Alignment a)
+	/**
+	 * Permet d'ajouter un espacement entre les boutons
+	 */
+	protected void addButtonBlank()
 	{
-		popupButtonBarLayout.setComponentAlignment(b,a);
+		HorizontalLayout hl = new HorizontalLayout();
+		popupButtonBarLayout.addComponent(hl);
+		popupButtonBarLayout.setExpandRatio(hl,1f);
 	}
+	
 
 	
 	protected void setType(PopupType popupType)
@@ -328,6 +333,16 @@ abstract public class CorePopup
 		return window;
 	}
 	
+	
+	public void open()
+	{
+		open(this);
+	}
+	
+	public void open(PopupListener listener)
+	{
+		open(this,listener);
+	}
 	
 	
 

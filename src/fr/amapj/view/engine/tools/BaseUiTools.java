@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -31,6 +31,8 @@ import com.vaadin.server.Page;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
@@ -95,7 +97,7 @@ public class BaseUiTools
 	 */
 	static public Label addBandeau(Layout layout,String content,String styleName)
 	{
-		Label l = new Label(content);
+		Label l = new Label(content,ContentMode.HTML);
 		l.setWidth("100%");
 		
 		Panel p1 = new Panel();
@@ -194,7 +196,7 @@ public class BaseUiTools
 				List<String> strs = new ArrayList<>();
 				strs.add("Nous ne comprenons pas la date \""+dateString+"\"");
 				strs.add("Merci de cliquer sur l'icone de calendrier \"14\" sur la droite pour choisir la date");
-				strs.add("ou de saisir la date au format 02/10/15 pour le 2 octobre 2015");
+				strs.add("ou de saisir la date au format 02/10/21 pour le 2 octobre 2021");
 				MessagePopup.open(new MessagePopup("Erreur sur la date", strs));
 				return null;
 			}
@@ -290,6 +292,16 @@ public class BaseUiTools
 	}
 
 
-	
+	static public void setReadOnlyRecursively(HasComponents a)
+	{
+		for (Component component : a) 
+		{
+			component.setReadOnly(true);
+			if (component instanceof HasComponents)
+			{
+				setReadOnlyRecursively( (HasComponents) component); 
+			}
+		}
+	}
 
 }

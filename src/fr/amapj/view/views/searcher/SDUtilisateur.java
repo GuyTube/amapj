@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,6 +23,7 @@
 import java.util.List;
 
 import fr.amapj.model.engine.Identifiable;
+import fr.amapj.model.models.fichierbase.EtatUtilisateur;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
 import fr.amapj.service.services.utilisateur.UtilisateurService;
@@ -39,7 +40,7 @@ public class SDUtilisateur implements SearcherDefinition
 	@Override
 	public List<? extends Identifiable> getAllElements(Object params)
 	{
-		return  new UtilisateurService().getUtilisateurs(false);
+		return  new UtilisateurService().getUtilisateurs(EtatUtilisateur.ACTIF);
 	}
 
 
@@ -47,7 +48,7 @@ public class SDUtilisateur implements SearcherDefinition
 	public String toString(Identifiable identifiable)
 	{
 		Utilisateur u = (Utilisateur) identifiable;
-		return u.getNom()+" "+u.getPrenom();
+		return u.nom+" "+u.prenom;
 	}
 
 	@Override

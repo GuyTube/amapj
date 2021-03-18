@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -59,6 +59,7 @@ public class TelechargerLogPopup extends CorePopup
 
 	protected void createButtonBar()
 	{		
+		addButtonBlank();
 		addButton("Quitter", e->close());
 	}	
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -97,6 +97,16 @@ public class SaisieContrat
 	
 	private String checkInitialCondition()
 	{
+		// Si saisie standard on vérifie si le contrat est bien accessible  
+		if (data.modeSaisie==ModeSaisie.STANDARD)
+		{
+			String msg = new MesContratsService().checkIfAccessAllowed(data.contratDTO,data.userId);
+			if (msg!=null)
+			{
+				return msg;
+			}
+		}
+		
 		// Si saisie standard et que le contrat n'est plus modifiable
 		// Ceci arrive si : à 23h59 l'utilisateur affiche l'écran "Mes contrats"
 		// à 00:01 il clique sur Modifier - le bouton est bien là mais il n'a plus le droit de modifier 
@@ -106,7 +116,7 @@ public class SaisieContrat
 		}
 		
 		// Si Saisie standard et Abonnement et si le contrat n'est pas régulier : l'utilisateur n'aurait pas du avoir le droit de le modifier
-		if ( (data.modeSaisie==ModeSaisie.STANDARD) && (data.contratDTO.nature==NatureContrat.ABONNEMENT) && (data.contratDTO.isRegulier()==false) )
+		if ( (data.modeSaisie==ModeSaisie.STANDARD) && (data.contratDTO.nature==NatureContrat.ABONNEMENT) && (new ContratAboManager().isRegulier(data.contratDTO)==false) )
 		{
 			return "Vous ne pouvez pas modifier ce contrat <br/> car il a été saisi par le référent";
 		}
@@ -184,7 +194,7 @@ public class SaisieContrat
 	private ContratPopupType computeAbonnement()
 	{	
 		// Sinon, dans le cas du contrat ABO, ca depend de l'utilisateur
-		boolean isRegulier = data.contratDTO.isRegulier();
+		boolean isRegulier = new ContratAboManager().isRegulier(data.contratDTO);
 		
 		switch (data.modeSaisie)
 		{

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,8 +24,13 @@ import java.util.List;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Button;
 
 import fr.amapj.model.models.fichierbase.Utilisateur;
+import fr.amapj.model.models.param.EtatModule;
+import fr.amapj.service.services.mesadhesions.AdhesionDTO;
+import fr.amapj.service.services.mesadhesions.MesAdhesionDTO;
+import fr.amapj.service.services.mesadhesions.MesAdhesionsService;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.utilisateur.UtilisateurDTO;
@@ -38,10 +43,12 @@ import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.NotNullValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.UniqueInDatabaseValidator;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
+import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
+import fr.amapj.view.views.cotisation.reception.PopupAjoutCotisation;
 import fr.amapj.view.views.importdonnees.UtilisateurImporter;
 
 /**
- * Permet uniquement de creer des contrats
+ * Permet de creer les utilisateurs
  * 
  *
  */
@@ -52,10 +59,14 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 
 	private boolean sendMail;
 
+	private ParametresDTO parametresGen;
+
+	private UtilisateurInfo info;
+
 
 	public enum Step
 	{
-		SAISIE, ENVOI;
+		SAISIE, ENVOI , COMPLEMENTS;
 	}
 
 	/**
@@ -68,6 +79,9 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 
 		utilisateurDTO = new UtilisateurDTO();
 		item = new BeanItem<UtilisateurDTO>(utilisateurDTO);
+		
+		saveButtonTitle = "OK";
+		parametresGen = new ParametresService().getParametres();
 
 	}
 	
@@ -75,7 +89,9 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 	protected void configure()
 	{
 		add(Step.SAISIE,()->addFieldSaisie(),()->checkSaisie());
-		add(Step.ENVOI,()->addFieldEnvoi());
+		add(Step.ENVOI,()->addFieldEnvoi(),()->doEnvoi());
+		add(Step.COMPLEMENTS,()->addFieldComplements());
+		
 	}
 
 	private void addFieldSaisie()
@@ -144,7 +160,7 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 						"Prenom= <b>"+utilisateurDTO.prenom+"</b><br/>"+
 						"E mail = <b>"+utilisateurDTO.email+"</b><br/><br/>";
 		
-		ParametresDTO param = new ParametresService().getParametres();
+		
 		
 		if (UtilisateurUtil.canSendMailTo(utilisateurDTO.email)==false)
 		{
@@ -153,7 +169,7 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 		}
 		else
 		{
-			if (param.serviceMailActif==true && UtilisateurUtil.canSendMailTo(utilisateurDTO.email))
+			if (parametresGen.serviceMailActif==true && UtilisateurUtil.canSendMailTo(utilisateurDTO.email))
 			{
 				sendMail = true;
 				str = str+"Un mot de passe va être automatiquement généré et un e mail sera envoyé à l'utilisateur";
@@ -164,21 +180,82 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 				str = str+"Votre service de mail n'est pas actif, le mot de passe va être affiché et vous devrez le transmettre à l'utilisateur";
 			}
 		}
-		str = str+"<br/><br/>Cliquez sur Sauvegarder pour terminer, ou Annuler pour ne rien faire";
+		str = str+"<br/><br/>Cliquez sur Etape Suivante pour réaliser cette opération, ou Annuler pour ne rien faire";
 		
 		addLabel(str, ContentMode.HTML);
 	}
+	
 
+	private String doEnvoi()
+	{
+		info = new UtilisateurService().createNewUser(utilisateurDTO,true,sendMail);
+		return null;
+	}
+	
+	
+	private void addFieldComplements()
+	{	
+		// On interdit tout retour en arrière
+		form.removeAllComponents();
+		previousButton.setEnabled(false);
+		cancelButton.setVisible(false);
+		
+		// Titre
+		setStepTitle("compléments sur cet utilisateur");
+		
+		addLabel("L'utilisateur "+utilisateurDTO.nom+" "+utilisateurDTO.prenom+"a été créé avec succés.</br>", ContentMode.HTML);		
+		
+		if (sendMail)
+		{
+			addLabel("Le mot de passe a été envoyé par mail directement à l'utilisateur</br>", ContentMode.HTML);
+		}
+		else
+		{
+			addLabel("Voici le mot de passe , à transmettre à l'utilisateur : "+info.password+"</br>", ContentMode.HTML);
+		}
+		
+		addLabel("</br><br/>", ContentMode.HTML);
+		
+		// 
+		if (parametresGen.etatGestionCotisation==EtatModule.ACTIF)
+		{
+			String str = findAdhesion();
+			if (str!=null)
+			{
+				addLabel("<b>Vous avez créé une adhésion pour cet utilisateur : "+str+"</b>", ContentMode.HTML);
+			}
+			else
+			{
+				addLabel("Vous pouvez maintenant compléter en enregistrant tout de suite l'adhésion de cet utilisateur.</br>", ContentMode.HTML);
+			
+				Button b = new Button("Enregistrer l'adhésion", e->handleAdhesion());
+				form.addComponent(b);
+			}
+		}
+		
+	}
+
+	private void handleAdhesion() 
+	{
+		new CreationUtilisateurAjoutCotisation(info.id).open(()->addFieldComplements());
+	}
+	
+	private String findAdhesion() 
+	{
+		MesAdhesionDTO adhs = new MesAdhesionsService().computeAdhesionInfo(info.id);
+		if (adhs.enCours.size()!=0)
+		{
+			AdhesionDTO adh = adhs.enCours.get(0);
+			return "Période :"+adh.nomPeriode+" Montant : "+new CurrencyTextFieldConverter().convertToString(adh.montantAdhesion)+" €";
+		}
+		
+		return null;
+	}
 
 	@Override
 	protected void performSauvegarder()
 	{
-		UtilisateurInfo info = new UtilisateurService().createNewUser(utilisateurDTO,true,sendMail);
-		if (sendMail==false)
-		{
-			MessagePopup popup = new MessagePopup("Mot de passe", ColorStyle.GREEN , "Le mot de passe est "+info.password);
-			MessagePopup.open(popup);
-		}
+		// Nothing to do
 	}
 
 	@Override

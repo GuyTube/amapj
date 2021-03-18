@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,12 +21,14 @@
  package fr.amapj.view.engine.infoservlet;
 
 import java.io.File;
+import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,6 +62,10 @@ public class MonitorInfo
 	// uptime en jours 
 	public int upTimeDays;
 	
+	// Garbage collector
+	public long totalGarbageCollections = 0;
+	public long garbageCollectionTime = 0;
+	
 	private final static Logger logger = LogManager.getLogger();
 	
 	private MonitorInfo()
@@ -76,7 +82,8 @@ public class MonitorInfo
 	public String toString()
 	{
 		return "cpuLoad=" + cpuLoad + "<br/> diskFreeSpace=" + diskFreeSpace + "<br/> nbOpenFile=" + nbOpenFile + "<br/> memInit=" + memInit + "<br/> memMax="
-				+ memMax + "<br/> memUsed=" + memUsed + "<br/> threadNb=" + threadNb + "<br/> threadPeak=" + threadPeak + "<br/> upTimeDays=" + upTimeDays;
+				+ memMax + "<br/> memUsed=" + memUsed + "<br/> threadNb=" + threadNb + "<br/> threadPeak=" + threadPeak + "<br/> upTimeDays=" + upTimeDays+
+				"<br/> totalGarbageCollections=" + totalGarbageCollections+"<br/> garbageCollectionTime=" + garbageCollectionTime;
 	}
 
 
@@ -122,8 +129,29 @@ public class MonitorInfo
 			// Uptime
 			RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
 			info.upTimeDays = (int) (runtimeBean.getUptime()/(1000*3600*24));
+			
+			// Garbage collector 
+			List<GarbageCollectorMXBean> garbageBean = ManagementFactory.getGarbageCollectorMXBeans();
+			for(GarbageCollectorMXBean gc : garbageBean) 
+			{	
+		        long count = gc.getCollectionCount();
+	
+		        if(count >= 0) 
+		        {
+		            info.totalGarbageCollections += count;
+		        }
+	
+		        long time = gc.getCollectionTime();
+	
+		        if(time >= 0) 
+		        {
+		            info.garbageCollectionTime += time;
+		        }
+	    }
+			
 
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			logger.error(StackUtils.asString(e));
 		}

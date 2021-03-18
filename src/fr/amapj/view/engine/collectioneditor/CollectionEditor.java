@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -90,9 +90,7 @@ public class CollectionEditor<BEANTYPE> extends CustomField implements Action.Ha
 	private boolean btnSupprimer = true;
 	private boolean btnMonter = true;
 	private boolean btnDescendre = true;
-	
  
-	
 	
 	/**
 	 * 
@@ -165,6 +163,7 @@ public class CollectionEditor<BEANTYPE> extends CustomField implements Action.Ha
 		table.setSelectable(true);
 		table.setImmediate(true);
 		table.setSortEnabled(false);
+		
 	}
 	
 	
@@ -622,7 +621,18 @@ public class CollectionEditor<BEANTYPE> extends CustomField implements Action.Ha
 		activeButton(false, false, false, false);
 	}
 	
-	
+	@Override
+	public void setReadOnly(boolean readOnly)
+	{
+		if (readOnly)
+		{
+			disableAllButtons();
+			for (ColumnInfo columnInfo : columns) 
+			{
+				columnInfo.editable = false;
+			}
+		}
+	}
 	
 	
 	private String propertyIdBeanToPreserve;

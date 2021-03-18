@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -80,7 +80,7 @@ public class PEReceptionChequeEditorPart extends WizardFormPopup
 	private void addFieldCommentaire()
 	{
 		// Titre
-		setStepTitle("Autoriser la saisie de commentaires lors de la réception des chèques (exemple : saisir le nom de la banque, saisir le numéro des chèques)");
+		setStepTitle("Autoriser la saisie de commentaires lors de la réception des chèques (exemple : saisir le nom de la banque, saisir le numéro des chèques, le nom sur le chèque, ...)");
 		
 		// Liste des validators
 		IValidator len_1_100 = new StringLengthValidator(1, 255);
@@ -92,6 +92,13 @@ public class PEReceptionChequeEditorPart extends WizardFormPopup
 		
 		addComboEnumField("Saisie d'un commentaire 2", "saisieCommentaire2", new NotNullValidator());
 		addTextField("Libellé du commentaire 2", "libSaisieCommentaire2",len_1_100);
+		
+		addComboEnumField("Saisie d'un commentaire 3", "saisieCommentaire3", new NotNullValidator());
+		addTextField("Libellé du commentaire 3", "libSaisieCommentaire3",len_1_100);
+		
+		
+		addComboEnumField("Saisie d'un commentaire 4", "saisieCommentaire4", new NotNullValidator());
+		addTextField("Libellé du commentaire 4", "libSaisieCommentaire4",len_1_100);
 		
 	}
 

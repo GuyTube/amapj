@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -68,12 +68,12 @@ public class PatchEditorPart extends WizardFormPopup
 		setStepTitle("les informations générales");
 		
 		// Champ 1
-		addLabel("Vous allez appliquer sur toutes les bases le patch V020. Cliquer sur OK pour Suivant pour continuer ...", ContentMode.HTML);
+		addLabel("Vous allez appliquer sur toutes les bases le patch V026. Cliquer sur OK pour Suivant pour continuer ...", ContentMode.HTML);
 	}
 	
 	private void addResultat()
 	{
-		String resultat = new PatchService().applyPatchV020();
+		String resultat = new PatchService().applyPatchV026();
 		
 		// Titre
 		setStepTitle("le résultat");

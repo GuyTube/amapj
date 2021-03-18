@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,19 +21,21 @@
  package fr.amapj.view.views.parametres;
 
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 
-import fr.amapj.model.models.param.paramecran.PELivraisonProducteur;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
 import fr.amapj.view.engine.template.BackOfficeLongView;
+import fr.amapj.view.views.parametres.paramecran.PEGestionContratsViergesEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PEListeAdherentEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PELivraisonAmapienEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PELivraisonProducteurEditorPart;
@@ -41,12 +43,11 @@ import fr.amapj.view.views.parametres.paramecran.PEMesContratsEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PEMesLivraisonsEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PEReceptionChequeEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PESaisiePaiementEditorPart;
+import fr.amapj.view.views.parametres.paramecran.PESyntheseMultiContratEditorPart;
 
 
 /**
  * Page permettant à l'administrateur de modifier les paramètres généraux
- *  
- *
  */
 public class ParametresView extends BackOfficeLongView implements PopupListener
 {
@@ -92,6 +93,7 @@ public class ParametresView extends BackOfficeLongView implements PopupListener
 		
 		final PopupListener listener = this;
 		
+		addLabel("Amapien");
 		
 		addButton("Ecran \"Mes contrats\" , Généralités",e -> CorePopup.open(new PEMesContratsEditorPart(),listener));
 		addButton("Ecran \"Mes contrats\" , Saisie des paiements par l'amapien",e -> CorePopup.open(new PESaisiePaiementEditorPart(),listener));
@@ -100,13 +102,19 @@ public class ParametresView extends BackOfficeLongView implements PopupListener
 
 		addButton("Ecran \"Liste des adhérents\"",e -> 	CorePopup.open(new PEListeAdherentEditorPart(),listener));
 		
+		addLabel("Producteur");
+		
 		addButton("Ecran \"Livraison d'un producteur\"",e -> 	CorePopup.open(new PELivraisonProducteurEditorPart(),listener));
 		
-		addButton("Ecran \"Livraison d'un amapien\"",e -> 	CorePopup.open(new PELivraisonAmapienEditorPart(),listener));
+		addLabel("Référent");
+		
+		addButton("Ecran \"Gestion des contrats vierges\"",e -> CorePopup.open(new PEGestionContratsViergesEditorPart(),listener));
 		
 		addButton("Ecran \"Réception des chèques\"",e -> CorePopup.open(new PEReceptionChequeEditorPart(),listener));
-
 		
+		addButton("Ecran \"Livraison d'un amapien\"",e -> 	CorePopup.open(new PELivraisonAmapienEditorPart(),listener));
+
+		addButton("Ecran \"Synthèse multi contrats\"",e -> CorePopup.open(new PESyntheseMultiContratEditorPart(),listener));
 		
 		
 		refresh();
@@ -117,6 +125,8 @@ public class ParametresView extends BackOfficeLongView implements PopupListener
 
 	
 	
+
+
 	private void handleChangerParam()
 	{
 		FormPopup.open(new PopupSaisieParametres(dto),this);
@@ -170,6 +180,14 @@ public class ParametresView extends BackOfficeLongView implements PopupListener
 		form.addComponent(name);
 
 		return name;
+	}
+	
+	private Label addLabel(String str)
+	{
+		Label tf = new Label(str,ContentMode.HTML);
+		addComponent(tf);
+		return tf;
+
 	}
 
 

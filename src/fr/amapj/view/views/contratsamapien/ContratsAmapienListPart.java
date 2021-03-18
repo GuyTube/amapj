@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -26,29 +26,26 @@ import com.vaadin.ui.Table.Align;
 
 import fr.amapj.model.engine.IdentifiableUtil;
 import fr.amapj.model.models.fichierbase.Producteur;
-import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.service.services.access.AccessManagementService;
 import fr.amapj.service.services.contratsamapien.AmapienContratDTO;
 import fr.amapj.service.services.contratsamapien.AmapienContratsService;
-import fr.amapj.service.services.dbservice.DbService;
-import fr.amapj.service.services.gestioncontratsigne.ContratSigneDTO;
-import fr.amapj.service.services.mescontrats.ContratDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.service.services.utilisateur.UtilisateurService;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.cascadingpopup.CInfo;
 import fr.amapj.view.engine.popup.cascadingpopup.CascadingData;
 import fr.amapj.view.engine.popup.cascadingpopup.CascadingPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 import fr.amapj.view.engine.tools.DateToStringConverter;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
+import fr.amapj.view.views.common.amapientelecharger.TelechargerAmapien;
 import fr.amapj.view.views.common.utilisateurselector.UtilisateurSelectorPart;
-import fr.amapj.view.views.gestioncontratsignes.PopupSaisieUtilisateur;
-import fr.amapj.view.views.gestioncontratsignes.GestionContratSignesListPart.AjouterData;
+import fr.amapj.view.views.receptioncheque.ReceptionChequeEditorPart;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
 
@@ -58,7 +55,7 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
  *
  */
 @SuppressWarnings("serial")
-public class ContratsAmapienListPart extends StandardListPart<AmapienContratDTO> implements PopupSuppressionListener
+public class ContratsAmapienListPart extends StandardListPart<AmapienContratDTO> 
 {
 
 	private UtilisateurSelectorPart utilisateurSelector;
@@ -68,7 +65,7 @@ public class ContratsAmapienListPart extends StandardListPart<AmapienContratDTO>
 	public ContratsAmapienListPart()
 	{
 		super(AmapienContratDTO.class,false);
-		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(),SessionManager.getUserId());
+		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(),SessionManager.getUserId(),false);
 	}
 	
 	
@@ -89,11 +86,13 @@ public class ContratsAmapienListPart extends StandardListPart<AmapienContratDTO>
 	@Override
 	protected void drawButton() 
 	{
-		addButton("Ajouter un nouveau contrat", ButtonType.ALWAYS, ()->handleAjouter());
+		addButton("Ajouter nouveau contrat", ButtonType.ALWAYS, ()->handleAjouter());
 		addButton("Visualiser", ButtonType.EDIT_MODE, ()->handleVisualiser());
-		addButton("Modifier les quantités", ButtonType.EDIT_MODE, ()->handleModifier());
-		addButton("Modifier les chéques", ButtonType.EDIT_MODE, ()->handleModifierCheque());
-		addButton("Supprimer le contrat", ButtonType.EDIT_MODE, ()->handleSupprimer());
+		addButton("Modifier quantités", ButtonType.EDIT_MODE, ()->handleModifier());
+		addButton("Réceptionner chèques",ButtonType.EDIT_MODE,()->handleReceptionCheque());
+		addButton("Modifier chéques", ButtonType.EDIT_MODE, ()->handleModifierCheque());
+		addButton("Supprimer contrat", ButtonType.EDIT_MODE, ()->handleSupprimer());
+		addButton("Télécharger ...", ButtonType.ALWAYS, ()->handleTelecharger());
 
 		addSearchField("Rechercher par nom");
 	}
@@ -178,15 +177,11 @@ public class ContratsAmapienListPart extends StandardListPart<AmapienContratDTO>
 		AmapienContratDTO dto = getSelectedLine();
 		
 		String text = "Etes vous sûr de vouloir supprimer le contrat de "+dto.prenomUtilisateur+" "+dto.nomUtilisateur+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.idContrat);
-		SuppressionPopup.open(confirmPopup, this);			
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.idContrat,e->new MesContratsService().deleteContrat(e));
+		confirmPopup.open(this);			
 	}
 	
-	
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new MesContratsService().deleteContrat(idItemToSuppress);
-	}	
+
 	
 	/**
 	 * Retourne true si l'utilisateur courant a le droit de manipuler ce contrat
@@ -222,8 +217,7 @@ public class ContratsAmapienListPart extends StandardListPart<AmapienContratDTO>
 	private CInfo successSaisieContrat(AjouterData data)
 	{
 		Long userId = data.userId;
-		Utilisateur u = (Utilisateur) new DbService().getOneElement(Utilisateur.class, userId);
-		String message = "Contrat de "+u.getPrenom()+" "+u.getNom();
+		String message = "Contrat de "+new UtilisateurService().prettyString(userId);
 					
 		SaisieContrat.saisieContrat(data.idModeleContrat,null,userId,message,ModeSaisie.QTE_CHEQUE_REFERENT,this);
 		
@@ -248,5 +242,16 @@ public class ContratsAmapienListPart extends StandardListPart<AmapienContratDTO>
 		
 	}
 	
+	private void handleReceptionCheque()
+	{
+		AmapienContratDTO dto = getSelectedLine();
+		CorePopup.open(new ReceptionChequeEditorPart(dto.idContrat,dto.nomUtilisateur,dto.prenomUtilisateur),this);
+	}
+	
+	private void handleTelecharger()
+	{
+		Long idUtilisateur = utilisateurSelector.getUtilisateurId();
+		TelechargerAmapien.handleTelecharger(idUtilisateur, this);
+	}
 	
 }

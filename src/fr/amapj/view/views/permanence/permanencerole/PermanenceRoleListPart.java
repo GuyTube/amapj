@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -26,11 +26,10 @@ import fr.amapj.service.services.permanence.role.PermanenceRoleDTO;
 import fr.amapj.service.services.permanence.role.PermanenceRoleService;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 
 
 /**
@@ -38,7 +37,7 @@ import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
  *
  */
 @SuppressWarnings("serial")
-public class PermanenceRoleListPart extends StandardListPart<PermanenceRoleDTO> implements PopupSuppressionListener
+public class PermanenceRoleListPart extends StandardListPart<PermanenceRoleDTO>
 {
 
 	public PermanenceRoleListPart()
@@ -120,14 +119,8 @@ public class PermanenceRoleListPart extends StandardListPart<PermanenceRoleDTO> 
 		
 		
 		String text = "Etes vous sûr de vouloir supprimer le rôle "+dto.nom+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
-		SuppressionPopup.open(confirmPopup, this);		
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id,e->new PermanenceRoleService().delete(e));
+		confirmPopup.open(this);		
 	}
-	
-	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new PermanenceRoleService().delete(idItemToSuppress);
-	}	
+
 }

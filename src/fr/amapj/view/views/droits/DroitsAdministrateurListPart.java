@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -26,9 +26,8 @@ import fr.amapj.service.services.access.AccessManagementService;
 import fr.amapj.service.services.access.AdminTresorierDTO;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 
 
 /**
@@ -36,7 +35,7 @@ import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
  *
  */
 @SuppressWarnings("serial")
-public class DroitsAdministrateurListPart extends StandardListPart<AdminTresorierDTO> implements PopupSuppressionListener
+public class DroitsAdministrateurListPart extends StandardListPart<AdminTresorierDTO> 
 {
 
 	public DroitsAdministrateurListPart()
@@ -103,14 +102,7 @@ public class DroitsAdministrateurListPart extends StandardListPart<AdminTresorie
 	{
 		AdminTresorierDTO dto = getSelectedLine();
 		String text = "Etes vous sûr de vouloir supprimer le droit administrateur à "+dto.nom+" "+dto.prenom+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
-		SuppressionPopup.open(confirmPopup, this);		
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id,e->new AccessManagementService().deleteAdmin(e));
+		confirmPopup.open(this);		
 	}
-	
-	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new AccessManagementService().deleteAdmin(idItemToSuppress);
-	}	
 }

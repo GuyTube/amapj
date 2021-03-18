@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -62,8 +62,11 @@ public class CurrencyVectorParam
 	// Message specifique a afficher en haut de popup
 	public String messageSpecifique;
 	
-	// Message specifique a afficher en haut de popup, aprés le message spécifique 
+	// Message specifique a afficher en haut de popup, aprés le message spécifique 1
 	public String messageSpecifique2;
+	
+	// Message specifique a afficher en haut de popup, aprés le message spécifique 2
+	public String messageSpecifique3;
 
 	
 	public List<GridHeaderLine> headerLines = new ArrayList<>();

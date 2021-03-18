@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,13 +22,16 @@
 
 import java.util.List;
 
+import com.vaadin.ui.Table.Align;
+
+import fr.amapj.model.models.fichierbase.EtatProducteur;
 import fr.amapj.service.services.producteur.ProducteurDTO;
 import fr.amapj.service.services.producteur.ProducteurService;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.tools.DateToStringConverter;
 
 
 /**
@@ -36,7 +39,7 @@ import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
  *
  */
 @SuppressWarnings("serial")
-public class ProducteurListPart extends StandardListPart<ProducteurDTO> implements PopupSuppressionListener
+public class ProducteurListPart extends StandardListPart<ProducteurDTO>
 {
 
 	public ProducteurListPart()
@@ -57,7 +60,9 @@ public class ProducteurListPart extends StandardListPart<ProducteurDTO> implemen
 	{
 		addButton("Créer un nouveau producteur",ButtonType.ALWAYS,()->handleAjouter());
 		addButton("Modifier",ButtonType.EDIT_MODE,()->handleEditer());
+		addButton("Voir",ButtonType.EDIT_MODE,()->handleVoir());
 		addButton("Supprimer",ButtonType.EDIT_MODE,()->handleSupprimer());
+		addButton("Archiver",ButtonType.EDIT_MODE,()->handleArchiver());
 		
 		addSearchField("Rechercher par nom");
 	}
@@ -67,9 +72,22 @@ public class ProducteurListPart extends StandardListPart<ProducteurDTO> implemen
 	protected void drawTable() 
 	{
 		// Titre des colonnes
-		cdesTable.setVisibleColumns(new String[] { "nom", "delaiModifContrat"  });
+		cdesTable.setVisibleColumns(new String[] { "nom", "utilisateurInfo" ,"referentInfo" , "nbModeleContratActif", "dateDerniereLivraison", "dateCreation"});
+		
 		cdesTable.setColumnHeader("nom","Nom");
-		cdesTable.setColumnHeader("delaiModifContrat","Délai avant modification d'un contrat");
+		cdesTable.setColumnHeader("utilisateurInfo","Producteurs");
+		cdesTable.setColumnHeader("referentInfo","Referents");
+		
+		cdesTable.setColumnHeader("nbModeleContratActif","Nb contrats");
+		cdesTable.setColumnHeader("dateDerniereLivraison","Dernière liv");
+		
+		cdesTable.setColumnHeader("dateCreation","Date création");
+		
+		cdesTable.setConverter("dateDerniereLivraison", new DateToStringConverter());
+		cdesTable.setConverter("dateCreation", new DateToStringConverter());
+		
+		cdesTable.setColumnAlignment("nbModeleContratActif",Align.CENTER);
+		
 	}
 
 
@@ -77,7 +95,7 @@ public class ProducteurListPart extends StandardListPart<ProducteurDTO> implemen
 	@Override
 	protected List<ProducteurDTO> getLines() 
 	{
-		return new ProducteurService().getAllProducteurs();
+		return new ProducteurService().getAllProducteurs(EtatProducteur.ACTIF);
 	}
 
 
@@ -102,21 +120,31 @@ public class ProducteurListPart extends StandardListPart<ProducteurDTO> implemen
 	private void handleEditer()
 	{
 		ProducteurDTO dto = getSelectedLine();
-		ProducteurEditorPart.open(new ProducteurEditorPart(false,dto), this);
+		ProducteurEditorPart.open(new ProducteurEditorPart(false,dto.id), this);
 	}
+	
+	private void handleVoir()
+	{
+		ProducteurDTO dto = getSelectedLine();
+		ProducteurVoirPart.open(new ProducteurVoirPart(dto), this);
+	}
+	
 
 	private void handleSupprimer()
 	{
 		ProducteurDTO dto = getSelectedLine();
 		String text = "Etes vous sûr de vouloir supprimer le producteur "+dto.nom+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
-		SuppressionPopup.open(confirmPopup, this);		
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id,e->new ProducteurService().delete(e));
+		confirmPopup.open(this);		
 	}
 	
+
 	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
+	
+	private void handleArchiver()
 	{
-		new ProducteurService().delete(idItemToSuppress);
-	}	
+		ProducteurDTO dto = getSelectedLine();
+		PopupProducteurArchiver.open(new PopupProducteurArchiver(dto), this);
+	}
+	
 }

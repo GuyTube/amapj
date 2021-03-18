@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -28,9 +28,10 @@ import fr.amapj.service.services.appinstance.AppInstanceDTO;
 import fr.amapj.service.services.appinstance.AppInstanceService;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.popup.copypopup.CopyPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.popup.swicthpopup.DirectSwitchPopup;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 
 
@@ -38,7 +39,7 @@ import fr.amapj.view.engine.tools.DateTimeToStringConverter;
  * Gestion des instances
  *
  */
-public class AppInstanceListPart extends StandardListPart<AppInstanceDTO> implements  PopupSuppressionListener
+public class AppInstanceListPart extends StandardListPart<AppInstanceDTO>
 {
 
 	public AppInstanceListPart()
@@ -63,7 +64,7 @@ public class AppInstanceListPart extends StandardListPart<AppInstanceDTO> implem
 		addButton("Requete SQL", ButtonType.EDIT_MODE, ()->handleSql());
 		addButton("Sauvegarder", ButtonType.EDIT_MODE, ()->handleSave());
 		addButton("Supprimer", ButtonType.EDIT_MODE, ()->handleSupprimer());
-		// addButton("PATCH V020", ButtonType.ALWAYS, ()->handlePatchV020());
+		addButton("PATCH V026", ButtonType.ALWAYS, ()->handlePatchV026());
 		addButton("Autre ...", ButtonType.ALWAYS, ()->handleAutre());
 
 		addSearchField("Rechercher par nom");
@@ -108,10 +109,10 @@ public class AppInstanceListPart extends StandardListPart<AppInstanceDTO> implem
 	}
 	
 	
-	/*private void handlePatchV020()
+	private void handlePatchV026()
 	{
 		PatchEditorPart.open(new PatchEditorPart(), this);
-	}*/
+	}
 
 	private void handleAjouter()
 	{
@@ -120,7 +121,14 @@ public class AppInstanceListPart extends StandardListPart<AppInstanceDTO> implem
 	
 	private void handleAutre()
 	{
-		ChoixAppInstance.open(new ChoixAppInstance(), this);
+		DirectSwitchPopup popup = new DirectSwitchPopup("Autres actions sur les instances",60);
+			
+		popup.setLine1("Veuillez indiquer ce que vous souhaitez faire :");
+
+		popup.addLine("Extraire les mails de tous les administrateurs", new CopyPopup("Mails des administrateurs", ()->new AppInstanceService().getAllMails()));
+		popup.addLine("Extraire les mails de tous les administrateurs + tresoriers + stats", new CopyPopup("Mails admin + stats", ()->new AppInstanceService().getStatInfo()));
+			
+		popup.open(this);
 	}
 	
 	private void handleStart()
@@ -169,15 +177,8 @@ public class AppInstanceListPart extends StandardListPart<AppInstanceDTO> implem
 		
 		AppInstanceDTO dto = dtos.get(0);
 		String text = "Etes vous sûr de vouloir supprimer l'instance "+dto.nomInstance+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
-		SuppressionPopup.open(confirmPopup, this);		
-	}
-	
-	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new AppInstanceService().delete(idItemToSuppress);
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id,e->new AppInstanceService().delete(e));
+		confirmPopup.open(this);		
 	}
 
 	

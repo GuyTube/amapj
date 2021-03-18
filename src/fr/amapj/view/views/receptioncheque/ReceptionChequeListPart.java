@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,7 +20,6 @@
  */
  package fr.amapj.view.views.receptioncheque;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.ui.HorizontalLayout;
@@ -28,14 +27,13 @@ import com.vaadin.ui.Table.Align;
 
 import fr.amapj.service.services.gestioncontratsigne.ContratSigneDTO;
 import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
-import fr.amapj.service.services.mescontrats.ContratDTO;
-import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 import fr.amapj.view.views.common.contratselector.ContratSelectorPart;
 import fr.amapj.view.views.common.contrattelecharger.TelechargerContrat;
+import fr.amapj.view.views.receptioncheque.ReceptionChequeEditorPart.Mode;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
 
@@ -67,6 +65,7 @@ public class ReceptionChequeListPart extends StandardListPart<ContratSigneDTO>
 		addButton("Réceptionner les chèques",ButtonType.EDIT_MODE,()->handleReceptionCheque());
 		addButton("Modifier les chèques",ButtonType.EDIT_MODE,()->handleModifierCheque());
 		addButton("Saisir un avoir",ButtonType.EDIT_MODE,()->handleSaisirAvoir());
+		addButton("Réception en masse",ButtonType.ALWAYS,()->handleReceptionChequeMasse());
 		addButton("Autre...",ButtonType.ALWAYS,()->handleMore());
 		addButton("Télécharger ...",ButtonType.ALWAYS,()->handleTelecharger());
 		
@@ -79,7 +78,7 @@ public class ReceptionChequeListPart extends StandardListPart<ContratSigneDTO>
 	protected void addSelectorComponent()
 	{
 		// Partie choix du contrat
-		contratSelectorPart = new ContratSelectorPart(this);
+		contratSelectorPart = new ContratSelectorPart(this,true);
 		HorizontalLayout toolbar1 = contratSelectorPart.getChoixContratComponent();
 		
 		addComponent(toolbar1);
@@ -182,8 +181,14 @@ public class ReceptionChequeListPart extends StandardListPart<ContratSigneDTO>
 
 	private void handleReceptionCheque()
 	{
-		ContratSigneDTO c = getSelectedLine();
-		CorePopup.open(new ReceptionChequeEditorPart(c),this);
+		ContratSigneDTO dto = getSelectedLine();
+		CorePopup.open(new ReceptionChequeEditorPart(dto.idContrat,dto.nomUtilisateur,dto.prenomUtilisateur),this);
+	}
+	
+	private void handleReceptionChequeMasse()
+	{
+		Long idModeleContrat = contratSelectorPart.getModeleContratId();
+		CorePopup.open(new ReceptionChequeEditorPart(idModeleContrat),this);
 	}
 
 

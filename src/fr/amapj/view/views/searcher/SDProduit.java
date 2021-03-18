@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -52,7 +52,7 @@ public class SDProduit implements SearcherDefinition
 	public String toString(Identifiable identifiable)
 	{
 		Produit u = (Produit) identifiable;
-		return u.getNom()+","+u.getConditionnement();
+		return u.nom+","+u.conditionnement;
 	}
 	
 

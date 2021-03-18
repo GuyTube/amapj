@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,186 +23,232 @@
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import com.vaadin.data.Item;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
+import fr.amapj.common.CollectionUtils;
 import fr.amapj.model.models.contrat.reel.EtatPaiement;
 import fr.amapj.model.models.param.ChoixOuiNon;
 import fr.amapj.model.models.param.paramecran.PEReceptionCheque;
-import fr.amapj.service.services.gestioncontratsigne.ContratSigneDTO;
-import fr.amapj.service.services.mescontrats.DatePaiementDTO;
-import fr.amapj.service.services.mespaiements.MesPaiementsService;
+import fr.amapj.service.services.mespaiements.reception.ReceptionChequeDTO;
+import fr.amapj.service.services.mespaiements.reception.ReceptionPaiementsService;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.menu.MenuList;
-import fr.amapj.view.engine.popup.okcancelpopup.OKCancelPopup;
-import fr.amapj.view.engine.tools.BaseUiTools;
-import fr.amapj.view.engine.tools.TableBuilder;
-import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
+import fr.amapj.view.engine.popup.formpopup.FormPopup;
+import fr.amapj.view.engine.popup.formpopup.OnSaveException;
+import fr.amapj.view.engine.tools.table.complex.ComplexTableBuilder;
 
 /**
- * Popup pour la réception des chèques
+ * Popup pour la réception des chèques (soit d'un contrat, soit en masse)
  *  
  */
-@SuppressWarnings("serial")
-public class ReceptionChequeEditorPart extends OKCancelPopup
+public class ReceptionChequeEditorPart extends FormPopup
 {
+	static public enum Mode
+	{
+		// Réception des cheques d'un contrat d'un adherent
+		CONTRAT,
+		
+		// Recepetion de tous les chèques d'un modele de contrat (multiples adherents)
+		MODELE_CONTRAT;
+	}
+	
+	static public enum SortMode
+	{
+		// Tri par date croissante (puis par nom)
+		DATE,
+		
+		// Tri par nom (puis par date)
+		NOM;
+
+		SortMode toogle() 
+		{
+			if (this==DATE)
+			{
+				return NOM;
+			}
+			else
+			{
+				return DATE;
+			}
+		}
+	}
+	
 	
 	private SimpleDateFormat df = new SimpleDateFormat("MMMMM yyyy");
 	
-	private ContratSigneDTO c;
+	private Long idContrat;
 	
-	private List<DatePaiementDTO> paiements;
+	private String nomUtilisateur;
 	
-	private Table t;
+	private String prenomUtilisateur;
+	
+	private List<ReceptionChequeDTO> paiements;
 	
 	private PEReceptionCheque peConf;
-		
+
+	private ComplexTableBuilder<ReceptionChequeDTO> builder;
+
+	private Mode mode;
+
+	private Long idModeleContrat;
 	
+	private SortMode sortMode;
+
+	private Button tri;
+		
+		
 	/**
-	 * 
+	 * Réception pour un contrat
 	 */
-	public ReceptionChequeEditorPart(ContratSigneDTO c)
+	public ReceptionChequeEditorPart(Long idContrat, String nomUtilisateur, String prenomUtilisateur)
 	{
 		super();
+		this.mode = Mode.CONTRAT;
+		this.idContrat = idContrat;
+		this.nomUtilisateur = nomUtilisateur;
+		this.prenomUtilisateur = prenomUtilisateur;
+		
+		popupTitle = "Réception chèques";
 		setHeight("90%");
-		this.c = c;
+		
 	}
 	
-	@Override
-	protected void createContent(VerticalLayout contentLayout)
-	{
-		
 	
-		//
-		paiements = new MesPaiementsService().getPaiementAReceptionner(c.idContrat);
+	/**
+	 * Réception en masse pour un modele de contrat
+	 */
+	public ReceptionChequeEditorPart(Long idModeleContrat)
+	{
+		super();
+		this.idModeleContrat = idModeleContrat;
+		this.mode = Mode.MODELE_CONTRAT;
+		
+		popupTitle = "Réception des chèques en masse";
+		setHeight("100%");
+		
+	}
+
+	
+
+	@Override
+	protected void addFields()
+	{
 		peConf = (PEReceptionCheque) new ParametresService().loadParamEcran(MenuList.RECEPTION_CHEQUES);
-		//
-		popupTitle = "Réception chèques";
-		setWidth(60);
+		if (mode==Mode.CONTRAT)
+		{
+			paiements = new ReceptionPaiementsService().getPaiementAReceptionnerContrat(idContrat);
+		}
+		else
+		{
+			paiements = new ReceptionPaiementsService().getPaiementAReceptionnerModeleContrat(idModeleContrat);
+		}
+		
+		sortMode = SortMode.NOM;
+		sortPaiement();
 		
 		// Premiere ligne de texte
-		String msg = "<h2> Réception des chèques de "+c.prenomUtilisateur+" "+c.nomUtilisateur+"</h2>";
-		Label lab = new Label(msg,ContentMode.HTML);
-		contentLayout.addComponent(lab);
+		String msg;
+		if (mode==Mode.CONTRAT)
+		{
+			msg = "<h2> Réception des chèques de "+prenomUtilisateur+" "+nomUtilisateur+"</h2>";
+		}
+		else
+		{
+			msg = "<h2>Réception en masse des chèques</h2>";
+		}
+		addLabel(msg, ContentMode.HTML);
 		
 		if(paiements.size()==0)
 		{
-			BaseUiTools.addStdLabel(contentLayout, "Il n'y a pas de chèques à réceptionner.", null);
+			addLabel("Il n'y a pas de chèques à réceptionner.", ContentMode.HTML);
+			setWidth(60);
 			return;
 		}
 		
 		
-		// Construction de l'entete de la table
-		TableBuilder builder = new TableBuilder();
+		builder = new ComplexTableBuilder<ReceptionChequeDTO>(paiements);
 		
-		builder.startHeader("tete", 70);
-		builder.addHeaderBox("Date", 213);
-		builder.addHeaderBox("Montant €", 163);
-		builder.addHeaderBox("Cocher la case si le chèque a été donné", 163);
+		if (mode==Mode.MODELE_CONTRAT)
+		{
+			builder.addString("Nom", false, 150, e->e.nomUtilisateur);
+			builder.addString("Prenom", false, 150, e->e.prenomUtilisateur);
+		}
+		
+		builder.addString("Date", false, 150, e->df.format(e.datePaiement));
+		builder.addCurrency("Montant €", false, 150,  e->e.montant);
+		builder.addCheckBox("Cocher la case si le chèque a été reçu à l'AMAP","cb",true,150,e->e.etatPaiement==EtatPaiement.AMAP,null);
+		
 		if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
 		{
-			builder.addHeaderBox(peConf.libSaisieCommentaire1, 213);
+			builder.addString(peConf.libSaisieCommentaire1, "c1",true,200,e->e.commentaire1);
 		}
 		if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
 		{
-			builder.addHeaderBox(peConf.libSaisieCommentaire2, 213);
+			builder.addString(peConf.libSaisieCommentaire2, "c2",true,200,e->e.commentaire2);
 		}
-		contentLayout.addComponent(builder.getHeader());
-		
-		
-		
-		// Construction du contenu de la table
-		t = new Table();
-		
-		int nbCol = 3;
-		t.addContainerProperty("date", Label.class, null);
-		t.addContainerProperty("montant", Label.class, null);
-		t.addContainerProperty("box", CheckBox.class, null);
-		if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
+		if (peConf.saisieCommentaire3==ChoixOuiNon.OUI)
 		{
-			t.addContainerProperty("c1", TextField.class, null);
-			nbCol++;
+			builder.addString(peConf.libSaisieCommentaire3, "c3",true,200,e->e.commentaire3);
 		}
-		if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
+		if (peConf.saisieCommentaire4==ChoixOuiNon.OUI)
 		{
-			t.addContainerProperty("c2", TextField.class, null);
-			nbCol++;
+			builder.addString(peConf.libSaisieCommentaire4, "c4",true,200,e->e.commentaire4);
 		}
 		
-		for (int i=0;i<paiements.size();i++)
-		{
-			DatePaiementDTO p = paiements.get(i);
-			
-			Object[] cells = new Object[nbCol];
-			
-			int index=0;
-			
-			Label l = builder.createLabel(df.format(p.datePaiement),200);
-			cells[index] = l;
-			index++;
-			
-			
-			l =  builder.createLabel(new CurrencyTextFieldConverter().convertToString(p.montant),150);
-			cells[index] = l;
-			index++;
-			
-			CheckBox cb =  builder.createCheckBox(p.etatPaiement==EtatPaiement.AMAP, 150);
-			cells[index] = cb;
-			index++;
-			
-			if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
-			{
-				TextField tf =  builder.createTextField(p.commentaire1,200);
-				cells[index] = tf;
-				index++;
-			}
-			
-			if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
-			{
-				TextField tf =  builder.createTextField(p.commentaire2,200);
-				cells[index] = tf;
-				index++;
-			}
-			
-			t.addItem(cells, i);
-		}
-		
-
-		t.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
-		t.setSelectable(true);
-		t.setSortEnabled(false);
-		t.setPageLength(15);
-		
-		contentLayout.addComponent(t);
+		addComplexTable(builder);
+		setWidth(60,100+builder.getTotalWidth());
 	
 	}
 	
+
+
+	private void sortPaiement() 
+	{
+		if (sortMode==SortMode.NOM)
+		{
+			CollectionUtils.sort(paiements, e->e.nomUtilisateur,e->e.prenomUtilisateur,e->e.datePaiement);
+		}
+		else
+		{
+			CollectionUtils.sort(paiements, e->e.datePaiement,e->e.nomUtilisateur,e->e.prenomUtilisateur);
+		}
+	}
+
+
 	@Override
 	protected void createButtonBar()
 	{
-		Button toutOK = addButton("J'ai bien reçu tous les chèques", e->handleToutSelectionner());
-		setButtonAlignement(toutOK, Alignment.TOP_LEFT);
+		if (mode==Mode.MODELE_CONTRAT)
+		{
+			tri = addButton("Trier par date", e->handleTri());
+		}
+		
+		addButtonBlank();
+		addButton("J'ai bien reçu tous les chèques", e->handleToutSelectionner());
 		
 		super.createButtonBar();
 	}
 	
 	
+	private void handleTri() 
+	{
+		sortMode = sortMode.toogle();
+		tri.setCaption(sortMode==SortMode.DATE ? "Trier par nom" : "Trier par date");
+		writeToModel();
+		sortPaiement();
+		builder.reload(paiements);
+	}
+
+
 	protected void handleToutSelectionner()
 	{
 		for (int i = 0; i <paiements.size(); i++)
 		{
-			Item item = t.getItem(i);
-			
-			CheckBox tf = (CheckBox) item.getItemProperty("box").getValue();
+			CheckBox tf = (CheckBox) builder.getComponent(i, "cb");
 			tf.setValue(Boolean.TRUE);
 		}
 		
@@ -210,15 +256,25 @@ public class ReceptionChequeEditorPart extends OKCancelPopup
 
 
 
-	public boolean performSauvegarder()
+	@Override
+	protected void performSauvegarder() throws OnSaveException
+	{
+		writeToModel();
+		
+		new ReceptionPaiementsService().receptionCheque(paiements);
+	}
+
+	/**
+	 * Copie les données saisies dans le modele
+	 */
+	private void writeToModel() 
 	{
 		for (int i = 0; i < paiements.size(); i++)
 		{
-			DatePaiementDTO paiement = paiements.get(i);
-			Item item = t.getItem(i);
-			
+			ReceptionChequeDTO paiement = paiements.get(i);
+						
 			// case à cocher
-			CheckBox cb = (CheckBox) item.getItemProperty("box").getValue();
+			CheckBox cb = (CheckBox)  builder.getComponent(i, "cb");
 			if (cb.getValue().booleanValue()==true)
 			{
 				paiement.etatPaiement=EtatPaiement.AMAP;
@@ -231,26 +287,32 @@ public class ReceptionChequeEditorPart extends OKCancelPopup
 			// Commentaire 1
 			if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
 			{
-				TextField tf = (TextField) item.getItemProperty("c1").getValue();
+				TextField tf = (TextField) builder.getComponent(i, "c1");
 				paiement.commentaire1 = tf.getValue();
 			}	
 			
 			// Commentaire 2
 			if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
 			{
-				TextField tf = (TextField) item.getItemProperty("c2").getValue();
+				TextField tf = (TextField) builder.getComponent(i, "c2");
 				paiement.commentaire2 = tf.getValue();
+			}
+			
+			// Commentaire 3
+			if (peConf.saisieCommentaire3==ChoixOuiNon.OUI)
+			{
+				TextField tf = (TextField) builder.getComponent(i, "c3");
+				paiement.commentaire3 = tf.getValue();
+			}	
+			
+			// Commentaire 4
+			if (peConf.saisieCommentaire4==ChoixOuiNon.OUI)
+			{
+				TextField tf = (TextField) builder.getComponent(i, "c4");
+				paiement.commentaire4 = tf.getValue();
 			}
 		}
 		
-	
-		new MesPaiementsService().receptionCheque(paiements);
-		
-		return true;
 	}
-
-
-
-	
 	
 }

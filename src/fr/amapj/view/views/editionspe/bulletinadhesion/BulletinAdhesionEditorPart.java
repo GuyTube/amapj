@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -160,9 +160,9 @@ public class BulletinAdhesionEditorPart extends WizardFormPopup
 		etiquetteDTO.setText(c);
 			
 		// Titre
-		setStepTitle("le contenu du contrat");
+		setStepTitle("le contenu du bulletin");
 		
-		addCKEditorField("text");    
+		addCKEditorFieldForDocument("text");    
 	}
 	
 	

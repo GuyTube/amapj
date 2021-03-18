@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,12 +20,13 @@
  */
  package fr.amapj.view.engine.popup.suppressionpopup;
 
+import java.util.function.Consumer;
+
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -34,7 +35,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
-import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
 import fr.amapj.view.engine.popup.errorpopup.ErrorPopup;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
 
@@ -49,7 +49,6 @@ public class SuppressionPopup extends CorePopup
 
 	private Button okButton;
 	private String okButtonTitle = "Supprimer";
-	private Button cancelButton;
 	private String cancelButtonTitle = "Annuler";
 	
 	// Dans le mode secured, l'utilisateur doit taper le mot SUPPRIMER pour confirmer la suppression 
@@ -57,20 +56,21 @@ public class SuppressionPopup extends CorePopup
 	
 	private String message;
 	private Long idItemToSuppress;
-	private PopupSuppressionListener listener;
+	private Consumer<Long> deleteAction;
 	
 	
-	public SuppressionPopup(String message,Long idItemToSuppress)
+	public SuppressionPopup(String message,Long idItemToSuppress,Consumer<Long> deleteAction)
 	{
-		this(message,idItemToSuppress,false);
+		this(message,idItemToSuppress,false,deleteAction);
 	}
 	
 	
-	public SuppressionPopup(String message,Long idItemToSuppress,boolean secured)
+	public SuppressionPopup(String message,Long idItemToSuppress,boolean secured,Consumer<Long> deleteAction)
 	{
 		this.message = message;
 		this.idItemToSuppress = idItemToSuppress;
 		this.secured = secured;
+		this.deleteAction = deleteAction;
 		
 		popupTitle = "Confirmation suppression";
 		
@@ -162,28 +162,17 @@ public class SuppressionPopup extends CorePopup
 	
 	protected void createButtonBar()
 	{
-		okButton = addButton(okButtonTitle, new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleSupprimer();
-			}
-		});
+		addButtonBlank();
+		
+		okButton = addButton(okButtonTitle, e->	handleSupprimer());
+			
 		if (secured)
 		{
 			okButton.setEnabled(false);
 			okButton.setImmediate(true);
 		}
 		
-		cancelButton = addDefaultButton(cancelButtonTitle, new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				handleAnnuler();
-			}
-		});
+		addDefaultButton(cancelButtonTitle, e->handleAnnuler());
 	}
 
 	protected void handleAnnuler()
@@ -195,7 +184,7 @@ public class SuppressionPopup extends CorePopup
 	{
 		try
 		{
-			listener.deleteItem(idItemToSuppress);
+			deleteAction.accept(idItemToSuppress);
 			Notification.show("Suppression", "Suppression faite", Notification.Type.HUMANIZED_MESSAGE);	
 		}
 		catch(UnableToSuppressException e)
@@ -213,13 +202,4 @@ public class SuppressionPopup extends CorePopup
 		
 		close();
 	}
-	
-
-
-	static public void open(SuppressionPopup popup, final PopupSuppressionListener listener)
-	{
-		popup.listener = listener;
-		CorePopup.open(popup,listener);
-	}
-
 }

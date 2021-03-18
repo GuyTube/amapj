@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,20 +22,15 @@
 
 import java.util.List;
 
-import fr.amapj.service.services.permanence.periode.PeriodePermanenceDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceService;
 import fr.amapj.service.services.permanence.periode.SmallPeriodePermanenceDTO;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.tools.DateToStringConverter;
-import fr.amapj.view.views.gestioncontratsignes.ChoixActionContratSigne;
-import fr.amapj.view.views.permanence.grille.AbstractPeriodePermanenceGrillePart;
 import fr.amapj.view.views.permanence.periode.grille.ModifierPeriodePermanenceGrillePart;
 import fr.amapj.view.views.permanence.periode.grille.VisualiserPeriodePermanenceGrillePart;
-import fr.amapj.view.views.permanence.periode.role.PeriodePermanenceGestionRolePart;
 import fr.amapj.view.views.permanence.periode.update.ChoixActionModificationPeriodePermanence;
 
 
@@ -44,7 +39,7 @@ import fr.amapj.view.views.permanence.periode.update.ChoixActionModificationPeri
  *
  */
 @SuppressWarnings("serial")
-public class PeriodePermanenceListPart extends StandardListPart<SmallPeriodePermanenceDTO> implements PopupSuppressionListener 
+public class PeriodePermanenceListPart extends StandardListPart<SmallPeriodePermanenceDTO>
 {
 	
 
@@ -162,15 +157,7 @@ public class PeriodePermanenceListPart extends StandardListPart<SmallPeriodePerm
 	{
 		SmallPeriodePermanenceDTO dto = getSelectedLine();
 		String text = "Etes vous sûr de vouloir supprimer la période de permanence "+dto.nom+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
-		SuppressionPopup.open(confirmPopup, this);		
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id,e->new PeriodePermanenceService().deletePeriodePermanence(e));
+		confirmPopup.open(this);		
 	}
-	
-	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new PeriodePermanenceService().deletePeriodePermanence(idItemToSuppress);
-	}
-	
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -29,9 +29,8 @@ import fr.amapj.service.services.produit.ProduitService;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.views.producteur.ProducteurSelectorPart;
 
 
@@ -40,7 +39,7 @@ import fr.amapj.view.views.producteur.ProducteurSelectorPart;
  *
  */
 @SuppressWarnings("serial")
-public class ProduitListPart extends StandardListPart<ProduitDTO> implements PopupSuppressionListener
+public class ProduitListPart extends StandardListPart<ProduitDTO>
 {
 
 	private ProducteurSelectorPart producteurSelector;
@@ -60,7 +59,7 @@ public class ProduitListPart extends StandardListPart<ProduitDTO> implements Pop
 	@Override
 	protected void addSelectorComponent()
 	{
-		producteurSelector = new ProducteurSelectorPart(this);
+		producteurSelector = new ProducteurSelectorPart(this,true);
 		addComponent(producteurSelector.getChoixProducteurComponent());
 	}
 
@@ -136,14 +135,8 @@ public class ProduitListPart extends StandardListPart<ProduitDTO> implements Pop
 	{
 		ProduitDTO dto = getSelectedLine();
 		String text = "Etes vous sûr de vouloir supprimer le produit "+dto.nom+" , "+dto.conditionnement+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
-		SuppressionPopup.open(confirmPopup, this);		
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id,e->new ProduitService().deleteProduit(e));
+		confirmPopup.open(this);		
 	}
-	
-	
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new ProduitService().deleteProduit(idItemToSuppress);
-	}	
 	
 }

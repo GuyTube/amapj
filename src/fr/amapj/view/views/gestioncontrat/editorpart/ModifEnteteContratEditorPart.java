@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -26,7 +26,6 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
-import fr.amapj.model.models.contrat.modele.NatureContrat;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
 import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
@@ -46,7 +45,7 @@ public class ModifEnteteContratEditorPart extends GestionContratEditorPart
 	
 	static public enum Step
 	{
-		INFO_GENERALES, DATE_FIN_INSCRIPTION;	
+		INFO_GENERALES, ACCESS , DATE_FIN_INSCRIPTION;	
 	}
 	
 	
@@ -54,7 +53,8 @@ public class ModifEnteteContratEditorPart extends GestionContratEditorPart
 	protected void configure()
 	{
 		add(Step.INFO_GENERALES, ()->drawEntete());
-		add(Step.DATE_FIN_INSCRIPTION, ()->drawFinInscription());
+		add(Step.ACCESS, ()->drawAccess());
+		add(Step.DATE_FIN_INSCRIPTION, ()->drawFinInscription(false));
 	}
 	
 	@Override
@@ -107,7 +107,7 @@ public class ModifEnteteContratEditorPart extends GestionContratEditorPart
 		Button modif = new Button("Modifier la nature du contrat");
 		modif.addClickListener(e->handleModifierNature());
 		hl.addComponent(modif);
-		
+			
 	}
 	
 	

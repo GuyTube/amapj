@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -32,7 +32,7 @@ import com.vaadin.ui.AbstractField;
 public class EmailValidator implements IValidator
 {
 	
-	private static final String EMAIL_REGEXP = "^([a-zA-Z0-9_\\.\\-+])+@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$";
+	private static final String EMAIL_REGEXP = "^([a-zA-Z0-9_\\.\\-+'])+@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$";
 	
 	public EmailValidator()
 	{

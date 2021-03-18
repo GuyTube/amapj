@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,6 +23,7 @@
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,9 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -41,6 +44,7 @@ import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.common.GenericUtils;
 import fr.amapj.view.engine.popup.errorpopup.ErrorPopup;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
+import fr.amapj.view.engine.tools.BaseUiTools;
 
 /**
  * Popup contenant un formulaire basé sur un PropertysetItem ou sur un BeanItem
@@ -166,6 +170,8 @@ abstract public class WizardFormPopup extends AbstractFormPopup
 
 	protected void createButtonBar()
 	{
+		addButtonBlank();
+		
 		if (errorInInitialCondition)
 		{
 			addDefaultButton("OK", e->close());
@@ -178,11 +184,9 @@ abstract public class WizardFormPopup extends AbstractFormPopup
 		//
 		previousButton = addButton(previousButtonTitle, e->handlePrevious());
 		previousButton.setEnabled(false);
-		previousButton.setId("amapj.popup.previous");
 		
 		//
 		nextButton = addDefaultButton(nextButtonTitle, e->handleNext());
-		nextButton.setId("amapj.popup.next");
 		
 		// On rend invisible le bouton précédent dans le cas ou il y a une seule page
 		if (enumArray.length==1)
@@ -388,5 +392,12 @@ abstract public class WizardFormPopup extends AbstractFormPopup
 		cancelButton.setVisible(false);
 	}
 	
+	/**
+	 * Mets tous les elements de la forme dans l'état indique 
+	 */
+	protected void setReadOnlyAll()
+	{
+		BaseUiTools.setReadOnlyRecursively(form);
+	}
 	
 }

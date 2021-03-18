@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -25,23 +25,17 @@ import java.util.List;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table.Align;
 
-import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.service.services.dbservice.DbService;
 import fr.amapj.service.services.gestioncontratsigne.ContratSigneDTO;
 import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
-import fr.amapj.service.services.mescontrats.ContratDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
+import fr.amapj.service.services.utilisateur.UtilisateurService;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.cascadingpopup.CInfo;
 import fr.amapj.view.engine.popup.cascadingpopup.CascadingData;
 import fr.amapj.view.engine.popup.cascadingpopup.CascadingPopup;
-import fr.amapj.view.engine.popup.cascadingpopup.sample.APopup;
-import fr.amapj.view.engine.popup.okcancelpopup.OKCancelPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 import fr.amapj.view.views.common.contratselector.ContratSelectorPart;
@@ -58,7 +52,7 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
  *
  */
 @SuppressWarnings("serial")
-public class GestionContratSignesListPart extends StandardListPart<ContratSigneDTO> implements PopupSuppressionListener 
+public class GestionContratSignesListPart extends StandardListPart<ContratSigneDTO> 
 {
 	
 	private ContratSelectorPart contratSelectorPart;
@@ -95,7 +89,7 @@ public class GestionContratSignesListPart extends StandardListPart<ContratSigneD
 	protected void addSelectorComponent()
 	{
 		// Partie choix du contrat
-		contratSelectorPart = new ContratSelectorPart(this);
+		contratSelectorPart = new ContratSelectorPart(this,true);
 		HorizontalLayout toolbar1 = contratSelectorPart.getChoixContratComponent();
 		
 		addComponent(toolbar1);
@@ -201,17 +195,10 @@ public class GestionContratSignesListPart extends StandardListPart<ContratSigneD
 	{
 		ContratSigneDTO contratSigneDTO = getSelectedLine();
 		String text = "Etes vous sûr de vouloir supprimer le contrat de "+contratSigneDTO.prenomUtilisateur+" "+contratSigneDTO.nomUtilisateur+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,contratSigneDTO.idContrat);
-		SuppressionPopup.open(confirmPopup, this);		
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,contratSigneDTO.idContrat,e->new MesContratsService().deleteContrat(e));
+		confirmPopup.open(this);		
 	}
 	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new MesContratsService().deleteContrat(idItemToSuppress);
-	}
-
-
 	private void handleAjouter()
 	{
 		AjouterData data= new AjouterData();
@@ -229,8 +216,7 @@ public class GestionContratSignesListPart extends StandardListPart<ContratSigneD
 	private CInfo successSaisieUtilisateur(AjouterData data)
 	{
 		Long userId = data.userId;
-		Utilisateur u = (Utilisateur) new DbService().getOneElement(Utilisateur.class, userId);
-		String message = "Contrat de "+u.getPrenom()+" "+u.getNom();
+		String message = "Contrat de "+new UtilisateurService().prettyString(userId);
 					
 		SaisieContrat.saisieContrat(data.idModeleContrat,null,userId,message,ModeSaisie.QTE_CHEQUE_REFERENT,this);
 		

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -40,6 +40,7 @@ import com.vaadin.ui.TextField;
 
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.service.engine.generator.CoreGenerator;
+import fr.amapj.view.engine.enumselector.EnumSearcher;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.searcher.Searcher;
 import fr.amapj.view.engine.searcher.SearcherDefinition;
@@ -93,96 +94,106 @@ public class ComplexTableBuilder<T>
 	//
 	public void addString(String title, boolean editable,int width,ToValue<T> toVal)
 	{
-		addColumn(title, null, editable,width, TableColumnType.STRING, toVal,null, null, null);
+		addColumn(title, null, editable,width, TableColumnType.STRING, toVal,null, null, null, null);
 	}
 	
 	public void addString(String title, String property,boolean editable,int width,ToValue<T> toVal)
 	{
-		addColumn(title, property,editable,width, TableColumnType.STRING, toVal,null, null, null);
+		addColumn(title, property,editable,width, TableColumnType.STRING, toVal,null, null, null, null);
 	}
 	
 	//
 	public void addInteger(String title, boolean editable,int width,ToValue<T> toVal)
 	{
-		addColumn(title, null, editable,width, TableColumnType.INTEGER, toVal,null, null, null);
+		addColumn(title, null, editable,width, TableColumnType.INTEGER, toVal,null, null, null, null);
 	}
 	
 	public void addInteger(String title, String property,boolean editable,int width,ToValue<T> toVal)
 	{
-		addColumn(title, property,editable,width, TableColumnType.INTEGER, toVal,null, null, null);
+		addColumn(title, property,editable,width, TableColumnType.INTEGER, toVal,null, null, null, null);
 	}
 	
 	//
 	public void addCurrency(String title, boolean editable,int width,ToValue<T> toVal)
 	{
-		addColumn(title, null, editable,width, TableColumnType.CURRENCY, toVal,null, null, null);
+		addColumn(title, null, editable,width, TableColumnType.CURRENCY, toVal,null, null, null, null);
 	}
 	
 	public void addCurrency(String title, String property,boolean editable,int width,ToValue<T> toVal)
 	{
-		addColumn(title, property,editable,width, TableColumnType.CURRENCY, toVal,null, null, null);
+		addColumn(title, property,editable,width, TableColumnType.CURRENCY, toVal,null, null, null, null);
 	}
 	
 	//
 	public void addDate(String title, boolean editable,int width,ToValue<T> toVal)
 	{
-		addColumn(title, null, editable,width, TableColumnType.DATE, toVal,null, null, null);
+		addColumn(title, null, editable,width, TableColumnType.DATE, toVal,null, null, null, null);
 	}
 	
 	public void addDate(String title, String property,boolean editable,int width,ToValue<T> toVal)
 	{
-		addColumn(title, property,editable,width, TableColumnType.DATE, toVal,null, null, null);
+		addColumn(title, property,editable,width, TableColumnType.DATE, toVal,null, null, null, null);
 	}
 	
 	
 	//
 	public void addCheckBox(String title, boolean editable,int width,ToValue<T> toVal,CallBack<T> onClic)
 	{
-		addColumn(title, null,editable,width, TableColumnType.CHECK_BOX, toVal,onClic, null, null);
+		addColumn(title, null,editable,width, TableColumnType.CHECK_BOX, toVal,onClic, null, null, null);
 	}
 		
 	public void addCheckBox(String title, String property,boolean editable,int width,ToValue<T> toVal,CallBack<T> onClic)
 	{
-		addColumn(title, property,editable,width, TableColumnType.CHECK_BOX, toVal,onClic, null, null);
+		addColumn(title, property,editable,width, TableColumnType.CHECK_BOX, toVal,onClic, null, null, null);
 	}
 	
 	
 	//
 	public void addButton(String title, int width,ToValue<T> toVal,CallBack<T> onClic)
 	{
-		addColumn(title, null,false,width, TableColumnType.BUTTON, toVal,onClic, null, null);
+		addColumn(title, null,false,width, TableColumnType.BUTTON, toVal,onClic, null, null, null);
 	}
 		
 	public void addButton(String title, String property,int width,ToValue<T> toVal,CallBack<T> onClic)
 	{
-		addColumn(title, property,false,width, TableColumnType.BUTTON, toVal,onClic, null, null);
+		addColumn(title, property,false,width, TableColumnType.BUTTON, toVal,onClic, null, null, null);
 	}
 	
 	
 	public void addLink(String title, int width,ToValue<T> toVal,ToGenerator<T> generator)
 	{
-		addColumn(title, null,false,width, TableColumnType.LINK, toVal,null,generator, null);
+		addColumn(title, null,false,width, TableColumnType.LINK, toVal,null,generator, null, null);
 	}
 	
 	
 	//
 	public void addSearcher(String title, boolean editable,int width,ToValue<T> toVal,SearcherDefinition searcher)
 	{
-		addColumn(title, null, editable,width, TableColumnType.SEARCHER, toVal,null, null, searcher);
+		addColumn(title, null, editable,width, TableColumnType.SEARCHER, toVal,null, null, searcher, null);
 	}
 	
 	public void addSearcher(String title, String property,boolean editable,int width,ToValue<T> toVal,SearcherDefinition searcher)
 	{
-		addColumn(title, property,editable,width, TableColumnType.SEARCHER, toVal,null, null, searcher);
+		addColumn(title, property,editable,width, TableColumnType.SEARCHER, toVal,null, null, searcher, null);
+	}
+	
+	
+	//
+	public void addCombo(String title, boolean editable,int width,ToValue<T> toVal,Class<Enum> enumClazz)
+	{
+		addColumn(title, null, editable,width, TableColumnType.COMBO, toVal,null, null, null, enumClazz);
+	}
+	
+	public void addCombo(String title, String property,boolean editable,int width,ToValue<T> toVal,Class<? extends Enum> enumClazz)
+	{
+		addColumn(title, property,editable,width, TableColumnType.COMBO, toVal,null, null, null, enumClazz);
 	}
 	
 	
 	
-	
-	
-	private void addColumn(String title, String property,boolean editable, int width,TableColumnType type, ToValue<T> toVal,CallBack<T> onClic, ToGenerator<T> generator, SearcherDefinition searcher)
+	private void addColumn(String title, String property,boolean editable, int width,TableColumnType type, ToValue<T> toVal,CallBack<T> onClic, ToGenerator<T> generator, SearcherDefinition searcher, Class<? extends Enum> enumClazz)
 	{
-		cols.add(new TableColumnInfo<T>(title, property,editable,width,type, toVal,onClic,generator,searcher));
+		cols.add(new TableColumnInfo<T>(title, property,editable,width,type, toVal,onClic,generator,searcher, enumClazz));
 	}
 	
 	
@@ -193,7 +204,7 @@ public class ComplexTableBuilder<T>
 		
 		for (TableColumnInfo<T> col : cols)
 		{
-			addHeaderBox(col.title, col.width+13);
+			addHeaderBox(col.title, col.width+13,col);
 		}
 		contentLayout.addComponent(header1);
 		
@@ -259,6 +270,10 @@ public class ComplexTableBuilder<T>
 		case SEARCHER:
 			return ComboBox.class;
 			
+		case COMBO:
+			return ComboBox.class;
+
+			
 
 		default:
 			throw new AmapjRuntimeException();
@@ -287,16 +302,34 @@ public class ComplexTableBuilder<T>
 		switch (col.type)
 		{
 		case STRING:
+		{
 			Object o = col.toVal.toValue(bean);
 			if (o==null)
 			{
 				o="";
 			}
-			return createLabel( o.toString(),col.width);
+			if (col.editable)
+			{
+				return createTextField(o.toString(), col.width);
+			}
+			else
+			{
+				return createLabel( o.toString(),col.width);
+			}
+		}
 
 		case DATE:
-			return createLabel( df.format( (Date) col.toVal.toValue(bean)),col.width);
-			
+		{
+			Object o = col.toVal.toValue(bean);
+			if (o==null)
+			{
+				return createLabel( "",col.width);
+			}
+			else
+			{
+				return createLabel( df.format( (Date) o),col.width);
+			}
+		}	
 		case INTEGER:
 			Integer cVal = (Integer) col.toVal.toValue(bean);
 			if (col.editable)
@@ -324,7 +357,15 @@ public class ComplexTableBuilder<T>
 			return createCheckBox((Boolean) col.toVal.toValue(bean), col.width);
 			
 		case BUTTON:
-			return createButton( col.toVal.toValue(bean).toString(), col.width,col.onClic,bean);
+			String str = (String) col.toVal.toValue(bean);
+			if (str!=null)
+			{
+				return createButton( str, col.width,col.onClic,bean);
+			}
+			else
+			{
+				return null;
+			}
 			
 		case LINK:
 			return createLink( col.toVal.toValue(bean).toString(), col.width,col.generator,bean);
@@ -332,6 +373,8 @@ public class ComplexTableBuilder<T>
 		case SEARCHER:
 			return createSearcher( (Long) col.toVal.toValue(bean), col.searcher , col.editable , col.width,bean);
 
+		case COMBO : 
+			return createCombo( (Enum) col.toVal.toValue(bean),  col.editable , col.width,col.enumClazz);
 			
 			
 		default:
@@ -340,6 +383,16 @@ public class ComplexTableBuilder<T>
 
 	}
 
+	
+	private ComboBox createCombo(Enum value, boolean editable, int width,Class<? extends Enum> enumClazz)
+	{
+		ComboBox box =  EnumSearcher.createEnumSearcher("", enumClazz);
+		box.setValue(value);
+		box.setEnabled(editable);
+		box.setWidth(width+"px");
+		return box;
+	}
+	
 	
 	
 	private ComboBox createSearcher(Long value, SearcherDefinition searcher, boolean editable, int width, T bean)
@@ -454,10 +507,12 @@ public class ComplexTableBuilder<T>
 	}
 	
 	
-	private void addHeaderBox(String msg,int taille)
+	private void addHeaderBox(String msg,int taille,TableColumnInfo<T> col)
 	{
+		int additionnalWith = computeAdditionnalWidth(col); 
+		
 		Label hLabel = new Label(msg);
-		hLabel.setWidth((taille+13)+"px");
+		hLabel.setWidth((taille+additionnalWith)+"px");
 		hLabel.setHeight(height+"px");
 		hLabel.addStyleName(styleName);
 		header1.addComponent(hLabel);
@@ -465,6 +520,25 @@ public class ComplexTableBuilder<T>
 
 	
 	
+	private int computeAdditionnalWidth(TableColumnInfo<T> col) 
+	{
+		switch(col.type)
+		{
+		case STRING:
+			if (col.editable)
+			{
+				return -1;
+			}
+			else
+			{
+				return 11;
+			}
+		
+		default :
+			return 13;
+		}
+	}
+
 	/**
 	 * Retourne le composant à la ligne lineNumber et à la colonne property
 	 */
@@ -475,6 +549,49 @@ public class ComplexTableBuilder<T>
 		AbstractField tf = (AbstractField) item.getItemProperty(property).getValue();
 		return tf;
 	}
+	
+	/**
+	 * Retourne le Button à la ligne lineNumber et à la colonne property
+	 */
+	public Button getButton(int lineNumber,String property)
+	{
+		Item item = t.getItem(lineNumber);
+		
+		Button tf = (Button) item.getItemProperty(property).getValue();
+		return tf;
+	}
+	
+	/**
+	 * Retourne le Button correspondant à la ligne t et à la colonne property
+	 */
+	public Button getButton(T t,String property)
+	{
+		int lineNumber = beans.indexOf(t);
+		return getButton(lineNumber, property);
+	}
+	
+	
+	
+	/**
+	 * Retourne le Label à la ligne lineNumber et à la colonne property
+	 */
+	public Label getLabel(int lineNumber,String property)
+	{
+		Item item = t.getItem(lineNumber);
+		
+		Label tf = (Label) item.getItemProperty(property).getValue();
+		return tf;
+	}
+	
+	/**
+	 * Retourne le Label correspondant à la ligne t et à la colonne property
+	 */
+	public Label getLabel(T t,String property)
+	{
+		int lineNumber = beans.indexOf(t);
+		return getLabel(lineNumber, property);
+	}
+
 	
 	
 	
@@ -513,6 +630,47 @@ public class ComplexTableBuilder<T>
 		
 		T dto = beans.get(index); 
 		return dto;
+	}
+
+	public void addStyleName(String styleName)
+	{
+		t.addStyleName(styleName);
+		
+	}
+	
+	/**
+	 * Calcule une approximation de la taille totale de la table 
+	 * Permet à l'utilisateur de dimensionner la fenetre qui va recevoir la table 
+	 */
+	public int getTotalWidth()
+	{
+		int width = 0;
+		for (TableColumnInfo<T> col : cols) 
+		{
+			width = width+col.width+computeAdditionnalWidth(col)+13; // 13 correspond à la marge du style 
+		}
+		return width;
+	}
+	
+	/**
+	 * Retourne la liste de tous les elements dont la colonne property est une checkbox cochée 
+	 */
+	public List<T> getSelectedCheckBox(String property)
+	{
+		List<T> res = new ArrayList<T>();
+		for (int i = 0; i < beans.size(); i++)
+		{
+			T mc = beans.get(i);
+			
+			// 
+			CheckBox cb = (CheckBox) getComponent(i, property);
+			
+			if (cb.getValue()==true)
+			{
+				res.add(mc);
+			}
+		}	
+		return res;
 	}
 
 }

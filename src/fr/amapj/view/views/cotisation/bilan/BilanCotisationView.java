@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -31,10 +31,8 @@ import fr.amapj.service.services.gestioncotisation.PeriodeCotisationDTO;
 import fr.amapj.view.engine.excelgenerator.TelechargerPopup;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.corepopup.CorePopup;
-import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
-import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
 
@@ -42,7 +40,7 @@ import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
  * Affichage de la liste des périodes de cotisation 
  *
  */
-public class BilanCotisationView extends StandardListPart<PeriodeCotisationDTO> implements PopupSuppressionListener
+public class BilanCotisationView extends StandardListPart<PeriodeCotisationDTO>
 {
 
 	public BilanCotisationView()
@@ -54,7 +52,7 @@ public class BilanCotisationView extends StandardListPart<PeriodeCotisationDTO> 
 	@Override
 	protected String getTitle() 
 	{
-		return "Liste des périodes de cotisation";
+		return "Liste des périodes d'adhésion";
 	}
 
 
@@ -124,25 +122,23 @@ public class BilanCotisationView extends StandardListPart<PeriodeCotisationDTO> 
 	private void handleSupprimer()
 	{
 		PeriodeCotisationDTO dto = getSelectedLine();
-		String text = "Etes vous sûr de vouloir supprimer la période de cotisation "+dto.nom+" ?";
-		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id);
-		SuppressionPopup.open(confirmPopup, this);		
-	}
-
-	
-	@Override
-	public void deleteItem(Long idItemToSuppress) throws UnableToSuppressException
-	{
-		new GestionCotisationService().delete(idItemToSuppress);
+		String text = "Etes vous sûr de vouloir supprimer la période d'adhésion "+dto.nom+" ?";
+		SuppressionPopup confirmPopup = new SuppressionPopup(text,dto.id,e->new GestionCotisationService().delete(e));
+		confirmPopup.open(this);		
 	}
 
 	
 	private void handleTelecharger()
 	{
 		PeriodeCotisationDTO dto = getSelectedLine();
-		TelechargerPopup popup = new TelechargerPopup("Bilan des cotisations");
+		boolean hasBulletin = dto.idBulletinAdhesion!=null;
+		
+		TelechargerPopup popup = new TelechargerPopup("Bilan des adhésions");
 		popup.addGenerator(new EGBilanAdhesion(dto.id));
-		popup.addGenerator(new PGBulletinAdhesion(dto.id, null, null));
-		CorePopup.open(popup,this);
+		if (hasBulletin)
+		{
+			popup.addGenerator(new PGBulletinAdhesion(dto.id, null, null));
+		}
+		popup.open(this);
 	}
 }

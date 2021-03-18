@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -53,6 +53,8 @@ public class ChoixModifEditorPart extends SwitchPopup
 		line1 = "Veuillez indiquer ce que vous souhaitez modifier :";
 
 		addLine("Les informations d'entete (nom,description, date limite d'inscription,nature)", new ModifEnteteContratEditorPart(id));
+		
+		addSeparator();
 
 		addLine("Les dates de livraisons", new ModifDateContratEditorPart(id));
 
@@ -60,10 +62,20 @@ public class ChoixModifEditorPart extends SwitchPopup
 
 		addLine("Barrer certaines dates ou certains produits", new BarrerDateContratEditorPart(id));
 		
+		addSeparator();
+		
+		addLine("La gestion des jokers", new ModifJokerContratEditorPart(id));
+		
+		addSeparator();
+		
 		addLine("Les informations de paiement", new ModifPaiementContratEditorPart(id));
 		
 		addLine("Supprimer / ajouter des dates de paiement", new ModifDatePaiementContratEditorPart(id));
-
+		
+		addSeparator();
+		
+		addLine("Modifier la mise en forme graphique", new MiseEnFormeModeleContratEditorPart(id));
+		
 	}
 
 }

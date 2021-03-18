@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -162,7 +162,7 @@ public class InfoServlet extends HttpServlet
 	private Void appendInfos(List<String> strs)
 	{
 		ParametresDTO dto = new ParametresService().getParametres();
-		String str = "<b>"+dto.nomAmap+"</b><br/>"+dto.villeAmap+"<br/><a href=\""+dto.url+"\">"+dto.url+"</a><br/><br/><br/>";
+		String str = "<b>"+dto.nomAmap+"</b><br/>"+dto.villeAmap+"<br/><a target=\"_blank\" href=\""+dto.url+"\">"+dto.url+"</a><br/><br/><br/>";
 		strs.add(str);
 		return null;
 	}

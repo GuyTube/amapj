@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -40,6 +40,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.common.DateUtils;
+import fr.amapj.common.GenericUtils;
+import fr.amapj.common.GenericUtils.StringAction;
 import fr.amapj.service.services.mailer.MailerCounter;
 import fr.amapj.view.engine.popup.cascadingpopup.sample.ABCSample;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
@@ -159,6 +161,7 @@ public class DevToolsView extends BackOfficeLongView implements View
 		addLabel(layout, "ATTENTION !!! Ne pas utiliser sur une base en production !!! ATTENTION !!!!.");
 		
 
+		Button b99 = new Button("Décoder le contenu d'un champ zippé", e->decodeZipField());
 		
 		
 		Button b0 = new Button("Générer une erreur", e->generateEror());
@@ -174,6 +177,17 @@ public class DevToolsView extends BackOfficeLongView implements View
 		
 		Button b3 = new Button("La selection dans une table", e->CorePopup.open(new DevToolsSelectionTable()));
 		
+		Button b4 = new Button("La gestion des entités JPA - égalité", e->jpaEntity());
+		
+		Button b5 = new Button("Transformation HTML To Pdf", e->htmlToPdf());
+		
+		Button b6 = new Button("Test du Complex Table Builder", e->CorePopup.open(new DevToolsComplexTableBuilder()));
+		
+		
+		
+		
+		layout.addComponent(b99);
+		addEmptyLine(layout);
 		layout.addComponent(b0);
 		addEmptyLine(layout);
 		layout.addComponent(b10);
@@ -183,15 +197,41 @@ public class DevToolsView extends BackOfficeLongView implements View
 		layout.addComponent(b2);
 		addEmptyLine(layout);
 		layout.addComponent(b3);
-		
-				
 		addEmptyLine(layout);
+		layout.addComponent(b4);
+		addEmptyLine(layout);
+		layout.addComponent(b5);
+		addEmptyLine(layout);
+		
+		layout.addComponent(b6);
+		addEmptyLine(layout);
+		
+		
+		
+		
+		
 		
 		return layout;
 	}
 	
 	
+	private void decodeZipField()
+	{
+		PopupDecodeZipField.open(new PopupDecodeZipField());
+	}
 	
+	private void jpaEntity()
+	{
+		PopupJpaEntityEquality.open(new PopupJpaEntityEquality());
+	}
+	
+	
+	private void htmlToPdf()
+	{
+		PopupHtmlToPdf.open(new PopupHtmlToPdf());
+	}
+	
+
 	
 	
 	private void generateEror()
@@ -277,6 +317,5 @@ public class DevToolsView extends BackOfficeLongView implements View
 		return tf;
 
 	}
-	
 	
 }

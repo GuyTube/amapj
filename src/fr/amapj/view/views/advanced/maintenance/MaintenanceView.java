@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -29,8 +29,6 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
@@ -43,8 +41,6 @@ import fr.amapj.service.engine.deamons.DeamonsContext;
 import fr.amapj.service.services.advanced.maintenance.MaintenanceService;
 import fr.amapj.service.services.backupdb.BackupDatabaseService;
 import fr.amapj.service.services.mailer.MailerCounter;
-import fr.amapj.service.services.session.SessionManager;
-import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.template.BackOfficeLongView;
 
 /**
@@ -70,8 +66,6 @@ public class MaintenanceView extends BackOfficeLongView implements View
 	@Override
 	public void enterIn(ViewChangeEvent event)
 	{
-		boolean adminFull = SessionManager.getSessionParameters().isAdminFull();
-		
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		
 
@@ -89,20 +83,9 @@ public class MaintenanceView extends BackOfficeLongView implements View
 		backupPanel.setContent(getBackupPanel());
 		
 		
-		Panel diversPanel = new Panel("Outils d'admin");
-		diversPanel.addStyleName("action");
-		diversPanel.setContent(getDiversPanel());
-		
-		
 		addComponent(backupPanel);
 		addEmptyLine(this);
-		
-		//
-		if (adminFull)
-		{
-			addComponent(diversPanel);
-		}
-		
+
 	}
 	
 
@@ -128,73 +111,6 @@ public class MaintenanceView extends BackOfficeLongView implements View
 		return layout;
 	}
 	
-	
-	
-	
-	private Component getDiversPanel()
-	{
-		VerticalLayout layout = new VerticalLayout();
-		layout.setMargin(true);
-		
-		addEmptyLine(layout);
-		addLabel(layout, "Outils divers réservés aux experts.");
-		addEmptyLine(layout);
-		addLabel(layout, "ATTENTION !!! Ne pas utiliser sur une base en production !!! ATTENTION !!!!.");
-		
-
-		addEmptyLine(layout);
-				
-
-		Button b2 = new Button("Remise à zéro du cache (obligatoire après requete SQL)", new ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				new MaintenanceService().resetDatabaseCache();
-			}
-		});
-		
-		
-		Button b3 = new Button("Appel du garbage collector", new ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				System.gc();
-			}
-		});
-		
-		
-		
-		
-		Button b4 = new Button("Positionner les dates pour la base démo", new ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				PopupDateDemo popup = new PopupDateDemo();
-				CorePopup.open(popup);
-			}
-		});
-				
-		
-		
-		layout.addComponent(b2);
-		addEmptyLine(layout);
-		layout.addComponent(b3);
-		addEmptyLine(layout);
-		layout.addComponent(b4);
-		addEmptyLine(layout);
-		
-				
-		addEmptyLine(layout);
-		
-		return layout;
-	}
-	
-	
-
-
 	
 	private Label addLabel(VerticalLayout layout, String str,String stylename)
 	{

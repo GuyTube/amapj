@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -54,12 +54,12 @@ public class PeriodeCotisationEditorPart extends WizardFormPopup
 		
 		if (create)
 		{
-			popupTitle = "Création d'une période de cotisation";
+			popupTitle = "Création d'une période d'adhésion";
 			this.dto = new PeriodeCotisationDTO();
 		}
 		else
 		{
-			popupTitle = "Modification d'une période de cotisation";
+			popupTitle = "Modification d'une période d'adhésion";
 			this.dto = p;
 		}	
 		
@@ -79,7 +79,7 @@ public class PeriodeCotisationEditorPart extends WizardFormPopup
 	private void addFieldGeneral()
 	{
 		// Titre
-		setStepTitle("les informations générales de la période de cotisation");
+		setStepTitle("les informations générales de la période d'adhésion");
 		
 		IValidator notNull = new NotNullValidator();
 		
@@ -108,12 +108,6 @@ public class PeriodeCotisationEditorPart extends WizardFormPopup
 		addTextField("Ordre du chèque","libCheque");
 		
 		addTextAeraField("Texte explicatif pour le paiement","textPaiement");
-		
-		addDateField("Date de début des inscriptions","dateDebutInscription",notNull);
-		
-		addDateField("Date de fin des inscriptions","dateFinInscription",notNull);
-		
-		addDateField("Date de remise des chèques","dateRemiseCheque");
 		
 		
 		if (new EditionSpeService().fichePeriodeNeedBulletinAdhesion())
