@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,6 +23,7 @@
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -95,7 +96,7 @@ public class PasswordManager
 			return "Adresse e-mail ou mot de passe incorrect";
 		}
 		
-		if (u.getEtatUtilisateur()==EtatUtilisateur.INACTIF)
+		if (u.etatUtilisateur==EtatUtilisateur.INACTIF)
 		{
 			return "Votre compte a été désactivé car vous n'êtes plus membre de l'AMAP.";
 		}
@@ -119,14 +120,14 @@ public class PasswordManager
 		// Si password ok :		
 		
 		// On mémorise l'accès dans la base de données du master
-		LogAccessDTO logAccessDTO = new LogViewService().saveAccess(u.getNom(),u.getPrenom(),u.getId(),ip,browser,dbName,TypLog.USER,(sudo!=null));
+		LogAccessDTO logAccessDTO = new LogViewService().saveAccess(u.nom,u.prenom,u.getId(),ip,browser,dbName,TypLog.USER,(sudo!=null));
 						
 		// On sauveagrde les paramètres de session
 		SessionParameters p = new SessionParameters();
 		p.userId = u.getId();
 		p.userRole = new AccessManagementService().getUserRole(u,em);
-		p.userNom = u.getNom();
-		p.userPrenom = u.getPrenom();
+		p.userNom = u.nom;
+		p.userPrenom = u.prenom;
 		p.userEmail = email;
 		p.dateConnexion = logAccessDTO.dateIn;
 		p.logId = logAccessDTO.id;
@@ -172,8 +173,8 @@ public class PasswordManager
 
 	private String checkCredentialByPassword(Utilisateur u, String password)
 	{
-		byte[] encryptedPassword = toByteArray(u.getPassword());
-		byte[] salt = toByteArray(u.getSalt());
+		byte[] encryptedPassword = toByteArray(u.password);
+		byte[] salt = toByteArray(u.salt);
 
 		
 		// Verification du password
@@ -199,15 +200,11 @@ public class PasswordManager
 			return null;
 		}
 		
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		TypedQuery<Utilisateur> q = em.createQuery("select u from Utilisateur u where u.email=:email",Utilisateur.class);
+		q.setParameter("email", email);
+		List<Utilisateur> us = q.getResultList();
 		
-		CriteriaQuery<Utilisateur> cq = cb.createQuery(Utilisateur.class);
-		Root<Utilisateur> root = cq.from(Utilisateur.class);
 		
-		// On ajoute la condition where 
-		cq.where(cb.equal(root.get(Utilisateur.P.EMAIL.prop()),email));
-		
-		List<Utilisateur> us = em.createQuery(cq).getResultList();
 		if (us.size()==0)
 		{
 			return null;
@@ -239,18 +236,18 @@ public class PasswordManager
 			return false;
 		}
 		
-		if (r.getSalt()==null)
+		if (r.salt==null)
 		{
-			r.setSalt(fromByteArray(passwordEncryptionService.generateSalt()));
+			r.salt = fromByteArray(passwordEncryptionService.generateSalt());
 		}
 		
-		byte[] salt = toByteArray(r.getSalt());
+		byte[] salt = toByteArray(r.salt);
 		byte[] encryptedPass = passwordEncryptionService.getEncryptedPassword(clearPassword, salt);
-		r.setPassword(fromByteArray(encryptedPass));
+		r.password = fromByteArray(encryptedPass);
 		
 		// A chaque changement du mot de passe on supprime la ré initilisation par mail
-		r.setResetPasswordDate(null);
-		r.setResetPasswordSalt(null);
+		r.resetPasswordDate = null;
+		r.resetPasswordSalt = null;
 		
 		return true;
 	
@@ -292,7 +289,7 @@ public class PasswordManager
 			return "Votre adresse e mail est inconnue";
 		}
 		
-		if (u.getEtatUtilisateur()==EtatUtilisateur.INACTIF)
+		if (u.etatUtilisateur==EtatUtilisateur.INACTIF)
 		{
 			return "Votre compte a été désactivé car vous n'êtes plus membre de l'AMAP.";
 		}
@@ -305,13 +302,13 @@ public class PasswordManager
 		}
 		
 		
-		u.setResetPasswordDate(DateUtils.getDate());
+		u.resetPasswordDate = DateUtils.getDate();
 		// Génère une clé pour le reset du password , de 20 caractères en minuscules
-		u.setResetPasswordSalt(RandomUtils.generatePasswordMin(20));
+		u.resetPasswordSalt = RandomUtils.generatePasswordMin(20);
 
 		ParametresDTO parametresDTO = new ParametresService().getParametres(); 
 		
-		String link = parametresDTO.getUrl()+"?resetPassword="+u.getResetPasswordSalt();
+		String link = parametresDTO.getUrl()+"?resetPassword="+u.resetPasswordSalt;
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("<h2>"+parametresDTO.nomAmap+"</h2>");
@@ -349,15 +346,11 @@ public class PasswordManager
 			return null;
 		}
 		
-		CriteriaBuilder cb = em.getCriteriaBuilder();
 		
-		CriteriaQuery<Utilisateur> cq = cb.createQuery(Utilisateur.class);
-		Root<Utilisateur> root = cq.from(Utilisateur.class);
+		TypedQuery<Utilisateur> q = em.createQuery("select u from Utilisateur u where u.resetPasswordSalt=:resetPasswordSalt",Utilisateur.class);
+		q.setParameter("resetPasswordSalt", resetPasswordSalt);
+		List<Utilisateur> us = q.getResultList();
 		
-		// On ajoute la condition where 
-		cq.where(cb.equal(root.get(Utilisateur.P.RESETPASSWORDSALT.prop()),resetPasswordSalt));
-		
-		List<Utilisateur> us = em.createQuery(cq).getResultList();
 		if (us.size()==0)
 		{
 			return null;
@@ -371,7 +364,7 @@ public class PasswordManager
 
 		Utilisateur u =  us.get(0);
 		
-		if (u.getEtatUtilisateur()==EtatUtilisateur.INACTIF)
+		if (u.etatUtilisateur==EtatUtilisateur.INACTIF)
 		{
 			return null;
 		}

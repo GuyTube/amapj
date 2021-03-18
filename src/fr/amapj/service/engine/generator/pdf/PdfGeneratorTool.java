@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -46,7 +46,7 @@ public class PdfGeneratorTool
 		this.imprimable = imprimable;
 		
 		buf = new StringBuffer();
-		buf.append(PdfHtmlUtils.generateHeaderAndBodyLineForPrinting(imprimable));
+		buf.append(PdfHtmlUtils.generateHeaderAndBodyLineForCKEditor(imprimable));
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class PdfGeneratorTool
 	
 	public String getParameterForCommandLine()
 	{
-		return "-T "+imprimable.getMargeHaut()+" -B "+imprimable.getMargeBas()+" -L "+imprimable.getMargeGauche()+" -R "+imprimable.getMargeDroite()+" ";
+		return " --disable-smart-shrinking -T 0 -B 0 -L 0 -R 0 ";
 	}
 	
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -100,7 +100,7 @@ public class PeriodePermanenceEnvoiMailService
 		ParametresDTO param = new ParametresService().getParametres();
 		
 		//
-		String email=utilisateur.getEmail();
+		String email=utilisateur.email;
 		
 		String subject = param.nomAmap+" - Planning des permanences";
 		String htmlContent = texte;

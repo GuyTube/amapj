@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -41,17 +41,17 @@ public class InsertDbUtilisateurWithDbTools
 		
 
 		Utilisateur u = new Utilisateur();
-		u.setNom("nom_c");
-		u.setPrenom("prenom_c");
-		u.setEmail("c");
+		u.nom = "nom_c";
+		u.prenom = "prenom_c";
+		u.email = "c";
 		
 		
 		em.persist(u);
 		
 		u = new Utilisateur();
-		u.setNom("nom_d");
-		u.setPrenom("prenom_d");
-		u.setEmail("d");
+		u.nom = "nom_d";
+		u.prenom = "prenom_d";
+		u.email = "d";
 		
 		em.persist(u);
 		

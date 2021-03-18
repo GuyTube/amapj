@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -62,8 +62,8 @@ public class EGAvoirs extends AbstractExcelGenerator
 		et.addRow("Liste des avoirs initiaux",et.grasGaucheNonWrappe);
 		et.addRow("",et.grasGaucheNonWrappe);
 		
-		et.addRow("Nom du contrat : "+mc.getNom(),et.grasGaucheNonWrappe);
-		et.addRow("Nom du producteur : "+mc.getProducteur().nom,et.grasGaucheNonWrappe);
+		et.addRow("Nom du contrat : "+mc.nom,et.grasGaucheNonWrappe);
+		et.addRow("Nom du producteur : "+mc.producteur.nom,et.grasGaucheNonWrappe);
 		et.addRow(avoirs.size()+" adhérents possèdent un avoir",et.grasGaucheNonWrappe);
 		et.addRow("",et.grasGaucheNonWrappe);
 		
@@ -115,7 +115,7 @@ public class EGAvoirs extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class,modeleContratId);
-		return "avoirs-"+mc.getNom();
+		return "avoirs-"+mc.nom;
 	}
 
 	@Override

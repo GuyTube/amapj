@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -58,20 +58,20 @@ public class EGRemise extends AbstractExcelGenerator
 	public void fillExcelFile(EntityManager em,ExcelGeneratorTool et)
 	{
 		RemiseProducteur remise = em.find(RemiseProducteur.class, remiseId);
-		ModeleContrat mc = remise.getDatePaiement().getModeleContrat();
+		ModeleContrat mc = remise.datePaiement.modeleContrat;
 		RemiseDTO dto = new RemiseProducteurService().loadRemise(remiseId);
 		
 		PEReceptionCheque peConf = (PEReceptionCheque) new ParametresService().loadParamEcran(MenuList.RECEPTION_CHEQUES);
 		
-		// Calcul du nombre de colonnes :  Nom + prénom + 1 montant du chéque + commentaire 1 + commentaire 2
-		et.addSheet(dto.moisRemise, 5, 20);
+		// Calcul du nombre de colonnes :  Nom + prénom + 1 montant du chéque + commentaire 1 + commentaire 2 +commentaire 3 + commentaire 4
+		et.addSheet(dto.moisRemise, 7, 20);
 				
 		et.addRow("Remise de chèques du mois de "+dto.moisRemise,et.grasGaucheNonWrappe);
 		et.addRow("",et.grasGaucheNonWrappe);
 		
-		et.addRow("Nom du contrat : "+mc.getNom(),et.grasGaucheNonWrappe);
-		et.addRow("Nom du producteur : "+mc.getProducteur().nom,et.grasGaucheNonWrappe);
-		et.addRow("Ordre des chèques : "+mc.getLibCheque(),et.grasGaucheNonWrappe);
+		et.addRow("Nom du contrat : "+mc.nom,et.grasGaucheNonWrappe);
+		et.addRow("Nom du producteur : "+mc.producteur.nom,et.grasGaucheNonWrappe);
+		et.addRow("Ordre des chèques : "+mc.libCheque,et.grasGaucheNonWrappe);
 	
 		
 		et.addRow(dto.paiements.size()+" chèques dans cette remise",et.grasGaucheNonWrappe);
@@ -83,27 +83,11 @@ public class EGRemise extends AbstractExcelGenerator
 		et.setCell(0,"Nom",et.grasCentreBordure);
 		et.setCell(1,"Prénom",et.grasCentreBordure);
 		et.setCell(2,"Montant chèques",et.grasCentreBordure);
-		et.setCell(3,"",et.grasCentreBordure);
-		if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
-		{
-			et.setCell(3,peConf.libSaisieCommentaire1,et.grasCentreBordure);
-		}
-		else
-		{
-			et.setColumnWidth(3, 0);
-		}
-		et.setCell(4,"",et.grasCentreBordure);
-		if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
-		{
-			et.setCell(4,peConf.libSaisieCommentaire2,et.grasCentreBordure);
-		}
-		else
-		{
-			et.setColumnWidth(4, 0);
-		}
-		
-		
-		
+		addTitreCommentaire(et,3,peConf.saisieCommentaire1,peConf.libSaisieCommentaire1);
+		addTitreCommentaire(et,4,peConf.saisieCommentaire2,peConf.libSaisieCommentaire2);
+		addTitreCommentaire(et,5,peConf.saisieCommentaire3,peConf.libSaisieCommentaire3);
+		addTitreCommentaire(et,6,peConf.saisieCommentaire4,peConf.libSaisieCommentaire4);
+				
 		
 		// Une ligne pour chaque chèque 
 		for (PaiementRemiseDTO paiementRemiseDTO : dto.paiements)
@@ -119,6 +103,19 @@ public class EGRemise extends AbstractExcelGenerator
 
 	}
 
+	private void addTitreCommentaire(ExcelGeneratorTool et, int col, ChoixOuiNon saisieCommentaire, String libSaisieCommentaire) 
+	{
+		et.setCell(col,"",et.grasCentreBordure);
+		if (saisieCommentaire==ChoixOuiNon.OUI)
+		{
+			et.setCell(col,libSaisieCommentaire,et.grasCentreBordure);
+		}
+		else
+		{
+			et.setColumnWidth(col, 0);
+		}
+	}
+
 	private void addRow(PaiementRemiseDTO paiementRemiseDTO, ExcelGeneratorTool et, PEReceptionCheque peConf)
 	{
 		et.addRow();
@@ -126,23 +123,26 @@ public class EGRemise extends AbstractExcelGenerator
 		et.setCell(1,paiementRemiseDTO.prenomUtilisateur,et.nonGrasGaucheBordure);
 		et.setCellPrix(2,paiementRemiseDTO.montant,et.prixCentreBordure);
 		
-		et.setCell(3,"",et.grasCentreBordure);
-		if (peConf.saisieCommentaire1==ChoixOuiNon.OUI)
-		{
-			et.setCell(3,paiementRemiseDTO.commentaire1,et.nonGrasGaucheBordure);
-		}
-		
-		et.setCell(4,"",et.grasCentreBordure);
-		if (peConf.saisieCommentaire2==ChoixOuiNon.OUI)
-		{
-			et.setCell(4,paiementRemiseDTO.commentaire2,et.nonGrasGaucheBordure);
-		}
-		
+		addCellCommentaire(et,3,peConf.saisieCommentaire1,paiementRemiseDTO.commentaire1);
+		addCellCommentaire(et,4,peConf.saisieCommentaire2,paiementRemiseDTO.commentaire2);
+		addCellCommentaire(et,5,peConf.saisieCommentaire3,paiementRemiseDTO.commentaire3);
+		addCellCommentaire(et,6,peConf.saisieCommentaire4,paiementRemiseDTO.commentaire4);
+				
 	}
 
 
 	
 	
+	private void addCellCommentaire(ExcelGeneratorTool et, int col, ChoixOuiNon saisieCommentaire, String commentaire) 
+	{
+		et.setCell(col,"",et.grasCentreBordure);
+		if (saisieCommentaire==ChoixOuiNon.OUI)
+		{
+			et.setCell(col,commentaire,et.nonGrasGaucheBordure);
+		}
+		
+	}
+
 	private void addRowCumul(ExcelGeneratorTool et, int nbPaiements)
 	{
 		et.addRow();
@@ -158,8 +158,8 @@ public class EGRemise extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		RemiseProducteur remise = em.find(RemiseProducteur.class, remiseId);
-		ModeleContrat mc = remise.getDatePaiement().getModeleContrat();
-		return "remise-"+mc.getNom();
+		ModeleContrat mc = remise.datePaiement.modeleContrat;
+		return "remise-"+mc.nom;
 	}
 
 	@Override

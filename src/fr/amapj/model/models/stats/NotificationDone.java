@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -34,10 +34,8 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import fr.amapj.model.engine.Identifiable;
-import fr.amapj.model.engine.Mdm;
 import fr.amapj.model.models.contrat.modele.ModeleContratDate;
 import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.model.models.permanence.reel.PermanenceCell;
 
 /**
  * Suivi des notifications réalisées par e mail 
@@ -69,24 +67,6 @@ public class NotificationDone  implements Identifiable
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date dateEnvoi;
-	
-	
-	public enum P implements Mdm
-	{
-		ID("id");
-		
-		private String propertyId;   
-		   
-	    P(String propertyId) 
-	    {
-	        this.propertyId = propertyId;
-	    }
-	    public String prop() 
-	    { 
-	    	return propertyId; 
-	    }
-		
-	}
 	
 
 	// Getters and setters

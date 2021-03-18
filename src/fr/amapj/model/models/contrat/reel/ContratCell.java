@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -38,41 +38,22 @@ public class ContratCell  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 
 	@NotNull
 	@ManyToOne
-	private Contrat contrat;
+	public Contrat contrat;
 	
 	@NotNull
 	@ManyToOne
-	private ModeleContratProduit modeleContratProduit;
+	public ModeleContratProduit modeleContratProduit;
 	
 	@NotNull
 	@ManyToOne
-	private ModeleContratDate modeleContratDate;
+	public ModeleContratDate modeleContratDate;
 
 	@NotNull
-	private int qte;
-	
-	
-	
-	public enum P implements Mdm
-	{
-		ID("id") , CONTRAT("contrat") , MODELECONTRATPRODUIT("modeleContratProduit") , MODELECONTRATDATE("modeleContratDate") , QTE("qte") ;
-		
-		private String propertyId;   
-		   
-	    P(String propertyId) 
-	    {
-	        this.propertyId = propertyId;
-	    }
-	    public String prop() 
-	    { 
-	    	return propertyId; 
-	    }
-		
-	} ;
+	public int qte;
 	
 	
 
@@ -85,50 +66,5 @@ public class ContratCell  implements Identifiable
 	{
 		this.id = id;
 	}
-
-	public Contrat getContrat()
-	{
-		return contrat;
-	}
-
-	public void setContrat(Contrat contrat)
-	{
-		this.contrat = contrat;
-	}
-
-	public ModeleContratProduit getModeleContratProduit()
-	{
-		return modeleContratProduit;
-	}
-
-	public void setModeleContratProduit(ModeleContratProduit modeleContratProduit)
-	{
-		this.modeleContratProduit = modeleContratProduit;
-	}
-
-	public ModeleContratDate getModeleContratDate()
-	{
-		return modeleContratDate;
-	}
-
-	public void setModeleContratDate(ModeleContratDate modeleContratDate)
-	{
-		this.modeleContratDate = modeleContratDate;
-	}
-
-	public int getQte()
-	{
-		return qte;
-	}
-
-	public void setQte(int qte)
-	{
-		this.qte = qte;
-	}
 		
-
-	
-
-	
-	
 }

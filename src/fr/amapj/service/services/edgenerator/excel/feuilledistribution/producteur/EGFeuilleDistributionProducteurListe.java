@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -62,16 +62,16 @@ public class EGFeuilleDistributionProducteurListe
 		SimpleDateFormat df2 = new SimpleDateFormat("dd MMMMM");
 		
 		ModeleContratDate mcd = em.find(ModeleContratDate.class, modeleContratDateId);
-		ModeleContrat mc = mcd.getModeleContrat();
+		ModeleContrat mc = mcd.modeleContrat;
 
 		// Il y a 1 colonne
-		String sheetName = df2.format(mcd.getDateLiv())+"-Liste";
+		String sheetName = df2.format(mcd.dateLiv)+"-Liste";
 		et.addSheet(sheetName, 1, 100);
 				
 		// Ligne 1 à 5
-		et.addRow("FEUILLE DE DISTRIBUTION PRODUCTEUR DU "+df.format(mcd.getDateLiv()),et.grasGaucheNonWrappe);
-		et.addRow(mc.getNom(),et.grasGaucheNonWrappe);
-		et.addRow(mc.getDescription(),et.grasGaucheNonWrappe);
+		et.addRow("FEUILLE DE DISTRIBUTION PRODUCTEUR DU "+df.format(mcd.dateLiv),et.grasGaucheNonWrappe);
+		et.addRow(mc.nom,et.grasGaucheNonWrappe);
+		et.addRow(mc.description,et.grasGaucheNonWrappe);
 		et.addRow("Extrait le "+df1.format(DateUtils.getDate()),et.grasGaucheNonWrappe);
 		et.addRow("",et.grasGaucheNonWrappe);
 		
@@ -108,8 +108,8 @@ public class EGFeuilleDistributionProducteurListe
 			ModeleContratProduit mcp = (ModeleContratProduit) line[0];
 			int qte = SQLUtils.toInt(line[1]);
 			
-			Produit p = mcp.getProduit();
-			et.addRow("  "+BULLET_CHARACTER+" "+qte+" "+p.getNom()+" ,"+p.getConditionnement(),et.nongrasGaucheWrappe);
+			Produit p = mcp.produit;
+			et.addRow("  "+BULLET_CHARACTER+" "+qte+" "+p.nom+" ,"+p.conditionnement,et.nongrasGaucheWrappe);
 		}
 		
 		
@@ -132,17 +132,17 @@ public class EGFeuilleDistributionProducteurListe
 		List<ContratCell> cells = q.getResultList();
 		for (ContratCell cell : cells)
 		{
-			int qte =  cell.getQte();
-			Utilisateur u = cell.getContrat().getUtilisateur();
-			Produit p = cell.getModeleContratProduit().getProduit();
+			int qte =  cell.qte;
+			Utilisateur u = cell.contrat.utilisateur;
+			Produit p = cell.modeleContratProduit.produit;
 			
 			if (u.getId().equals(user)==false)
 			{
 				user = u.getId();
 				et.addRow("",et.grasGaucheNonWrappe);
-				et.addRow(u.getNom()+" "+u.getPrenom(),et.grasGaucheNonWrappe);
+				et.addRow(u.nom+" "+u.prenom,et.grasGaucheNonWrappe);
 			}
-			et.addRow("  "+BULLET_CHARACTER+" "+qte+" "+p.getNom()+" ,"+p.getConditionnement(),et.nongrasGaucheWrappe);
+			et.addRow("  "+BULLET_CHARACTER+" "+qte+" "+p.nom+" ,"+p.conditionnement,et.nongrasGaucheWrappe);
 		}	
 		
 	}

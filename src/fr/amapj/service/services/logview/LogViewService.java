@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -82,21 +82,21 @@ public class LogViewService
 			{
 				// On crée l'object et on le rend persistant pour avoir son id
 				LogAccess logAccess = new LogAccess();
-				logAccess.setNom(nom);
-				logAccess.setPrenom(prenom);
-				logAccess.setIdUtilisateur(idUtilisateur);
-				logAccess.setIp(ip);
-				logAccess.setBrowser(browser);
-				logAccess.setDbName(dbName);
-				logAccess.setDateIn(DateUtils.getDate());
-				logAccess.setTypLog(typLog);
-				logAccess.setSudo((sudo==true) ? 1 : 0);
+				logAccess.nom = nom;
+				logAccess.prenom = prenom;
+				logAccess.idUtilisateur = idUtilisateur;
+				logAccess.ip = ip;
+				logAccess.browser = browser;
+				logAccess.dbName = dbName;
+				logAccess.dateIn = DateUtils.getDate();
+				logAccess.typLog = typLog;
+				logAccess.sudo = (sudo==true) ? 1 : 0;
 				em.persist(logAccess);
 
 				// Gestion du logging ensuite
-				String fileName = AmapJLogManager.createLogFileName(dbName,logAccess.getId(), logAccess.getDateIn(),typLog);
-				logAccess.setLogFileName(fileName);
-				String d = new SimpleDateFormat("dd/MM/yyyy").format(logAccess.getDateIn());
+				String fileName = AmapJLogManager.createLogFileName(dbName,logAccess.getId(), logAccess.dateIn,typLog);
+				logAccess.logFileName = fileName;
+				String d = new SimpleDateFormat("dd/MM/yyyy").format(logAccess.dateIn);
 				
 				if (typLog==TypLog.USER)
 				{
@@ -126,12 +126,12 @@ public class LogViewService
 			public Object executeInNewTransaction(EntityManager em)
 			{
 				LogAccess logAccess = em.find(LogAccess.class, idLogAccess);
-				logAccess.setDateOut(DateUtils.getDate());
-				int nbSec = (int) ((logAccess.getDateOut().getTime()-logAccess.getDateIn().getTime())/1000);
-				logAccess.setActivityTime(nbSec);
-				if (logAccess.getNbError()<nbError)
+				logAccess.dateOut = DateUtils.getDate();
+				int nbSec = (int) ((logAccess.dateOut.getTime()-logAccess.dateIn.getTime())/1000);
+				logAccess.activityTime = nbSec;
+				if (logAccess.nbError<nbError)
 				{
-					logAccess.setNbError(nbError);
+					logAccess.nbError = nbError;
 				}
 
 				return null;
@@ -143,19 +143,19 @@ public class LogViewService
 	{
 		LogAccessDTO dto = new LogAccessDTO();
 
-		dto.browser = logAccess.getBrowser();
-		dto.dateIn = logAccess.getDateIn();
-		dto.dateOut = logAccess.getDateOut();
-		dto.dbName = logAccess.getDbName();
+		dto.browser = logAccess.browser;
+		dto.dateIn = logAccess.dateIn;
+		dto.dateOut = logAccess.dateOut;
+		dto.dbName = logAccess.dbName;
 		dto.id = logAccess.getId();
-		dto.idUtilisateur = logAccess.getIdUtilisateur();
-		dto.ip = logAccess.getIp();
-		dto.logFileName = logAccess.getLogFileName();
-		dto.nom = logAccess.getNom();
-		dto.prenom = logAccess.getPrenom();
-		dto.typLog = logAccess.getTypLog();
-		dto.nbError = logAccess.getNbError();
-		dto.sudo = (logAccess.getSudo()==0) ? "" : "SUDO";
+		dto.idUtilisateur = logAccess.idUtilisateur;
+		dto.ip = logAccess.ip;
+		dto.logFileName = logAccess.logFileName;
+		dto.nom = logAccess.nom;
+		dto.prenom = logAccess.prenom;
+		dto.typLog = logAccess.typLog;
+		dto.nbError = logAccess.nbError;
+		dto.sudo = (logAccess.sudo==0) ? "" : "SUDO";
 
 		return dto;
 	}
@@ -367,7 +367,7 @@ public class LogViewService
 		
 		// 
 		c1.fill(cs);
-		c1.groupBy(e->e.getDbName());
+		c1.groupBy(e->e.dbName);
 		
 		// Pas de tri des lignes 
 		// Pas de tri sur les cellules
@@ -403,16 +403,16 @@ public class LogViewService
 		dto.detail = new Detail[3];
 		
 		
-		List<LogAccess> users = CollectionUtils.filter(cells, e->e.getTypLog()==TypLog.USER);
-		List<LogAccess> deamons = CollectionUtils.filter(cells, e->e.getTypLog()==TypLog.DEAMON);
+		List<LogAccess> users = CollectionUtils.filter(cells, e->e.typLog==TypLog.USER);
+		List<LogAccess> deamons = CollectionUtils.filter(cells, e->e.typLog==TypLog.DEAMON);
 		
 		
 		dto.detail[0] = getDetail(select(users,ref2,ref1));
 		dto.detail[1] = getDetail(select(users,ref3,ref2));
 		dto.detail[2] = getDetail(select(users,ref4,ref3));
 		
-		dto.erreurDemon = CollectionUtils.accumulateInt(deamons, e->e.getNbError());
-		dto.erreurUser = CollectionUtils.accumulateInt(users, e->e.getNbError());
+		dto.erreurDemon = CollectionUtils.accumulateInt(deamons, e->e.nbError);
+		dto.erreurUser = CollectionUtils.accumulateInt(users, e->e.nbError);
 		
 		return dto;
 	}
@@ -425,7 +425,7 @@ public class LogViewService
 	
 	private boolean isIn(LogAccess l,Date debut,Date fin)
 	{
-		return l.getDateIn().after(debut) && ( l.getDateIn().before(fin) || l.getDateIn().equals(fin) );
+		return l.dateIn.after(debut) && ( l.dateIn.before(fin) || l.dateIn.equals(fin) );
 	}
 	
 
@@ -433,7 +433,7 @@ public class LogViewService
 	{
 		Detail d = new Detail();
 		d.nbAccess = ls.size();
-		d.nbVisiteur = CollectionUtils.selectDistinct(ls, e->e.getIdUtilisateur()).size();
+		d.nbVisiteur = CollectionUtils.selectDistinct(ls, e->e.idUtilisateur).size();
 		
 		return d;
 	}

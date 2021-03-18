@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -57,8 +57,8 @@ public class GestionContratSigneUpdateService
 	public void addOneDateLiv(EntityManager em,Date datLiv,ModeleContrat mc)
 	{
 		ModeleContratDate md = new ModeleContratDate();
-		md.setModeleContrat(mc);
-		md.setDateLiv(datLiv);
+		md.modeleContrat = mc;
+		md.dateLiv = datLiv;
 		em.persist(md);
 	}
 	
@@ -133,10 +133,10 @@ public class GestionContratSigneUpdateService
 	public void addOneProduit(EntityManager em, Long produitId, Integer prix, int index, ModeleContrat mc)
 	{	
 		ModeleContratProduit mcp = new ModeleContratProduit();
-		mcp.setIndx(index);
-		mcp.setModeleContrat(mc);
-		mcp.setPrix(prix);
-		mcp.setProduit(em.find(Produit.class, produitId));
+		mcp.indx = index;
+		mcp.modeleContrat = mc;
+		mcp.prix = prix;
+		mcp.produit = em.find(Produit.class, produitId);
 
 		em.persist(mcp);
 		
@@ -147,8 +147,8 @@ public class GestionContratSigneUpdateService
 	{
 		ModeleContratProduit mcp = em.find(ModeleContratProduit.class, idModeleContratProduit);
 
-		mcp.setIndx(index);
-		mcp.setPrix(prix);
+		mcp.indx = index;
+		mcp.prix = prix;
 
 	}
 

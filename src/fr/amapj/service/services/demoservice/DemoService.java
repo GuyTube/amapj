@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -23,6 +23,7 @@
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +37,7 @@ import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
 import fr.amapj.model.models.contrat.modele.EtatModeleContrat;
 import fr.amapj.model.models.contrat.modele.GestionPaiement;
+import fr.amapj.model.models.contrat.modele.JokerMode;
 import fr.amapj.model.models.contrat.modele.NatureContrat;
 import fr.amapj.model.models.fichierbase.EtatNotification;
 import fr.amapj.model.models.fichierbase.Producteur;
@@ -48,7 +50,6 @@ import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.model.models.param.ChoixOuiNon;
 import fr.amapj.model.models.param.EtatModule;
 import fr.amapj.model.models.param.Parametres;
-import fr.amapj.model.models.param.SmtpType;
 import fr.amapj.model.models.saas.AppInstance;
 import fr.amapj.model.models.saas.TypDbExemple;
 import fr.amapj.service.services.appinstance.AppInstanceDTO;
@@ -57,6 +58,12 @@ import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.LigneContratDTO;
 import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
 import fr.amapj.service.services.gestioncontrat.ModeleContratSummaryDTO;
+import fr.amapj.service.services.gestioncotisation.GestionCotisationService;
+import fr.amapj.service.services.gestioncotisation.PeriodeCotisationDTO;
+import fr.amapj.service.services.mesadhesions.AdhesionDTO;
+import fr.amapj.service.services.mesadhesions.MesAdhesionDTO;
+import fr.amapj.service.services.mesadhesions.MesAdhesionsService;
+import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.views.gestioncontrat.editorpart.FrequenceLivraison;
 
 /**
@@ -87,8 +94,12 @@ public class DemoService
 			createProducteur(em);
 	
 			createProduit(em);
+			
+			Long idPeriodeCotisation = createPeriodeCotisation(em,dto.dateDebut, dto.dateFin);
 	
-			createContrat(em, dto.dateDebut, dto.dateFin, dto.dateFinInscription);
+			createContrat(em, dto.dateDebut, dto.dateFin, dto.dateFinInscription,idPeriodeCotisation);
+			
+			createCotisation(idPeriodeCotisation);
 		}
 		else if (dto.typDbExemple==TypDbExemple.BASE_MINIMALE)
 		{
@@ -102,7 +113,7 @@ public class DemoService
 		return null;
 	}
 
-
+	
 
 	private void createParamGeneraux(EntityManager em, AppInstanceDTO dto)
 	{
@@ -111,28 +122,36 @@ public class DemoService
 		p.setId(1L);
 		
 		// Etape 1 - Nom et ville Amap
-		p.setNomAmap(dto.nomAmap);
-		p.setVilleAmap(dto.villeAmap);
+		p.nomAmap = dto.nomAmap;
+		p.villeAmap = dto.villeAmap;
 		
 		// Etape 2 - Les mails 
-		p.setSmtpType(dto.smtpType);
-		p.setSendingMailUsername(dto.adrMailSrc);
-		p.setSendingMailPassword("");
-		p.setSendingMailNbMax(dto.nbMailMax);
-		p.setUrl(dto.url);
-		p.setMailCopyTo("");
-		p.setBackupReceiver("");
+		p.smtpType = dto.smtpType;
+		p.sendingMailUsername = dto.adrMailSrc;
+		p.sendingMailPassword = "";
+		p.sendingMailFooter = "Merci de ne pas répondre à ce message.<br/>Pour toute demande, merci de contacter votre Amap avec son mail habituel.<br/>";
+		p.sendingMailNbMax = dto.nbMailMax;
+		p.url = dto.url;
+		p.mailCopyTo = "";
+		p.backupReceiver = "";
 		
 		// Etape 3
-		p.setEtatPlanningDistribution(EtatModule.INACTIF);
-		p.setEnvoiMailRappelPermanence(ChoixOuiNon.NON);
+		p.etatPlanningDistribution = EtatModule.INACTIF;
+		p.envoiMailRappelPermanence = ChoixOuiNon.NON;
 		
 		// Etape 4
-		p.setEnvoiMailPeriodique(ChoixOuiNon.NON);
+		p.envoiMailPeriodique = ChoixOuiNon.NON;
 		
 		// Etape 5
-		p.setEtatGestionCotisation(EtatModule.INACTIF);
+		p.etatGestionCotisation = EtatModule.ACTIF;
 		
+		// Parametres d'archivage 
+		p.archivageContrat=180;
+		p.suppressionContrat=730;
+		p.archivageUtilisateur=90;
+		p.archivageProducteur=365;
+		p.suppressionPeriodePermanence=730;
+		p.suppressionPeriodeCotisation=1095;
 		
 		em.persist(p);
 
@@ -145,7 +164,7 @@ public class DemoService
 		insertUtilisateur(em, 1507, "DUBOIS", "Rémi", "remi.dubois@example.fr", password);
 		insertUtilisateur(em, 1508, "GAGNON", "Magali", "magali.gagnon@example.fr", password);
 		insertUtilisateur(em, 1509, "ROY", "Gaelle", "gaelle.roy@example.fr", password);
-		insertUtilisateur(em, 1510, "CÔTÉ", "Nathalie", "nathalie.côte@example.fr", password);
+		insertUtilisateur(em, 1510, "CÔTÉ", "Nathalie", "nathalie.cote@example.fr", password);
 		insertUtilisateur(em, 1511, "BOUCHARD", "Benjamin", "benjamin.bouchard@example.fr", password);
 		insertUtilisateur(em, 1512, "GAUTHIER", "Alex", "alex.gauthier@example.fr", password);
 		insertUtilisateur(em, 1513, "MORIN", "Karine", "karine.morin@example.fr", password);
@@ -175,11 +194,11 @@ public class DemoService
 	private void createRoleUtilisateur(EntityManager em)
 	{
 		RoleTresorier rt = new RoleTresorier();
-		rt.setUtilisateur(em.find(Utilisateur.class, new Long(1051)));
+		rt.utilisateur = em.find(Utilisateur.class, new Long(1051));
 		em.persist(rt);
 		
 		RoleAdmin ra = new RoleAdmin();
-		ra.setUtilisateur(em.find(Utilisateur.class, new Long(1052)));
+		ra.utilisateur = em.find(Utilisateur.class, new Long(1052));
 		em.persist(ra);
 		
 	}
@@ -189,9 +208,10 @@ public class DemoService
 		Utilisateur u = new Utilisateur();
 		
 		u.setId(new Long(id));
-		u.setNom(nom);
-		u.setPrenom(prenom);
-		u.setEmail(email);
+		u.nom = nom;
+		u.prenom = prenom;
+		u.email = email;
+		u.dateCreation = DateUtils.getDate();
 		
 		em.persist(u);
 		
@@ -208,7 +228,7 @@ public class DemoService
 		insertUtilisateur(em, 1052, dto.user1Nom, dto.user1Prenom, dto.user1Email, dto.password);
 		
 		RoleAdmin ra = new RoleAdmin();
-		ra.setUtilisateur(em.find(Utilisateur.class, new Long(1052)));
+		ra.utilisateur = em.find(Utilisateur.class, new Long(1052));
 		em.persist(ra);
 		
 	}
@@ -219,9 +239,9 @@ public class DemoService
 	{
 		AppInstance app = new AppInstance();
 		
-		app.setDateCreation(DateUtils.getDate());
-		app.setDbms("hi");
-		app.setNomInstance("amap1");
+		app.dateCreation = DateUtils.getDate();
+		app.dbms = "hi";
+		app.nomInstance = "amap1";
 		em.persist(app);
 		
 	}
@@ -245,19 +265,21 @@ public class DemoService
 		p.delaiModifContrat = 3;
 		p.feuilleDistributionGrille = ChoixOuiNon.OUI;
 		p.feuilleDistributionListe = ChoixOuiNon.NON;
+		p.dateCreation = DateUtils.getDate();
 		
 		em.persist(p);
 		
 		ProducteurUtilisateur pu  =new ProducteurUtilisateur();
-		pu.setNotification(EtatNotification.SANS_NOTIFICATION_MAIL);
-		pu.setProducteur(p);
-		pu.setUtilisateur(em.find(Utilisateur.class, new Long(idUtilisateur)));
+		pu.notification = EtatNotification.SANS_NOTIFICATION_MAIL;
+		pu.producteur = p;
+		pu.utilisateur = em.find(Utilisateur.class, new Long(idUtilisateur));
 		
 		em.persist(pu);
 		
-		ProducteurReferent pr  =new ProducteurReferent();
-		pr.setProducteur(p);
-		pr.setReferent(em.find(Utilisateur.class, new Long(idReferent)));
+		ProducteurReferent pr = new ProducteurReferent();
+		pr.producteur = p;
+		pr.referent = em.find(Utilisateur.class, new Long(idReferent));
+		pr.notification = EtatNotification.SANS_NOTIFICATION_MAIL;
 		
 		em.persist(pr);
 	}
@@ -311,24 +333,87 @@ public class DemoService
 		Produit p = new Produit();
 		
 		p.setId(new Long(idProduit));
-		p.setNom(nom);
-		p.setConditionnement(cond);
-		p.setProducteur(em.find(Producteur.class, new Long(idProducteur)));
+		p.nom = nom;
+		p.conditionnement = cond;
+		p.producteur = em.find(Producteur.class, new Long(idProducteur));
 		
 		em.persist(p);
 		
 	}
+	
+	
+	private Long createPeriodeCotisation(EntityManager em, Date dateDebut, Date dateFin) 
+	{
+		Date debutPeriode;
+		Date finPeriode;
+		String nom;
+		
+		int y1 = DateUtils.getYear(dateDebut);
+		int y2 = DateUtils.getYear(dateFin);
+		if (y1==y2)
+		{
+			Calendar c = Calendar.getInstance();
+			c.set(Calendar.YEAR, y1);
+			c.set(Calendar.MONTH, Calendar.JANUARY);
+			c.set(Calendar.DAY_OF_MONTH, 1);
+			
+			debutPeriode = c.getTime();
+			
+			c.set(Calendar.MONTH, Calendar.DECEMBER);
+			c.set(Calendar.DAY_OF_MONTH, 31);
+			
+			finPeriode = c.getTime();
+			
+			nom = "Saison "+y1;
+		}
+		else
+		{
+			Calendar c = Calendar.getInstance();
+			c.set(Calendar.YEAR, y1);
+			c.set(Calendar.MONTH, Calendar.JULY);
+			c.set(Calendar.DAY_OF_MONTH, 1);
+			
+			debutPeriode = c.getTime();
+			
+			c.set(Calendar.YEAR, y2);
+			c.set(Calendar.MONTH, Calendar.JUNE);
+			c.set(Calendar.DAY_OF_MONTH, 30);
+			
+			finPeriode = c.getTime();
+			
+			nom = "Saison "+y1+"/"+y2;
+		}
+		PeriodeCotisationDTO dto = new PeriodeCotisationDTO();
+		
+		dto.dateDebut = debutPeriode;
+		dto.dateFin = finPeriode;
+		dto.nom = nom;
+		dto.libCheque = "lib cheque AMAP";
+		dto.textPaiement = "";
+		dto.montantMini = 800;
+		dto.montantConseille = 1500;
+		
+		try 
+		{
+			return new GestionCotisationService().createOrUpdate(dto);
+		}
+		catch (OnSaveException e) 
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
 
-	private void createContrat(EntityManager em, Date dateDebut, Date dateFin, Date dateFinInscription)
+	private void createContrat(EntityManager em, Date dateDebut, Date dateFin, Date dateFinInscription,Long idPeriodeCotisation)
 	{
 
-		createContrat(em, "PRODUITS LAITIERS de VACHE", "lait, yaourts, faisselle, crème fraîche", 3011L, dateFinInscription, dateDebut, dateFin);
+		createContrat(em, "PRODUITS LAITIERS de VACHE", "lait, yaourts, faisselle, crème fraîche", 3011L, dateFinInscription, dateDebut, dateFin,idPeriodeCotisation);
 
-		createContrat(em, "PAIN", "pains complet, campagne ou seigle", 3029L, dateFinInscription, dateDebut, dateFin);
+		createContrat(em, "PAIN", "pains complet, campagne ou seigle", 3029L, dateFinInscription, dateDebut, dateFin,idPeriodeCotisation);
 
-		createContrat(em, "PRODUITS LAITIERS de CHEVRE", "fromages, yaourts, faisselles, savons", 3002L, dateFinInscription, dateDebut, dateFin);
+		createContrat(em, "PRODUITS LAITIERS de CHEVRE", "fromages, yaourts, faisselles, savons", 3002L, dateFinInscription, dateDebut, dateFin,idPeriodeCotisation);
 
-		createContrat(em, "PRODUITS LAITIERS de BREBIS", "lait, yaourts, et fromages de brebis", 3019L, dateFinInscription, dateDebut, dateFin);
+		createContrat(em, "PRODUITS LAITIERS de BREBIS", "lait, yaourts, et fromages de brebis", 3019L, dateFinInscription, dateDebut, dateFin,idPeriodeCotisation);
 
 		setAllContratActifs();
 
@@ -340,7 +425,7 @@ public class DemoService
 	private void setAllContratActifs()
 	{
 		GestionContratService service = new GestionContratService();
-		List<ModeleContratSummaryDTO> modeles = service.getModeleContratInfo();
+		List<ModeleContratSummaryDTO> modeles = service.getModeleContratInfo(EtatModeleContrat.CREATION);
 		for (ModeleContratSummaryDTO dto : modeles)
 		{
 			service.updateEtat(EtatModeleContrat.ACTIF, dto.id);
@@ -348,7 +433,7 @@ public class DemoService
 
 	}
 
-	private void createContrat(EntityManager em, String nom, String description, Long idProducteur, Date dateFinInscription, Date dateDebut, Date dateFin)
+	private void createContrat(EntityManager em, String nom, String description, Long idProducteur, Date dateFinInscription, Date dateDebut, Date dateFin,Long idPeriodeCotisation)
 	{
 		ModeleContratDTO modeleContrat = new ModeleContratDTO();
 		modeleContrat.nom = nom;
@@ -358,6 +443,7 @@ public class DemoService
 		modeleContrat.frequence = FrequenceLivraison.UNE_FOIS_PAR_SEMAINE;
 		modeleContrat.gestionPaiement = GestionPaiement.GESTION_STANDARD;
 		modeleContrat.nature = NatureContrat.LIBRE;
+		modeleContrat.jokerMode = JokerMode.INSCRIPTION;
 
 		modeleContrat.dateDebut = dateDebut;
 		modeleContrat.dateFin = dateFin;
@@ -368,6 +454,8 @@ public class DemoService
 		modeleContrat.dateRemiseCheque = dateFinInscription;
 		modeleContrat.premierCheque = DateUtils.firstDayInMonth(modeleContrat.dateDebut);
 		modeleContrat.dernierCheque = DateUtils.firstDayInMonth(modeleContrat.dateFin);
+		
+		modeleContrat.idPeriodeCotisation = idPeriodeCotisation;
 
 		new GestionContratService().saveNewModeleContrat(modeleContrat);
 
@@ -439,6 +527,32 @@ public class DemoService
 
 		res.add(dto);
 
+	}
+	
+	
+	private void createCotisation(Long idPeriodeCotisation) 
+	{		  
+		insertCotisation(1051, idPeriodeCotisation);
+		insertCotisation(1052, idPeriodeCotisation);
+		insertCotisation(1509, idPeriodeCotisation);
+		insertCotisation(1513, idPeriodeCotisation);
+		insertCotisation(1514, idPeriodeCotisation);
+		insertCotisation(1522, idPeriodeCotisation);
+		insertCotisation(1659, idPeriodeCotisation);	
+	}
+
+	private void insertCotisation(int idUtilisateur, Long idPeriodeCotisation) 
+	{
+		Long userId = (long) idUtilisateur;
+		MesAdhesionDTO mesAdhesionDTO = new MesAdhesionsService().computeAdhesionInfo(userId);
+		if (mesAdhesionDTO.nouvelles.size()==0)
+		{
+			return ;
+		}
+		
+		AdhesionDTO adhesionDTO = mesAdhesionDTO.nouvelles.get(0);
+		new MesAdhesionsService().createOrUpdateAdhesion(adhesionDTO, 1500);
+		
 	}
 
 	public static void main(String[] args) throws ParseException

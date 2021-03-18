@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -162,7 +162,7 @@ public class BackupDatabaseService implements Job
 		try
 		{
 			logger.info("Execution de la commande ="+exec);
-			int ret = RuntimeUtils.executeCommandLine(exec, 30000);
+			int ret = RuntimeUtils.executeCommandLine(exec, 60000);
 			if (ret!=0)
 			{
 				logger.error("Erreur lors de l'execution de la commande complémentaire ret="+ret);

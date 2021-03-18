@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -51,6 +51,8 @@ public class ModeleContratSummaryDTO implements TableItem
 	public Date finInscription;
 	
 	public EtatModeleContrat etat;
+	
+	public Long periodeCotisationId;
 	
 	// Nombre d'adherents ayant souscrit à ce contrat
 	public int nbInscrits;

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -104,9 +104,9 @@ public class MesCartesPrepayeesService
 		Date ref = DateUtils.addDays(now, -1);
 		for (ModeleContratDate lig : datLivs)
 		{
-			if (ref.before(lig.getDateLiv()))
+			if (ref.before(lig.dateLiv))
 			{
-				return lig.getDateLiv();
+				return lig.dateLiv;
 			}
 		}
 		return null;
@@ -121,7 +121,7 @@ public class MesCartesPrepayeesService
 		{
 			if (cartePrepayeeLigModifiable(lig,now,cartePrepayeeDelai))
 			{
-				return lig.getDateLiv();
+				return lig.dateLiv;
 			}
 		}
 		return null;
@@ -130,9 +130,9 @@ public class MesCartesPrepayeesService
 	
 	
 	
-	private boolean cartePrepayeeLigModifiable(ModeleContratDate lig,Date now, int cartePrepayeeDelai)
+	public boolean cartePrepayeeLigModifiable(ModeleContratDate lig,Date now, int cartePrepayeeDelai)
 	{
-		Date d = DateUtils.addDays(lig.getDateLiv(), -cartePrepayeeDelai);
+		Date d = DateUtils.addDays(lig.dateLiv, -cartePrepayeeDelai);
 		return  d.after(now);
 	}
 	

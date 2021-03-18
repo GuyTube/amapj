@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,18 +21,20 @@
  package fr.amapj.service.services.gestioncotisation;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.common.DateUtils;
 import fr.amapj.common.LongUtils;
+import fr.amapj.common.SQLUtils;
 import fr.amapj.model.engine.IdentifiableUtil;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
@@ -43,10 +45,13 @@ import fr.amapj.model.models.cotisation.PeriodeCotisationUtilisateur;
 import fr.amapj.model.models.editionspe.EditionSpecifique;
 import fr.amapj.model.models.fichierbase.EtatUtilisateur;
 import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.service.services.mescontrats.AdhesionDTO;
-import fr.amapj.service.services.mescontrats.AdhesionDTO.AffichageOnly;
-import fr.amapj.service.services.mescontrats.MesContratsDTO;
+import fr.amapj.service.engine.tools.DbToDto;
+import fr.amapj.service.services.archivage.tools.SuppressionState;
+import fr.amapj.service.services.archivage.tools.SuppressionState.SStatus;
+import fr.amapj.service.services.mesadhesions.MesAdhesionDTO;
+import fr.amapj.service.services.parametres.ParametresArchivageDTO;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
+import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 
 /**
  * Permet la gestion des cotisations
@@ -56,6 +61,26 @@ public class GestionCotisationService
 {
 	
 	private final static Logger logger = LogManager.getLogger();
+	
+	
+	// PARTIE SEARCHER
+	
+	/**
+	 * Permet de charger les périodes d'adhesion en cours, 
+	 * c'est à dire dont la date de fin est dans le futur
+	 */
+	@DbRead
+	public List<PeriodeCotisation> getAllEnCours()
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		// Récupération de la liste des cotisations en cours 
+		TypedQuery<PeriodeCotisation> q = em.createQuery("select p from PeriodeCotisation p WHERE p.dateFin>=:d ORDER BY p.dateFin",PeriodeCotisation.class);
+		Date d = DateUtils.getDateWithNoTime();
+		q.setParameter("d",d);
+		return q.getResultList();
+	}
+	
 
 	// PARTIE REQUETAGE POUR AVOIR LA LISTE DE TOUTES LES PERIODES DE COTISATIONS
 
@@ -66,20 +91,16 @@ public class GestionCotisationService
 	public List<PeriodeCotisationDTO> getAll()
 	{
 		EntityManager em = TransactionHelper.getEm();
-
-		List<PeriodeCotisationDTO> res = new ArrayList<>();
-
-		Query q = em.createQuery("select a from PeriodeCotisation a");
-
-		List<PeriodeCotisation> ps = q.getResultList();
-		for (PeriodeCotisation p : ps)
-		{
-			PeriodeCotisationDTO dto = createPeriodeCotisationDto(em, p);
-			res.add(dto);
-		}
-
-		return res;
-
+		TypedQuery<PeriodeCotisation> q = em.createQuery("select a from PeriodeCotisation a",PeriodeCotisation.class);
+		return DbToDto.convert(q, e->createPeriodeCotisationDto(em, e));
+	}
+	
+	@DbRead
+	public PeriodeCotisationDTO load(Long idPeriodeCotisation)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		PeriodeCotisation a = em.find(PeriodeCotisation.class, idPeriodeCotisation);
+		return createPeriodeCotisationDto(em, a);
 	}
 
 	public PeriodeCotisationDTO createPeriodeCotisationDto(EntityManager em, PeriodeCotisation a)
@@ -87,17 +108,14 @@ public class GestionCotisationService
 		PeriodeCotisationDTO dto = new PeriodeCotisationDTO();
 		
 		dto.id = a.getId();
-		dto.nom = a.getNom();
-		dto.montantMini = a.getMontantMini();
-		dto.montantConseille = a.getMontantConseille();
-		dto.dateDebutInscription = a.getDateDebutInscription();
-		dto.dateFinInscription = a.getDateFinInscription();
-		dto.textPaiement = a.getTextPaiement();
-		dto.libCheque = a.getLibCheque();
-		dto.dateRemiseCheque =a.getDateRemiseCheque();
-		dto.dateDebut = a.getDateDebut();
-		dto.dateFin = a.getDateFin();
-		dto.idBulletinAdhesion = IdentifiableUtil.getId(a.getBulletinAdhesion());
+		dto.nom = a.nom;
+		dto.montantMini = a.montantMini;
+		dto.montantConseille = a.montantConseille;
+		dto.textPaiement = a.textPaiement;
+		dto.libCheque = a.libCheque;
+		dto.dateDebut = a.dateDebut;
+		dto.dateFin = a.dateFin;
+		dto.idBulletinAdhesion = IdentifiableUtil.getId(a.bulletinAdhesion);
 		
 		// Champs calculés
 		dto.nbAdhesion = getNbAdhesion(em,a);
@@ -109,20 +127,25 @@ public class GestionCotisationService
 	}
 
 	
-	private PeriodeCotisationUtilisateurDTO createPeriodeCotisationUtilisateurDto(EntityManager em, PeriodeCotisationUtilisateur a)
+	public PeriodeCotisationUtilisateurDTO createPeriodeCotisationUtilisateurDto(EntityManager em, PeriodeCotisationUtilisateur a)
 	{
 		PeriodeCotisationUtilisateurDTO dto = new PeriodeCotisationUtilisateurDTO();
 
-		dto.dateAdhesion = a.getDateAdhesion();
-		dto.dateReceptionCheque = a.getDateReceptionCheque();
-		dto.etatPaiementAdhesion = a.getEtatPaiementAdhesion();
+		dto.dateAdhesion = a.dateAdhesion;
+		dto.dateReceptionCheque = a.dateReceptionCheque;
+		dto.etatPaiementAdhesion = a.etatPaiementAdhesion;
 		dto.id = a.getId();
-		dto.idPeriodeCotisation = a.getPeriodeCotisation().getId();
-		dto.idUtilisateur = a.getUtilisateur().getId();
-		dto.nomUtilisateur = a.getUtilisateur().getNom();
-		dto.prenomUtilisateur = a.getUtilisateur().getPrenom();
-		dto.montantAdhesion = a.getMontantAdhesion();
-		dto.typePaiementAdhesion = a.getTypePaiementAdhesion();
+		dto.idUtilisateur = a.utilisateur.getId();
+		dto.nomUtilisateur = a.utilisateur.nom;
+		dto.prenomUtilisateur = a.utilisateur.prenom;
+		dto.montantAdhesion = a.montantAdhesion;
+		dto.typePaiementAdhesion = a.typePaiementAdhesion;
+
+		// 
+		dto.idPeriodeCotisation = a.periodeCotisation.getId();
+		dto.periodeNom = a.periodeCotisation.nom;
+		dto.periodeDateDebut = a.periodeCotisation.dateDebut;
+		dto.periodeDateFin = a.periodeCotisation.dateFin;
 		
 		return dto;
 	}
@@ -153,7 +176,7 @@ public class GestionCotisationService
 
 	// CREATION D'UNE PERIODE DE COTISATION
 	@DbWrite
-	public void createOrUpdate(PeriodeCotisationDTO dto) throws OnSaveException
+	public Long createOrUpdate(PeriodeCotisationDTO dto) throws OnSaveException
 	{
 		EntityManager em = TransactionHelper.getEm();
 
@@ -167,23 +190,21 @@ public class GestionCotisationService
 			a = em.find(PeriodeCotisation.class, dto.id);
 		}
 
-		a.setNom(dto.nom);
-		a.setMontantMini(dto.montantMini);
-		a.setMontantConseille(dto.montantConseille);
-		a.setDateDebutInscription(dto.dateDebutInscription);
-		a.setDateFinInscription(dto.dateFinInscription);
-		a.setTextPaiement(dto.textPaiement);
-		a.setLibCheque(dto.libCheque);
-		a.setDateRemiseCheque(dto.dateRemiseCheque);
-		a.setDateDebut(dto.dateDebut);
-		a.setDateFin(dto.dateFin);
-		a.setBulletinAdhesion(IdentifiableUtil.findIdentifiableFromId(EditionSpecifique.class, dto.idBulletinAdhesion, em));
+		a.nom = dto.nom;
+		a.montantMini = dto.montantMini;
+		a.montantConseille = dto.montantConseille;
+		a.textPaiement = dto.textPaiement;
+		a.libCheque = dto.libCheque;
+		a.dateDebut = dto.dateDebut;
+		a.dateFin = dto.dateFin;
+		a.bulletinAdhesion = IdentifiableUtil.findIdentifiableFromId(EditionSpecifique.class, dto.idBulletinAdhesion, em);
 				
 		if (dto.id==null)
 		{
 			em.persist(a);
 		}
-
+		
+		return a.id;
 	}
 
 
@@ -191,168 +212,50 @@ public class GestionCotisationService
 	// PARTIE SUPPRESSION  D'UNE PERIODE DE COTISATION
 
 	/**
-	 * Permet de supprimer une periode de cotisation Ceci est fait dans une transaction en ecriture
+	 * Permet de supprimer une periode de cotisation
 	 */
 	@DbWrite
-	public void delete(final Long id)
+	public void delete(Long id)
 	{
 		EntityManager em = TransactionHelper.getEm();
-
-		PeriodeCotisation a = em.find(PeriodeCotisation.class, id);
-
-		em.remove(a);
+		PeriodeCotisation p = em.find(PeriodeCotisation.class, id);
+		
+		int r = countPeriodeCotisationUtilisateur(em,p);
+		if (r>0)
+		{
+			throw new UnableToSuppressException("Il y a des utilisateurs inscrits sur cette période de cotisation :  "+r+" inscrits.");
+		}
+		
+		em.remove(p);
 	}
 	
-
-	/*
-	 * PARTIE GESTION DES ADHESIONS D'UN UTILISATEUR
-	 */
-
 	
-	
-	public void computeAdhesionInfo(EntityManager em, MesContratsDTO res, Utilisateur user)
+	private int countPeriodeCotisationUtilisateur(EntityManager em,PeriodeCotisation p)
 	{
-		res.adhesionDTO.idUtilisateur = user.getId();
-		
-		// Récupération de la liste des cotisations
-		Query q = em.createQuery("select p from PeriodeCotisation p " +
-				"WHERE p.dateDebutInscription<=:d and p.dateFinInscription>=:d");
-
-		Date d = DateUtils.getDateWithNoTime();
-		q.setParameter("d",d);
-		
-
-		List<PeriodeCotisation> periodeCotisations = q.getResultList();
-		
-		logger.debug("Nombre de periodes de cotisation = {} ",periodeCotisations.size());
-		
-		// Cas pas de gestion des cotisations
-		if (periodeCotisations.size()==0)
-		{
-			res.adhesionDTO.periodeCotisationDTO = null;
-			
-			// On recherche si on s'est inscrit récemment  (moins de 30 jours), pour affichage uniquement 
-			res.adhesionDTO.affichageOnly = findAdhesionRecente(em,user);
-			
-			return;
-		}
-		
-		// Cas erreur de paramétrage
-		if (periodeCotisations.size()>1)
-		{
-			throw new AmapjRuntimeException("Erreur dans le paramétrage : il y a deux périodes de cotisations pour la date du jour");
-		}
-		
-		PeriodeCotisation periodeCotisation = periodeCotisations.get(0);
-		res.adhesionDTO.periodeCotisationDTO = createPeriodeCotisationDto(em, periodeCotisation);
-		
-		// Récupération de la cotisation
-		q = em.createQuery("select pu from PeriodeCotisationUtilisateur pu " +
-						"WHERE pu.periodeCotisation=:p and pu.utilisateur=:u");
-		q.setParameter("p",periodeCotisation);
-		q.setParameter("u",user);
-		
-		List<PeriodeCotisationUtilisateur> periodeCotisationUtilisateurs = q.getResultList();
-		
-		// L'utilisateur n'a pas adhéré
-		if (periodeCotisationUtilisateurs.size()==0)
-		{
-			res.adhesionDTO.periodeCotisationUtilisateurDTO = null;
-			return;
-		}
-		
-		// Cas erreur
-		if (periodeCotisationUtilisateurs.size()>1)
-		{
-			throw new AmapjRuntimeException("Il y a deux adhesions pour la même personne");
-		}
-		
-		PeriodeCotisationUtilisateur periodeCotisationUtilisateur = periodeCotisationUtilisateurs.get(0);
-		res.adhesionDTO.periodeCotisationUtilisateurDTO = createPeriodeCotisationUtilisateurDto(em, periodeCotisationUtilisateur);
-			
+		Query q = em.createQuery("select count(pu) from PeriodeCotisationUtilisateur pu WHERE pu.periodeCotisation=:p");
+		q.setParameter("p", p);
+		return LongUtils.toInt(q.getSingleResult());
 	}
+	
 	
 	/**
-	 * Les adhesions sont terminées, mais on cherche une adhesion récente pour affichage uniquement 
-	 * (moins de 30 jours)
-	 * 
-	 * @param em
-	 * @param user
-	 * @return
+	 * Permet de charger la liste de toutes les periodes de cotisations d'un utilisateur,
+	 * la plus récente en premier 
 	 */
-	private AffichageOnly findAdhesionRecente(EntityManager em, Utilisateur user)
+	@DbRead
+	public List<PeriodeCotisationUtilisateurDTO> getPeriodeCotisation(Long idUtilisateur)
 	{
-		// Récupération de la cotisation
-		Query q = em.createQuery("select pu from PeriodeCotisationUtilisateur pu " +
-						"WHERE pu.utilisateur=:u "+
-						"ORDER BY pu.periodeCotisation.dateFinInscription desc");
+		EntityManager em = TransactionHelper.getEm();
 		
-		q.setParameter("u",user);
+
+		TypedQuery<PeriodeCotisationUtilisateur> q = em.createQuery("select pu from PeriodeCotisationUtilisateur pu " +
+														 "WHERE pu.utilisateur.id=:idUtilisateur "+
+														 "ORDER BY pu.periodeCotisation.dateFin desc",PeriodeCotisationUtilisateur.class);
+		q.setParameter("idUtilisateur", idUtilisateur);
 		
-		List<PeriodeCotisationUtilisateur> pcus = q.getResultList();
-		
-		if (pcus.size()==0)
-		{
-			return null;
-		}
-		
-		PeriodeCotisationUtilisateur pcu = pcus.get(0);
+		return DbToDto.convert(q, e->createPeriodeCotisationUtilisateurDto(em, e));
+	}
 	
-		// SI c'est passé de plus de 30 jours, on oublie
-		Date dateRef = DateUtils.getDateWithNoTime();
-		dateRef = DateUtils.addDays(dateRef, -30);
-		if (pcu.getPeriodeCotisation().getDateFinInscription().before(dateRef))
-		{
-			return null;
-		}
-		
-		AffichageOnly lien = new AffichageOnly();
-		lien.idPeriode = pcu.getPeriodeCotisation().getId();
-		lien.idPeriodeUtilisateur = pcu.getId();
-		lien.nomPeriode = pcu.getPeriodeCotisation().getNom();
-		lien.idBulletin = IdentifiableUtil.getId(pcu.getPeriodeCotisation().getBulletinAdhesion());
-		lien.montantAdhesion = pcu.getMontantAdhesion();
-		
-		return lien;
-	}
-
-	@DbWrite
-	public void createOrUpdateAdhesion(AdhesionDTO dto, int montant)
-	{
-		EntityManager em = TransactionHelper.getEm();
-		
-		PeriodeCotisationUtilisateur pcu;
-		if (dto.isCotisant())
-		{
-			pcu = em.find(PeriodeCotisationUtilisateur.class, dto.periodeCotisationUtilisateurDTO.id); 
-		}
-		else
-		{
-			pcu = new PeriodeCotisationUtilisateur();
-			pcu.setPeriodeCotisation(em.find(PeriodeCotisation.class, dto.periodeCotisationDTO.id));
-			pcu.setUtilisateur(em.find(Utilisateur.class, dto.idUtilisateur));
-		}
-		
-		pcu.setDateAdhesion(DateUtils.getDate());
-		pcu.setMontantAdhesion(montant);
-		
-		if (dto.isCotisant()==false)
-		{
-			em.persist(pcu);
-		}
-		
-	}
-
-	@DbWrite
-	public void deleteAdhesion(Long idItemToSuppress)
-	{
-		EntityManager em = TransactionHelper.getEm();
-
-		PeriodeCotisationUtilisateur a = em.find(PeriodeCotisationUtilisateur.class, idItemToSuppress);
-
-		em.remove(a);
-		
-	}
 	
 	/*
 	 * PARTIE BILAN GLOBAL POUR UNE PERIODE
@@ -381,19 +284,6 @@ public class GestionCotisationService
 		}
 		
 		return res;
-	}
-	
-	@DbWrite
-	public void receptionMasseAdhesion(List<PeriodeCotisationUtilisateurDTO> dtos)
-	{
-		EntityManager em = TransactionHelper.getEm();
-		
-		for (PeriodeCotisationUtilisateurDTO pcuDto : dtos)
-		{
-			PeriodeCotisationUtilisateur pcu = em.find(PeriodeCotisationUtilisateur.class, pcuDto.id);
-			pcu.setDateReceptionCheque(pcuDto.dateReceptionCheque);
-			pcu.setEtatPaiementAdhesion(pcuDto.etatPaiementAdhesion);
-		}
 	}
 	
 	
@@ -469,19 +359,19 @@ public class GestionCotisationService
 		else
 		{
 			pcu = new PeriodeCotisationUtilisateur();
-			pcu.setPeriodeCotisation(em.find(PeriodeCotisation.class, dto.idPeriodeCotisation));
-			pcu.setUtilisateur(em.find(Utilisateur.class, dto.idUtilisateur));
-			pcu.setDateAdhesion(DateUtils.getDate());
+			pcu.periodeCotisation = em.find(PeriodeCotisation.class, dto.idPeriodeCotisation);
+			pcu.utilisateur = em.find(Utilisateur.class, dto.idUtilisateur);
+			pcu.dateAdhesion = DateUtils.getDate();
 		}
 		
-		pcu.setEtatPaiementAdhesion(dto.etatPaiementAdhesion);
-		pcu.setMontantAdhesion(dto.montantAdhesion);
-		pcu.setTypePaiementAdhesion(dto.typePaiementAdhesion);
+		pcu.etatPaiementAdhesion = dto.etatPaiementAdhesion;
+		pcu.montantAdhesion = dto.montantAdhesion;
+		pcu.typePaiementAdhesion = dto.typePaiementAdhesion;
 		
 		// On met à jour la date de réception du chèque si elle n'est pas connu et que l'état est ENCAISSE
-		if (pcu.getDateReceptionCheque()==null && dto.etatPaiementAdhesion==EtatPaiementAdhesion.ENCAISSE)
+		if (pcu.dateReceptionCheque==null && dto.etatPaiementAdhesion==EtatPaiementAdhesion.ENCAISSE)
 		{
-			pcu.setDateReceptionCheque(DateUtils.getDate());
+			pcu.dateReceptionCheque = DateUtils.getDate();
 		}
 		
 		
@@ -490,4 +380,97 @@ public class GestionCotisationService
 			em.persist(pcu);
 		}	
 	}
+	
+	
+	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES PERIODES DE COTISATION QU'IL EST SOUHAITABLE DE SUPPRIMER
+	
+	
+	
+	public String computeSuppressionLib(ParametresArchivageDTO param)
+	{
+		String str = "Il est souhaitable de supprimer une période de cotisation qui remplit les conditions suivantes : <ul>"+
+				 	"<li>la date de fin de cette période de cotisation est plus vieille que "+param.suppressionPeriodeCotisation+" jours</li></ul><br/>";
+				 	
+		return str;
+	}
+	
+	/**
+	 * Vérifie si cette période peut être supprimée
+	 */
+	public SuppressionState computeSuppressionState(PeriodeCotisationDTO dto,ParametresArchivageDTO param)
+	{
+		SuppressionState res = new SuppressionState();
+		
+		// Non supprimable si la date de fin n'est pas assez ancienne
+		Date ref2 = DateUtils.getDateWithNoTime();
+		ref2 = DateUtils.addDays(ref2, -param.suppressionPeriodeCotisation);
+		if (dto.dateFin.after(ref2)) 
+		{	
+			res.nonSupprimables.add("La date de fin de cette période de cotisation est trop récente");
+		}
+		
+		return res;
+	}
+	
+	
+	/**
+	 * Récupère la liste des périodes de cotisation supprimables
+	 */
+	public List<PeriodeCotisationDTO> getAllPeriodeCotisationSupprimables(ParametresArchivageDTO param) 
+	{
+		List<PeriodeCotisationDTO> ps = getAll();
+		
+		List<PeriodeCotisationDTO> res = new ArrayList<PeriodeCotisationDTO>();
+		for (PeriodeCotisationDTO p : ps) 
+		{
+			SuppressionState state = computeSuppressionState(p, param);
+			if (state.getStatus()==SStatus.OUI_SANS_RESERVE)
+			{
+				res.add(p);
+			}
+		}
+		res.sort(Comparator.comparing(e->e.dateFin));
+		
+		return res;
+	}
+
+	/**
+	 * Effacement complet de la période de cotisation
+	 */
+	@DbWrite
+	public void deleteWithInscrits(Long id) 
+	{
+		EntityManager em = TransactionHelper.getEm();
+		PeriodeCotisation p = em.find(PeriodeCotisation.class, id);
+		
+		Query q = em.createQuery("select pu from PeriodeCotisationUtilisateur pu WHERE pu.periodeCotisation=:p");
+		q.setParameter("p", p);
+		SQLUtils.deleteAll(em, q);
+		
+		em.remove(p);
+	}
+	
+	// CREATION EN MASSE DES COTISATIONS
+	@DbRead
+	public List<PeriodeCotisationUtilisateurDTO> getAllForAjouterEnMasse(Long idPeriodeCotisation) 
+	{
+		List<PeriodeCotisationUtilisateurDTO> res = new ArrayList<PeriodeCotisationUtilisateurDTO>();
+		
+		List<Utilisateur> us = getAllUtilisateurSansAdhesion(idPeriodeCotisation);
+				
+		for (Utilisateur u : us) 
+		{
+			PeriodeCotisationUtilisateurDTO dto = new PeriodeCotisationUtilisateurDTO();
+			dto.idUtilisateur = u.id;
+			dto.nomUtilisateur = u.nom;
+			dto.prenomUtilisateur = u.prenom;
+			dto.idPeriodeCotisation = idPeriodeCotisation;
+			
+			res.add(dto);
+		}
+		
+		return res;
+	}
+
+	
 }

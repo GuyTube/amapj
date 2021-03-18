@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -76,28 +76,28 @@ public class AmapienContratsService
 		for (Contrat contrat : contrats)
 		{
 			
-				ModeleContrat mc = contrat.getModeleContrat();
+				ModeleContrat mc = contrat.modeleContrat;
 	
 				
 				DateInfo di = new GestionContratService().getDateDebutFin(em, mc);
 	
 				AmapienContratDTO dto = new AmapienContratDTO();
 				
-				dto.nomContrat = contrat.getModeleContrat().getNom();
-				dto.nomProducteur = contrat.getModeleContrat().getProducteur().nom;
+				dto.nomContrat = contrat.modeleContrat.nom;
+				dto.nomProducteur = contrat.modeleContrat.producteur.nom;
 				dto.dateDebut = di.dateDebut;
 				dto.dateFin = di.dateFin;
-				dto.dateCreation = contrat.getDateCreation();
-				dto.dateModification = contrat.getDateModification();
+				dto.dateCreation = contrat.dateCreation;
+				dto.dateModification = contrat.dateModification;
 				dto.montant = gestionContratSigneService.getMontant(em, contrat);
 				
 				dto.idContrat = contrat.getId();
 				dto.idModeleContrat = mc.getId();
 				dto.idUtilisateur = userId;
-				dto.idProducteur = contrat.getModeleContrat().getProducteur().id;
+				dto.idProducteur = contrat.modeleContrat.producteur.id;
 				
-				dto.prenomUtilisateur = contrat.getUtilisateur().getPrenom();
-				dto.nomUtilisateur = contrat.getUtilisateur().getNom();
+				dto.prenomUtilisateur = contrat.utilisateur.prenom;
+				dto.nomUtilisateur = contrat.utilisateur.nom;
 				
 				
 				// Si ce contrat est en historique

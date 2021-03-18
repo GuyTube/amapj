@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -79,18 +79,18 @@ public class OffuscatedUtilisateur
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			u.setNom(getNom());
-			u.setPrenom(getPrenom());
+			u.nom = getNom();
+			u.prenom = getPrenom();
 
-			String email = (u.getPrenom() + "." + u.getNom() + "@example.fr").toLowerCase();
+			String email = (u.prenom + "." + u.nom + "@example.fr").toLowerCase();
 			email = StringUtils.sansAccent(email);
 			
-			u.setEmail(email);
+			u.email = email;
 			
 			
 			// Mot de passe : a 
-			u.setPassword("S3SDt6lhE40QpL/8QFZgLeJveys=");
-			u.setSalt("EkCq0lok/zk=");
+			u.password = "S3SDt6lhE40QpL/8QFZgLeJveys=";
+			u.salt = "EkCq0lok/zk=";
 			// System.out.println(u.getNom()+"=>"+getNom()+" "+getPrenom());
 
 		}

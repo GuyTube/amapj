@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -82,6 +82,10 @@ public class PeriodePermanence implements Identifiable
 	public int flottantDelai;
 	
 	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	// Permet de savoir les controles réalisés lors des inscriptions 
+    public RegleInscriptionPeriodePermanence regleInscription;
 
 
 	public Long getId()

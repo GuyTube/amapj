@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -87,17 +87,17 @@ public class InfoBarrerProduitDTO
 		
 		// 
 		c1.fill(cellChanges);
-		c1.groupByLig(e->e.modeleContratProduit.getProduit());
+		c1.groupByLig(e->e.modeleContratProduit.produit);
 		c1.groupByCol(e->e.state);
 		
 		// Tri par index du produit dans le contrat
-		c1.sortLigAdvanced(e->e.modeleContratProduit.getIndx(),true);
+		c1.sortLigAdvanced(e->e.modeleContratProduit.indx,true);
 		
 		// Tri des colonnes dans l'ordre de declaration, donc NO_MORE_DISPO en premier 
 		c1.sortCol(e->e,true);
 		
 		// tri sur les cellules par dates croissantes
-		c1.sortCell(e->e.modeleContratDate.getDateLiv(), true);
+		c1.sortCell(e->e.modeleContratDate.dateLiv, true);
 		
 		//
 		c1.compute();
@@ -117,14 +117,14 @@ public class InfoBarrerProduitDTO
 				
 			if (noMoreDispo.size()>0)
 			{
-				List<Date> noMoreDispoDates = CollectionUtils.convert(noMoreDispo, e->e.modeleContratDate.getDateLiv());
-				buf.append("<li>" + produit.getNom() + "," + produit.getConditionnement() + " n'est plus disponible "+FormatUtils.listeDate(noMoreDispoDates)+"</li>");
+				List<Date> noMoreDispoDates = CollectionUtils.convert(noMoreDispo, e->e.modeleContratDate.dateLiv);
+				buf.append("<li>" + produit.nom + "," + produit.conditionnement + " n'est plus disponible "+FormatUtils.listeDate(noMoreDispoDates)+"</li>");
 			}
 			
 			if (nowDispo.size()>0)
 			{
-				List<Date> nowDispoDates = CollectionUtils.convert(nowDispo, e->e.modeleContratDate.getDateLiv());
-				buf.append("<li>" + produit.getNom() + "," + produit.getConditionnement() + " est maintenant disponible "+FormatUtils.listeDate(nowDispoDates)+"</li>");
+				List<Date> nowDispoDates = CollectionUtils.convert(nowDispo, e->e.modeleContratDate.dateLiv);
+				buf.append("<li>" + produit.nom + "," + produit.conditionnement + " est maintenant disponible "+FormatUtils.listeDate(nowDispoDates)+"</li>");
 			}
 		}
 		

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,6 +21,7 @@
  package fr.amapj.service.services.permanence.periode;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
+import javax.persistence.TypedQuery;
 
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.common.DateUtils;
@@ -36,6 +38,7 @@ import fr.amapj.common.SQLUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.fichierbase.EtatUtilisateur;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.model.models.permanence.periode.EtatPeriodePermanence;
 import fr.amapj.model.models.permanence.periode.PeriodePermanence;
@@ -43,7 +46,11 @@ import fr.amapj.model.models.permanence.periode.PeriodePermanenceDate;
 import fr.amapj.model.models.permanence.periode.PeriodePermanenceUtilisateur;
 import fr.amapj.model.models.permanence.periode.PermanenceRole;
 import fr.amapj.model.models.permanence.reel.PermanenceCell;
+import fr.amapj.service.engine.tools.DbToDto;
+import fr.amapj.service.services.archivage.tools.SuppressionState;
+import fr.amapj.service.services.archivage.tools.SuppressionState.SStatus;
 import fr.amapj.service.services.gestioncotisation.GestionCotisationService;
+import fr.amapj.service.services.parametres.ParametresArchivageDTO;
 import fr.amapj.service.services.permanence.role.PermanenceRoleService;
 import fr.amapj.service.services.utilisateur.UtilisateurService;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
@@ -103,6 +110,23 @@ public class PeriodePermanenceService
 		return dto;
 	}
 	
+	// REQUETAGE DE TOUTES LES INFORMATIONS PERMANENCE D'UN UTILISATEUR
+	
+	/**
+	 * Retourne la liste des permanences sur lesquelles l'utilisateur est rattaché
+	 * quelle soit l'état de la permanence (active ou non, passé ou futures, ...)
+	 */
+	@DbRead
+	public List<PeriodePermanenceDTO> getAllPermanenceDTO(Long userId)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		//  
+		TypedQuery<PeriodePermanence> q = em.createQuery("select distinct(d.periodePermanence) from PeriodePermanenceUtilisateur d WHERE d.utilisateur.id=:id",PeriodePermanence.class);
+		q.setParameter("id",userId);
+		
+		return DbToDto.convert(q, e->loadPeriodePermanenceDTO(e.id));
+	}
+
 	
 	// CHARGEMENT DETAILLE d'une periode de permanence 
 	
@@ -172,9 +196,11 @@ public class PeriodePermanenceService
 		ddto.idPeriodePermanenceDate = pd.id;
 		ddto.datePerm = pd.datePerm;
 		ddto.nbPlace = pd.nbPlace;
+		ddto.regleInscription = pd.periodePermanence.regleInscription;
 		
 		return ddto;
 	}
+	
 	
 	public PermanenceCellDTO createPermanenceCellDTO(PermanenceCell pc)
 	{
@@ -187,8 +213,8 @@ public class PeriodePermanenceService
 			Utilisateur u = pc.periodePermanenceUtilisateur.utilisateur;
 			
 			pcDto.idUtilisateur = u.getId();
-			pcDto.nom = u.getNom();
-			pcDto.prenom = u.getPrenom();
+			pcDto.nom = u.nom;
+			pcDto.prenom = u.prenom;
 			pcDto.idPeriodePermanenceUtilisateur = pc.periodePermanenceUtilisateur.id;
 		}
 		
@@ -257,8 +283,8 @@ public class PeriodePermanenceService
 		
 		adto.idPeriodePermanenceUtilisateur = ppu.id;
 		adto.idUtilisateur = ppu.utilisateur.getId();
-		adto.nom = ppu.utilisateur.getNom();
-		adto.prenom = ppu.utilisateur.getPrenom();
+		adto.nom = ppu.utilisateur.nom;
+		adto.prenom = ppu.utilisateur.prenom;
 		adto.nbParticipation = ppu.nbParticipation;
 		
 		return adto;
@@ -290,6 +316,7 @@ public class PeriodePermanenceService
 		dto.etat = p.etat;
 		dto.nature = p.nature;
 		dto.pourcentageInscription = getPourcentageInscription(p,em);
+		dto.regleInscription = p.regleInscription;
 		
 		return dto;
 	}
@@ -464,6 +491,7 @@ public class PeriodePermanenceService
 		p.flottantDelai = dto.flottantDelai;
 		p.etat = EtatPeriodePermanence.CREATION;
 		p.nature = dto.nature;
+		p.regleInscription = dto.regleInscription;
 		
 		em.persist(p);
 
@@ -638,7 +666,7 @@ public class PeriodePermanenceService
 			String str = "Vous ne pouvez plus supprimer cette periode de permanence<br/>"+
 					 "car "+nbInscrits+" adhérents sont déjà inscrits<br/><br/>."+
 					 "Si vous souhaitez réellement supprimer cette periode de permanence,<br/>"+
-					 "allez tout d'abord dans \"Affectation des permanences\", puis vous supprimez les inscriptions";
+					 "allez tout d'abord dans \"Gestions des inscriptions aux permanences\", puis vous supprimez les inscriptions (bouton Autre)";
 			throw new UnableToSuppressException(str);
 		}
 
@@ -705,7 +733,7 @@ public class PeriodePermanenceService
 	{
 		if (idPeriodeCotisation==null)
 		{
-			return new UtilisateurService().getUtilisateurs(false);
+			return new UtilisateurService().getUtilisateurs(EtatUtilisateur.ACTIF);
 			
 		}
 		else
@@ -730,8 +758,8 @@ public class PeriodePermanenceService
 		PeriodePermanenceUtilisateurDTO e = new PeriodePermanenceUtilisateurDTO();
 		
 		e.idUtilisateur = utilisateur.getId();
-		e.nom = utilisateur.getNom();
-		e.prenom = utilisateur.getPrenom();
+		e.nom = utilisateur.nom;
+		e.prenom = utilisateur.prenom;
 		
 		return e;
 	}
@@ -887,4 +915,120 @@ public class PeriodePermanenceService
 		
 		return sb.toString();
 	}
+
+	
+	// PARTIE SUPPRESSION D'UN UTILISATEUR 
+	
+	/**
+	 * Cette méthode permet de desaffecter cet utilisateur de toutes les periodes de permanences , 
+	 * dans le but de pouvoir supprimer cet utilisateur 
+	 */
+	public void deleteUtilisateur(EntityManager em, Utilisateur u) 
+	{
+		//  
+		TypedQuery<PeriodePermanenceUtilisateur> q = em.createQuery("select d from PeriodePermanenceUtilisateur d WHERE d.utilisateur=:u",PeriodePermanenceUtilisateur.class);
+		q.setParameter("u",u);
+		
+		List<PeriodePermanenceUtilisateur> ppus = q.getResultList();
+		for (PeriodePermanenceUtilisateur ppu : ppus)
+		{
+			// On efface les permanences faites par cet utilisateur 
+			deleteUtilisateurPermanenceCell(em,ppu);
+			
+			// On supprime l'utilisateur de la liste des personnes affectées à cette permanence
+			em.remove(ppu);
+		}
+	}
+
+	private void deleteUtilisateurPermanenceCell(EntityManager em, PeriodePermanenceUtilisateur ppu) 
+	{
+		//   
+		TypedQuery<PermanenceCell> q = em.createQuery("select c from PermanenceCell c WHERE c.periodePermanenceUtilisateur=:ppu",PermanenceCell.class);
+		q.setParameter("ppu", ppu);
+		
+		List<PermanenceCell> pcs = q.getResultList();
+		
+		// On supprime les inscriptions de cet utilisateur
+		for (PermanenceCell pc : pcs)
+		{
+			pc.dateNotification = null;
+			pc.periodePermanenceUtilisateur = null;
+		}		
+	}
+	
+	
+	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES PERIODES DE PERMANENCE QU'IL EST SOUHAITABLE DE SUPPRIMER
+	
+	
+	
+	public String computeSuppressionLib(ParametresArchivageDTO param)
+	{
+		String str = "Il est souhaitable de supprimer une période de permanence qui remplit les conditions suivantes : <ul>"+
+				 	"<li>la date de fin de cette période de permanence est plus vieille que "+param.suppressionPeriodePermanence+" jours</li></ul><br/>";
+				 	
+		return str;
+	}
+	
+	/**
+	 * Vérifie si cette période peut être supprimée
+	 */
+	public SuppressionState computeSuppressionState(SmallPeriodePermanenceDTO dto,ParametresArchivageDTO param)
+	{
+		SuppressionState res = new SuppressionState();
+		
+		// Non supprimable si la date de fin n'est pas assez ancienne
+		Date ref2 = DateUtils.getDateWithNoTime();
+		ref2 = DateUtils.addDays(ref2, -param.suppressionPeriodePermanence);
+		if (dto.dateFin.after(ref2)) 
+		{	
+			res.nonSupprimables.add("La date de fin de cette période de permanence est trop récente");
+		}
+		
+		return res;
+	}
+	
+	
+	/**
+	 * Récupère la liste des périodes de permanence supprimables
+	 */
+	public List<SmallPeriodePermanenceDTO> getAllPeriodePermanenceSupprimables(ParametresArchivageDTO param) 
+	{
+		List<SmallPeriodePermanenceDTO> ps = getAllPeriodePermanence();
+		
+		List<SmallPeriodePermanenceDTO> res = new ArrayList<SmallPeriodePermanenceDTO>();
+		for (SmallPeriodePermanenceDTO p : ps) 
+		{
+			SuppressionState state = computeSuppressionState(p, param);
+			if (state.getStatus()==SStatus.OUI_SANS_RESERVE)
+			{
+				res.add(p);
+			}
+		}
+		res.sort(Comparator.comparing(e->e.dateFin));
+		
+		return res;
+	}
+
+	/**
+	 * Effacement complet de la période de permanence , avec effacement des inscriptions
+	 */
+	@DbWrite
+	public void deleteWithInscrits(Long id) 
+	{
+		EntityManager em = TransactionHelper.getEm();
+		PeriodePermanence p = em.find(PeriodePermanence.class, id);
+		
+		
+		// On efface tout d'abord les inscriptions
+		TypedQuery<PermanenceCell> q = em.createQuery("select c from PermanenceCell c WHERE c.periodePermanenceDate.periodePermanence=:p",PermanenceCell.class);
+		q.setParameter("p",p);
+		for (PermanenceCell permanenceCell : q.getResultList()) 
+		{
+			permanenceCell.periodePermanenceUtilisateur =null;
+		}
+			
+		deletePeriodePermanence(id);
+			
+	}
+	
 }

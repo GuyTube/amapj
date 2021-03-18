@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -68,10 +68,10 @@ public class EGCollecteCheque extends AbstractExcelGenerator
 		et.addRow("Bordereau de collecte des chèques",et.titre);
 		et.addRow("",et.grasGaucheNonWrappe);
 		
-		et.addRow("Nom du contrat : "+mc.getNom(),et.grasGaucheNonWrappe);
-		et.addRow("Nom du producteur : "+mc.getProducteur().nom,et.grasGaucheNonWrappe);
-		et.addRow("Date limite de remise des chèques : "+df.format(mc.getDateRemiseCheque()),et.grasGaucheNonWrappe);
-		et.addRow("Ordre des chèques : "+mc.getLibCheque(),et.grasGaucheNonWrappe);
+		et.addRow("Nom du contrat : "+mc.nom,et.grasGaucheNonWrappe);
+		et.addRow("Nom du producteur : "+mc.producteur.nom,et.grasGaucheNonWrappe);
+		et.addRow("Date limite de remise des chèques : "+df.format(mc.dateRemiseCheque),et.grasGaucheNonWrappe);
+		et.addRow("Ordre des chèques : "+mc.libCheque,et.grasGaucheNonWrappe);
 		et.addRow("",et.grasGaucheNonWrappe);
 		
 		// Avec une sous requete, on obtient la liste de tous les utilisateur ayant commandé au moins un produit
@@ -82,7 +82,7 @@ public class EGCollecteCheque extends AbstractExcelGenerator
 		
 		for (Utilisateur utilisateur : utilisateurs)
 		{
-			et.addRow(utilisateur.getPrenom()+" "+utilisateur.getNom(),et.grasGaucheNonWrappe);
+			et.addRow(utilisateur.prenom+" "+utilisateur.nom,et.grasGaucheNonWrappe);
 			Contrat c = getContrat(modeleContratId,em,utilisateur);
 			List<DetailPaiementAFournirDTO> details = new MesPaiementsService().getPaiementAFournir(em,c);
 			for (DetailPaiementAFournirDTO detail : details)
@@ -107,7 +107,7 @@ public class EGCollecteCheque extends AbstractExcelGenerator
 		List<Contrat> cs = q.getResultList();
 		if (cs.size()!=1)
 		{
-			throw new RuntimeException("Erreur inattendue pour "+utilisateur.getNom()+utilisateur.getPrenom());
+			throw new RuntimeException("Erreur inattendue pour "+utilisateur.nom+utilisateur.prenom);
 		}
 		
 		return cs.get(0);
@@ -118,7 +118,7 @@ public class EGCollecteCheque extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		return "collecte-cheque-"+mc.getNom();
+		return "collecte-cheque-"+mc.nom;
 	}
 	
 

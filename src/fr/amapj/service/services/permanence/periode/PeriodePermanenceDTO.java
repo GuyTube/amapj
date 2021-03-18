@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,8 +24,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import fr.amapj.common.CollectionUtils;
+import fr.amapj.common.LongUtils;
 import fr.amapj.model.models.permanence.periode.EtatPeriodePermanence;
 import fr.amapj.model.models.permanence.periode.NaturePeriodePermanence;
+import fr.amapj.model.models.permanence.periode.RegleInscriptionPeriodePermanence;
 import fr.amapj.view.engine.tools.TableItem;
 
 /**
@@ -80,7 +83,42 @@ public class PeriodePermanenceDTO implements TableItem
 	// La liste suivante est utilisée uniquement pour l'affectation des roles
 	public List<PeriodePermanenceRoleDTO> roles;
 		
-		
+	public RegleInscriptionPeriodePermanence regleInscription;
+	
+	
+	// Permet de retrouver les informations d'un utilisateur
+	public PeriodePermanenceUtilisateurDTO findPeriodePermanenceUtilisateurDTO(Long idUtilisateur)
+	{
+		for (PeriodePermanenceUtilisateurDTO utilisateur : utilisateurs)
+		{
+			if (LongUtils.equals(utilisateur.idUtilisateur,idUtilisateur))
+			{
+				return utilisateur;
+			}
+		}
+		return null;
+	}
+	
+	// Permet de retrouver les dates d'inscriptions de cet utilisateur 
+	public List<PeriodePermanenceDateDTO> findPeriodePermanenceDateDTO(Long idUtilisateur)
+	{
+		List<PeriodePermanenceDateDTO> res = new ArrayList<PeriodePermanenceDateDTO>();
+		for (PeriodePermanenceDateDTO datePerm : datePerms)
+		{
+			if (datePerm.isInscrit(idUtilisateur))
+			{
+				res.add(datePerm);
+			}
+		}
+		CollectionUtils.sort(res, e->e.datePerm);
+		return res;
+	}
+	
+	
+	
+	/*
+	 * Getters et setters classiques
+	 */
 
 	public Long getIdPeriodeCotisation()
 	{
@@ -285,6 +323,16 @@ public class PeriodePermanenceDTO implements TableItem
 	public void setRoles(List<PeriodePermanenceRoleDTO> roles)
 	{
 		this.roles = roles;
+	}
+
+	public RegleInscriptionPeriodePermanence getRegleInscription()
+	{
+		return regleInscription;
+	}
+
+	public void setRegleInscription(RegleInscriptionPeriodePermanence regleInscription)
+	{
+		this.regleInscription = regleInscription;
 	}
 	
 	

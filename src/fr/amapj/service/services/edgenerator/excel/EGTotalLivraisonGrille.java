@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -31,6 +31,8 @@ import fr.amapj.model.models.contrat.modele.ModeleContratDate;
 import fr.amapj.model.models.contrat.modele.ModeleContratProduit;
 import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
 import fr.amapj.service.services.edgenerator.excel.feuilledistribution.producteur.EGGrilleTool;
+import fr.amapj.service.services.parametres.ParametresDTO;
+import fr.amapj.service.services.parametres.ParametresService;
 
 
 /**
@@ -50,7 +52,6 @@ public class EGTotalLivraisonGrille
 		// Calcul du nombre de colonnes 
 		int nbColTotal = nbColGauche+prods.size();
 		
-		
 		// Construction de la feuille et largeur des colonnes
 		et.addSheet("Total livraison", nbColTotal, 10);
 		et.setColumnWidth(0, 20);
@@ -64,7 +65,9 @@ public class EGTotalLivraisonGrille
 	    List<String> titres = new ArrayList<>();
 	    titres.add("");
 	    
-	    String firstLine = "TOTAL DES LIVRAISONS";
+	    ParametresDTO param = new ParametresService().getParametres();
+	    
+	    String firstLine = param.nomAmap+" - TOTAL DES LIVRAISONS";
 	    int nbLine = dates.size();
 
 		// Construction de l'entete
@@ -97,7 +100,7 @@ public class EGTotalLivraisonGrille
 		et.addRow();
 		
 		// Colonne 0  : la date
-		et.setCell(0,df2.format(date.getDateLiv()),et.grasCentreBordure);
+		et.setCell(0,df2.format(date.dateLiv),et.grasCentreBordure);
 		
 		// Colonne 1 - Vide
 		et.setCell(1,"",et.grasGaucheNonWrappeBordure);
@@ -105,7 +108,7 @@ public class EGTotalLivraisonGrille
 		// Colonne 2 - cumul pour cette date
 		et.setCellSumProdInRow(2, 3, nbProd, 7, et.prixCentreBordure);
 		
-		String sheetName = df1.format(date.getDateLiv());
+		String sheetName = df1.format(date.dateLiv);
 		
 		// Affectation des quantités
 		int index =nbColGauche;

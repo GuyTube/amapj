@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -405,7 +406,19 @@ public class HsqlInternalDbms implements DBMS
 	 * 
 	 */
 	public static void main(String[] args) throws ParseException
-	{		
+	{	
+		try
+		{
+			distBase();
+		}
+		catch(Exception e)
+		{
+			System.out.println(StackUtils.asString(e));
+		}
+	}
+
+	private static void distBase() 
+	{
 		DbManager dbManager = TestTools.initInternalDb();
 		
 		HsqlInternalDbms dbms = (HsqlInternalDbms) dbManager.getDbms("hi");
@@ -464,7 +477,6 @@ public class HsqlInternalDbms implements DBMS
 		System.out.println("f[\"d3\"]=\""+df.format(d3)+"\";");
 		System.out.println("f[\"d4\"]=\""+df.format(d4)+"\";");
 		System.out.println("===================================================");
-		
 		
 		
 		

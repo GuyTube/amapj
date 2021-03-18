@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;import org.apache.logging.log4j.Logge
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import fr.amapj.common.DateUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
@@ -79,6 +80,7 @@ public class ImportDonneesService
 			p.delaiModifContrat = 3;
 			p.feuilleDistributionGrille = ChoixOuiNon.OUI;
 			p.feuilleDistributionListe = ChoixOuiNon.NON;
+			p.dateCreation = DateUtils.getDate();
 			em.persist(p);
 		}
 		else if (prods.size()==1)
@@ -92,9 +94,9 @@ public class ImportDonneesService
 		
 		
 		Produit pr = new Produit();
-		pr.setConditionnement(dto.conditionnement);
-		pr.setNom(dto.produit);
-		pr.setProducteur(p);
+		pr.conditionnement = dto.conditionnement;
+		pr.nom = dto.produit;
+		pr.producteur = p;
 		em.persist(pr);
 		
 	}
@@ -112,9 +114,9 @@ public class ImportDonneesService
 		for (Produit prod : prods)
 		{
 			ImportProduitProducteurDTO dto = new ImportProduitProducteurDTO();
-			dto.producteur = prod.getProducteur().nom;
-			dto.produit = prod.getNom();
-			dto.conditionnement = prod.getConditionnement();
+			dto.producteur = prod.producteur.nom;
+			dto.produit = prod.nom;
+			dto.conditionnement = prod.conditionnement;
 			
 			res.add(dto);
 		}

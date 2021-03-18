@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -37,10 +37,6 @@ public class PeriodeCotisationDTO implements TableItem
 	public int montantMini;
 	
 	public int montantConseille;
-	
-	public Date dateDebutInscription;
-	
-	public Date dateFinInscription;
 	
 	public String textPaiement;
 	
@@ -105,17 +101,6 @@ public class PeriodeCotisationDTO implements TableItem
 	public void setMontantConseille(int montantConseille)
 	{
 		this.montantConseille = montantConseille;
-	}
-
-
-	public Date getDateFinInscription()
-	{
-		return dateFinInscription;
-	}
-
-	public void setDateFinInscription(Date dateFinInscription)
-	{
-		this.dateFinInscription = dateFinInscription;
 	}
 
 	public String getTextPaiement()
@@ -206,16 +191,6 @@ public class PeriodeCotisationDTO implements TableItem
 	public void setMntTotalAdhesion(int mntTotalAdhesion)
 	{
 		this.mntTotalAdhesion = mntTotalAdhesion;
-	}
-
-	public Date getDateDebutInscription()
-	{
-		return dateDebutInscription;
-	}
-
-	public void setDateDebutInscription(Date dateDebutInscription)
-	{
-		this.dateDebutInscription = dateDebutInscription;
 	}
 
 	public Long getIdBulletinAdhesion()

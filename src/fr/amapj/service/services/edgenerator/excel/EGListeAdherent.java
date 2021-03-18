@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -28,6 +28,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import fr.amapj.common.DateUtils;
+import fr.amapj.model.models.fichierbase.EtatUtilisateur;
 import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 import fr.amapj.service.engine.generator.excel.ExcelFormat;
 import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
@@ -72,7 +73,7 @@ public class EGListeAdherent extends AbstractExcelGenerator
 	@Override
 	public void fillExcelFile(EntityManager em,ExcelGeneratorTool et)
 	{
-		et.addSheet("Liste des adhérents", 9, 20);
+		et.addSheet("Liste des adhérents", 10, 20);
 		et.setColumnWidth(2, 40);
 		et.setColumnWidth(5, 40);
 		et.setColumnWidth(7, 40);
@@ -97,11 +98,11 @@ public class EGListeAdherent extends AbstractExcelGenerator
 		}
 		else if (type==Type.STD)
 		{
-			utilisateurs = new UtilisateurService().getAllUtilisateurs(false);
+			utilisateurs = new UtilisateurService().getAllUtilisateurs(EtatUtilisateur.ACTIF);
 		}
 		else
 		{
-			utilisateurs = new UtilisateurService().getAllUtilisateurs(true);
+			utilisateurs = new UtilisateurService().getAllUtilisateurs(null);
 		}
 		
 		
@@ -142,10 +143,13 @@ public class EGListeAdherent extends AbstractExcelGenerator
 		et.setCell(5, "Adr", et.grasGaucheNonWrappeBordure);
 		et.setCell(6, "Code Postal", et.grasGaucheNonWrappeBordure);
 		et.setCell(7, "Ville", et.grasGaucheNonWrappeBordure);
-		
+		if (type!=Type.EXAMPLE)
+		{
+			et.setCell(8, "Rôle", et.grasGaucheNonWrappeBordure);
+		}
 		if (type==Type.AVEC_INACTIF)
 		{
-			et.setCell(8, "Actif/Inactif", et.grasGaucheNonWrappeBordure);
+			et.setCell(9, "Actif/Inactif", et.grasGaucheNonWrappeBordure);
 		}
 		
 	}
@@ -187,10 +191,13 @@ public class EGListeAdherent extends AbstractExcelGenerator
 			et.setCell(6, u.getCodePostal(), et.nonGrasGaucheBordure);
 			et.setCell(7, u.getVille(), et.nonGrasGaucheBordure);
 		}
-		
+		if (type!=Type.EXAMPLE)
+		{
+			et.setCell(8, u.getRoles(), et.nonGrasGaucheBordure);
+		}
 		if (type==Type.AVEC_INACTIF)
 		{
-			et.setCell(8, u.getEtatUtilisateur().name(), et.grasGaucheNonWrappeBordure);
+			et.setCell(9, u.getEtatUtilisateur().name(), et.nonGrasGaucheBordure);
 		}
 	}
 	
@@ -212,11 +219,11 @@ public class EGListeAdherent extends AbstractExcelGenerator
 		}
 		else if (type==Type.STD)
 		{
-			return "la liste des adhérents"; 
+			return "la liste des adhérents actifs"; 
 		}
 		else
 		{
-			return "la liste des adhérents, y compris les inactifs";
+			return "la liste des adhérents (actifs et inactifs)";
 		}
 	}
 	

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,6 +21,7 @@
  package fr.amapj.model.models.param.paramecran.common;
 
 import fr.amapj.common.AmapjRuntimeException;
+import fr.amapj.model.models.param.paramecran.PEGestionContratsVierges;
 import fr.amapj.model.models.param.paramecran.PEListeAdherent;
 import fr.amapj.model.models.param.paramecran.PELivraisonAmapien;
 import fr.amapj.model.models.param.paramecran.PELivraisonProducteur;
@@ -28,6 +29,7 @@ import fr.amapj.model.models.param.paramecran.PEMesContrats;
 import fr.amapj.model.models.param.paramecran.PEMesLivraisons;
 import fr.amapj.model.models.param.paramecran.PEReceptionCheque;
 import fr.amapj.model.models.param.paramecran.PESaisiePaiement;
+import fr.amapj.model.models.param.paramecran.PESyntheseMultiContrat;
 import fr.amapj.view.engine.menu.MenuList;
 
 /**
@@ -60,10 +62,15 @@ public class ParamEcranInfo
 		case RECEPTION_CHEQUES:
 			return PEReceptionCheque.class;
 			
+		case SYNTHESE_MULTI_CONTRAT:
+			return PESyntheseMultiContrat.class;
+			
 		case OUT_SAISIE_PAIEMENT:
 			return PESaisiePaiement.class;
-			
 		
+		case GESTION_CONTRAT:
+			return PEGestionContratsVierges.class;
+			
 		default:
 			throw new AmapjRuntimeException("Type non pris en compte");
 		}

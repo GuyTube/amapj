@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -30,9 +30,7 @@ import java.util.List;
  */
 public class MesContratsDTO
 {
-	// Information sur l'adhesion
-	public AdhesionDTO adhesionDTO = new AdhesionDTO();
-	
+
 	// Liste des nouveaux contrats auxquels peut subscrire l'utilisateur
 	List<ContratDTO> newContrats;
 	

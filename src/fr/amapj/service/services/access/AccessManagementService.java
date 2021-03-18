@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -25,11 +25,13 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
 import fr.amapj.model.models.acces.RoleList;
+import fr.amapj.model.models.fichierbase.EtatProducteur;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.model.models.fichierbase.RoleAdmin;
 import fr.amapj.model.models.fichierbase.RoleTresorier;
@@ -195,59 +197,67 @@ public class AccessManagementService
 	/**
 	 * Permet de charger la liste de tous les producteurs autorisés pour cet utilisateur 
 	 * dans une transaction en lecture
+	 * 
+	 * si actifOnly = true : il y a uniquement les producteurs actifs
+	 * si actifOnly = false : il y a tous les producteurs (actifs et inactifs)
 	 */
 	@DbRead
-	public List<Producteur> getAccessLivraisonProducteur(List<RoleList> roles,Long idUtilisateur)
+	public List<Producteur> getAccessLivraisonProducteur(List<RoleList> roles,Long idUtilisateur,boolean actifOnly)
 	{
 		EntityManager em = TransactionHelper.getEm();
 		
 		Utilisateur user = em.find(Utilisateur.class, idUtilisateur);
-		Query q;
+		TypedQuery<Producteur> q;
 		List<Producteur> res = new ArrayList<Producteur>();
 		
 		if ( (roles.contains(RoleList.ADMIN)) ||  (roles.contains(RoleList.TRESORIER)) )
 		{
 			// Recherche tous les producteurs
-			q = em.createQuery("select p from Producteur p order by p.nom");
-			res.addAll( (List<Producteur>) q.getResultList() );
+			if (actifOnly)
+			{
+				q = em.createQuery("select p from Producteur p WHERE p.etat = :etat order by p.nom",Producteur.class);
+				q.setParameter("etat", EtatProducteur.ACTIF);
+			}
+			else
+			{
+				q = em.createQuery("select p from Producteur p order by p.nom",Producteur.class);
+			}
+			res.addAll(q.getResultList() );
 			return res;
 		}
 		
 		
 		// Recherche en tant que producteur
-		q = em.createQuery("select distinct(c.producteur) from ProducteurUtilisateur c WHERE " +
-						"c.utilisateur=:u "+
-						"order by c.producteur.nom");
-				q.setParameter("u", user);
-		res.addAll( (List<Producteur>) q.getResultList() );
+		if (actifOnly)
+		{
+			q = em.createQuery("select distinct(c.producteur) from ProducteurUtilisateur c WHERE c.utilisateur=:u AND c.producteur.etat=:etat order by c.producteur.nom",Producteur.class);
+			q.setParameter("etat", EtatProducteur.ACTIF);
+			q.setParameter("u", user);
+		}
+		else
+		{
+			q = em.createQuery("select distinct(c.producteur) from ProducteurUtilisateur c WHERE c.utilisateur=:u order by c.producteur.nom",Producteur.class);
+			q.setParameter("u", user);
+		}
+		res.addAll(q.getResultList() );
 				
 		// Recherche en tant que referent
-		q = em.createQuery("select distinct(c.producteur) from ProducteurReferent c WHERE " +
-						"c.referent=:u " +
-						"order by c.producteur.nom");
-				q.setParameter("u", user);
-		res.addAll( (List<Producteur>) q.getResultList() );				
+		if (actifOnly)
+		{
+			q = em.createQuery("select distinct(c.producteur) from ProducteurReferent c WHERE c.referent=:u AND c.producteur.etat=:etat order by c.producteur.nom",Producteur.class);
+			q.setParameter("etat", EtatProducteur.ACTIF);
+			q.setParameter("u", user);
+		}
+		else
+		{
+			q = em.createQuery("select distinct(c.producteur) from ProducteurReferent c WHERE c.referent=:u order by c.producteur.nom",Producteur.class);
+			q.setParameter("u", user);
+		}
+		res.addAll(q.getResultList() );				
 			
 		return res;
 
 	}
-
-	// RESTRICTION DES ACCES AUX INACTIFS
-	
-	
-	/**
-	 * 
-	 */
-	public Boolean getAccessInactif(List<RoleList> roles)
-	{
-		if ( (roles.contains(RoleList.ADMIN)) ||  (roles.contains(RoleList.TRESORIER)) )
-		{
-			return Boolean.TRUE;
-		}
-		
-		return Boolean.FALSE;
-	}
-
 
 
 	// PARTIE fichier de base
@@ -274,9 +284,9 @@ public class AccessManagementService
 		AdminTresorierDTO dto = new AdminTresorierDTO();
 		
 		dto.id = roleAdmin.getId();
-		dto.utilisateurId = roleAdmin.getUtilisateur().getId();
-		dto.nom = roleAdmin.getUtilisateur().getNom();
-		dto.prenom = roleAdmin.getUtilisateur().getPrenom();
+		dto.utilisateurId = roleAdmin.utilisateur.getId();
+		dto.nom = roleAdmin.utilisateur.nom;
+		dto.prenom = roleAdmin.utilisateur.prenom;
 		
 		return dto;		
 	}
@@ -289,7 +299,7 @@ public class AccessManagementService
 	{
 		EntityManager em = TransactionHelper.getEm();
 		RoleAdmin p =  new RoleAdmin();
-		p.setUtilisateur(em.find(Utilisateur.class, dto.utilisateurId));
+		p.utilisateur = em.find(Utilisateur.class, dto.utilisateurId);
 		em.persist(p);
 		
 	}
@@ -328,9 +338,9 @@ public class AccessManagementService
 		AdminTresorierDTO dto = new AdminTresorierDTO();
 		
 		dto.id = r.getId();
-		dto.utilisateurId = r.getUtilisateur().getId();
-		dto.nom = r.getUtilisateur().getNom();
-		dto.prenom = r.getUtilisateur().getPrenom();
+		dto.utilisateurId = r.utilisateur.getId();
+		dto.nom = r.utilisateur.nom;
+		dto.prenom = r.utilisateur.prenom;
 		
 		return dto;		
 	}
@@ -345,7 +355,7 @@ public class AccessManagementService
 	{
 		EntityManager em = TransactionHelper.getEm();
 		RoleTresorier p  = new RoleTresorier();
-		p.setUtilisateur(em.find(Utilisateur.class, dto.utilisateurId));
+		p.utilisateur = em.find(Utilisateur.class, dto.utilisateurId);
 		em.persist(p);
 	}	
 	
@@ -360,5 +370,84 @@ public class AccessManagementService
 		em.remove(p);
 	}
 
+	/** 
+	 * Retourne null si cet utilisateur n'est ni PRODUCTEUR ni REFERENT ni TRESORIER ni ADMIN
+	 * 
+	 * sinon retourne ce qui empeche la suppression de cet utilisateur 
+	 * 
+	 */
+	@DbRead
+	public String canBeDeleted(Long idUtilisateur) 
+	{
+		EntityManager em = TransactionHelper.getEm();
+		Utilisateur u = em.find(Utilisateur.class, idUtilisateur);
+		
+		if (isAdmin(em, u))
+		{
+			return "L'utilisateur est ADMIN";
+		}
+		if (isTresorier(em, u))
+		{
+			return "L'utilisateur est TRESORIER";
+		}
+		
+		TypedQuery<Producteur> q = em.createQuery("select r.producteur from ProducteurReferent r  WHERE r.referent=:u",Producteur.class);
+		q.setParameter("u", u);
+		List<Producteur> ps = q.getResultList();
+		if (ps.size()>=1)
+		{
+			return "L'utilisateur est marqué comme REFERENT pour le producteur "+ps.get(0).nom;
+		}
+		
+		q = em.createQuery("select r.producteur from ProducteurUtilisateur r  WHERE r.utilisateur=:u",Producteur.class);
+		q.setParameter("u", u);
+		ps = q.getResultList();
+		if (ps.size()>=1)
+		{
+			return "L'utilisateur est marqué comme PRODUCTEUR pour le producteur "+ps.get(0).nom;
+		}
+		return null;	
+	}
+	
+	/** 
+	 * Retourne la liste détaillée des roles de cet utilisateur 
+	 * 
+	 */
+	@DbRead
+	public List<String> detailDesRoles(Long idUtilisateur) 
+	{
+		 List<String> res= new ArrayList<String>();
+		 
+		EntityManager em = TransactionHelper.getEm();
+		Utilisateur u = em.find(Utilisateur.class, idUtilisateur);
+		
+		if (isAdmin(em, u))
+		{
+			res.add("Cet utilisateur est ADMIN");
+		}
+		if (isTresorier(em, u))
+		{
+			res.add("Cet utilisateur est TRESORIER");
+		}
+		
+		TypedQuery<Producteur> q = em.createQuery("select r.producteur from ProducteurReferent r  WHERE r.referent=:u",Producteur.class);
+		q.setParameter("u", u);
+		for (Producteur producteur : q.getResultList()) 
+		{
+			res.add("Cet utilisateur est REFERENT pour le producteur "+producteur.nom);
+		}
+		
+		
+		q = em.createQuery("select r.producteur from ProducteurUtilisateur r  WHERE r.utilisateur=:u",Producteur.class);
+		q.setParameter("u", u);
+		for (Producteur producteur : q.getResultList()) 
+		{
+			res.add("Cet utilisateur est PRODUCTEUR pour le producteur "+producteur.nom);
+		}
+		
+		return res;	
+	}
+	
+	
 	
 }

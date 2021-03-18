@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -37,7 +37,7 @@ public class StackUtils
 {
 	
 	public static final String SEP = System.getProperty("line.separator");
-
+	
 	/**
 	 * 
 	 */
@@ -49,6 +49,18 @@ public class StackUtils
 		}
 		
 		messages.add(e1.getClass().toString()+" : "+e1.getMessage());
+		
+		if (e1 instanceof ConstraintViolationException)
+		{
+			Set<ConstraintViolation<?>> set = ( (ConstraintViolationException) e1).getConstraintViolations();
+			
+			for (ConstraintViolation<?> constraintViolation : set)
+			{
+				String str = "Le champ "+constraintViolation.getPropertyPath()+" : "+constraintViolation.getMessage()+". Valeur incorrecte : "+constraintViolation.getInvalidValue()+" Bean :"+constraintViolation.getLeafBean();
+				messages.add(str);
+			}
+		}
+		
 		StackTraceElement[] elts = e1.getStackTrace();
 		for (int i = 0; i < elts.length; i++)
 		{

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -53,6 +53,10 @@ import fr.amapj.view.engine.ui.AppConfiguration;
 public class MailerService
 {
 	private final static Logger logger = LogManager.getLogger();
+	
+	public static final String HTML_MAIL_HEADER = "<html><head></head><body>";
+	
+	public static final String HTML_MAIL_FOOTER = "</body></html>";
 
 
 	public MailerService()
@@ -84,8 +88,8 @@ public class MailerService
 		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
 		if ( (param.mailCopyTo!=null) && (param.mailCopyTo.length()>0))
 		{
-			message.addRecipient(Message.RecipientType.BCC, InternetAddress.parse(param.mailCopyTo)[0]);
-			message.setReplyTo(InternetAddress.parse(param.mailCopyTo));
+			message.addRecipients(Message.RecipientType.BCC, InternetAddress.parse(param.mailCopyTo));
+			// Supprimé - Provoque le rejet du message en tant que SPAM - message.setReplyTo(InternetAddress.parse(param.mailCopyTo));
 		}
 		message.setSubject(subject);
 		
@@ -164,7 +168,8 @@ public class MailerService
 			Multipart mp = new MimeMultipart();
 
 	        MimeBodyPart htmlPart = new MimeBodyPart();
-	        htmlPart.setText(mailerMessage.getContent(), "UTF-8", "html");
+	        String html = buildHtlmContent(mailerMessage,param);
+	        htmlPart.setText(html, "UTF-8", "html");
 	        mp.addBodyPart(htmlPart);
 
 	        for (MailerAttachement attachement : mailerMessage.getAttachements())
@@ -199,6 +204,24 @@ public class MailerService
 	
 	
 	
+	private String buildHtlmContent(MailerMessage mailerMessage, ParametresDTO param)
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(HTML_MAIL_HEADER);
+		
+		sb.append(mailerMessage.getContent());
+		if (param.sendingMailFooter!=null && param.sendingMailFooter.length()>0)
+		{
+			sb.append("<br/><br/>");
+			sb.append(param.sendingMailFooter);
+		}
+		
+		sb.append(HTML_MAIL_FOOTER);
+		
+		return sb.toString();
+	}
+
 	public static void main(String[] args)
 	{
 		TestTools.init();

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -32,6 +32,7 @@ import fr.amapj.common.LongUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.contrat.modele.EtatModeleContrat;
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.contrat.reel.Contrat;
 import fr.amapj.model.models.contrat.reel.EtatPaiement;
@@ -80,11 +81,12 @@ public class MesPaiementsService
 	{
 		List<PaiementAFournirDTO> res = new ArrayList<>();
 
-		// On récupère d'abord la liste des contrats de l'utilisateur avec des
-		// paiements à l'état A_FOURNIR
+		// On récupère d'abord la liste des contrats de l'utilisateur avec des paiements à l'état A_FOURNIR
+		// On ne prend pas en compte les modele de contrats à l'état ARCHIVE
 		Query q = em.createQuery("select c from Contrat c "
-				+ "WHERE c.utilisateur=:u and EXISTS ( select p from Paiement p where p.etat=:etat and p.contrat=c) "
+				+ "WHERE c.utilisateur=:u AND c.modeleContrat.etat<>:etatContrat AND EXISTS ( select p from Paiement p where p.etat=:etat and p.contrat=c) "
 				+ "order by c.modeleContrat.dateRemiseCheque asc , c.modeleContrat.nom , c.modeleContrat.id");
+		q.setParameter("etatContrat", EtatModeleContrat.ARCHIVE);
 		q.setParameter("etat", EtatPaiement.A_FOURNIR);
 		q.setParameter("u", user);
 
@@ -93,9 +95,9 @@ public class MesPaiementsService
 		for (Contrat contrat : cs)
 		{
 			PaiementAFournirDTO dto = new PaiementAFournirDTO();
-			dto.dateRemise = contrat.getModeleContrat().getDateRemiseCheque();
-			dto.libCheque = contrat.getModeleContrat().getLibCheque();
-			dto.nomContrat = contrat.getModeleContrat().getNom();
+			dto.dateRemise = contrat.modeleContrat.dateRemiseCheque;
+			dto.libCheque = contrat.modeleContrat.libCheque;
+			dto.nomContrat = contrat.modeleContrat.nom;
 			dto.paiements = getPaiementAFournir(em, contrat);
 			res.add(dto);
 		}
@@ -117,7 +119,7 @@ public class MesPaiementsService
 
 		for (Paiement paiement : ps)
 		{
-			String datePaiement = df.format(paiement.getModeleContratDatePaiement().getDatePaiement());
+			String datePaiement = df.format(paiement.modeleContratDatePaiement.datePaiement);
 			if (lastMatch(res, paiement) == true)
 			{
 				DetailPaiementAFournirDTO last = res.get(res.size() - 1);
@@ -129,7 +131,7 @@ public class MesPaiementsService
 				DetailPaiementAFournirDTO dto = new DetailPaiementAFournirDTO();
 				dto.nbCheque = 1;
 				dto.moisPaiement = datePaiement;
-				dto.montant = paiement.getMontant();
+				dto.montant = paiement.montant;
 				res.add(dto);
 			}
 		}
@@ -143,7 +145,7 @@ public class MesPaiementsService
 			return false;
 		}
 		DetailPaiementAFournirDTO last = res.get(res.size() - 1);
-		if (last.montant == paiement.getMontant())
+		if (last.montant == paiement.montant)
 		{
 			return true;
 		}
@@ -159,10 +161,12 @@ public class MesPaiementsService
 		List<PaiementFourniDTO> res = new ArrayList<>();
 
 		// On récupère d'abord la liste des paiements qui n'ont pas été donné aux producteurs
-		Query q = em.createQuery("select p from Paiement p " + "WHERE p.etat<>:etat and p.contrat.utilisateur=:u "
+		// On ne prend pas en compte les contrats à l'état archivé 
+		Query q = em.createQuery("select p from Paiement p " + "WHERE p.etat<>:etat and p.contrat.utilisateur=:u AND p.contrat.modeleContrat.etat<>:etatModeleContrat "
 				+ "order by p.modeleContratDatePaiement.datePaiement," + " p.modeleContratDatePaiement.modeleContrat.nom ,"
 				+ " p.modeleContratDatePaiement.modeleContrat.id");
 		q.setParameter("etat", EtatPaiement.PRODUCTEUR);
+		q.setParameter("etatModeleContrat", EtatModeleContrat.ARCHIVE);
 		q.setParameter("u", user);
 
 		List<Paiement> ps = q.getResultList();
@@ -170,7 +174,7 @@ public class MesPaiementsService
 		for (Paiement paiement : ps)
 		{
 			DetailPaiementFourniDTO detail = createDetail(paiement);
-			String datePaiement = df.format(paiement.getModeleContratDatePaiement().getDatePaiement());
+			String datePaiement = df.format(paiement.modeleContratDatePaiement.datePaiement);
 			if (lastMatch(res, datePaiement) == true)
 			{
 				PaiementFourniDTO last = res.get(res.size() - 1);
@@ -209,10 +213,10 @@ public class MesPaiementsService
 	private DetailPaiementFourniDTO createDetail(Paiement paiement)
 	{
 		DetailPaiementFourniDTO dto = new DetailPaiementFourniDTO();
-		dto.libCheque = paiement.getContrat().getModeleContrat().getLibCheque();
-		dto.nomContrat = paiement.getContrat().getModeleContrat().getNom();
-		dto.montant = paiement.getMontant();
-		dto.etatPaiement = paiement.getEtat();
+		dto.libCheque = paiement.contrat.modeleContrat.libCheque;
+		dto.nomContrat = paiement.contrat.modeleContrat.nom;
+		dto.montant = paiement.montant;
+		dto.etatPaiement = paiement.etat;
 		return dto;
 	}
 	
@@ -234,11 +238,11 @@ public class MesPaiementsService
 			PaiementHistoriqueDTO dto = new PaiementHistoriqueDTO();
 			
 			dto.id = paiement.getId();
-			dto.nomProducteur = paiement.getContrat().getModeleContrat().getProducteur().nom;
-			dto.nomContrat = paiement.getContrat().getModeleContrat().getNom();
-			dto.montant = paiement.getMontant();
-			dto.datePrevu = paiement.getModeleContratDatePaiement().getDatePaiement();
-			dto.dateReelle = paiement.getRemise().getDateRemise();
+			dto.nomProducteur = paiement.contrat.modeleContrat.producteur.nom;
+			dto.nomContrat = paiement.contrat.modeleContrat.nom;
+			dto.montant = paiement.montant;
+			dto.datePrevu = paiement.modeleContratDatePaiement.datePaiement;
+			dto.dateReelle = paiement.remise.dateRemise;
 			
 			res.add(dto);
 		}
@@ -272,11 +276,11 @@ public class MesPaiementsService
 		{
 			DatePaiementDTO dto = new DatePaiementDTO();
 			dto.idPaiement = paiement.getId();
-			dto.datePaiement = paiement.getModeleContratDatePaiement().getDatePaiement();
-			dto.montant = paiement.getMontant();
-			dto.etatPaiement = paiement.getEtat();
-			dto.commentaire1 = paiement.getCommentaire1();
-			dto.commentaire2 = paiement.getCommentaire2();
+			dto.datePaiement = paiement.modeleContratDatePaiement.datePaiement;
+			dto.montant = paiement.montant;
+			dto.etatPaiement = paiement.etat;
+			dto.commentaire1 = paiement.commentaire1;
+			dto.commentaire2 = paiement.commentaire2;
 			
 			res.add(dto);
 		}
@@ -298,9 +302,9 @@ public class MesPaiementsService
 		for (DatePaiementDTO dto : paiementDto)
 		{
 			Paiement p = em.find(Paiement.class, dto.idPaiement);
-			p.setEtat(dto.etatPaiement);
-			p.setCommentaire1(dto.commentaire1);
-			p.setCommentaire2(dto.commentaire2);
+			p.etat = dto.etatPaiement;
+			p.commentaire1 = dto.commentaire1;
+			p.commentaire2 = dto.commentaire2;
 						
 		}	
 	}
@@ -351,17 +355,17 @@ public class MesPaiementsService
 		
 		if ( (mntDonneAmap>mntCommande) && (paiements.size()>0) )
 		{
-			Utilisateur u = contrat.getUtilisateur();
+			Utilisateur u = contrat.utilisateur;
 			SimpleDateFormat df = new SimpleDateFormat("MMMMM yyyy");
 			
-			buf.append("L'adhérent "+u.getNom()+" "+u.getPrenom()+" a un trop payé de "
+			buf.append("L'adhérent "+u.nom+" "+u.prenom+" a un trop payé de "
 						+new CurrencyTextFieldConverter().convertToString(mntDonneAmap-mntCommande)+" €<br/>");
 			
 			buf.append("Vous avez en votre possession ces chèques, que vous pouvez rendre ou faire refaire:<br/>");
 			for (Paiement paiement : paiements)
 			{
-				buf.append(" - "+df.format(paiement.getModeleContratDatePaiement().getDatePaiement())+" - "
-							+new CurrencyTextFieldConverter().convertToString(paiement.getMontant())+"€ <br/>");
+				buf.append(" - "+df.format(paiement.modeleContratDatePaiement.datePaiement)+" - "
+							+new CurrencyTextFieldConverter().convertToString(paiement.montant)+"€ <br/>");
 			}
 			buf.append("<br/>");
 		}
@@ -390,7 +394,7 @@ public class MesPaiementsService
 				
 		int mnt1 = LongUtils.toInt(q.getSingleResult());
 		
-		int avoir = contrat.getMontantAvoir();
+		int avoir = contrat.montantAvoir;
 		return mnt1+avoir;
 	}
 

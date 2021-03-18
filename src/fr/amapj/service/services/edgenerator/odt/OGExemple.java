@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -61,7 +61,7 @@ public class OGExemple extends AbstractOdtGenerator
 	public void fillWordFile(EntityManager em,OdtGeneratorTool et)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		EditionSpecifique editionSpecifique = mc.getProducteur().engagement;
+		EditionSpecifique editionSpecifique = mc.producteur.engagement;
 		EngagementJson engagement = (EngagementJson)  new EditionSpeService().load(editionSpecifique.id);
 		String htmlContent = engagement.getText();
 		
@@ -93,12 +93,12 @@ public class OGExemple extends AbstractOdtGenerator
 	{
 		VelocityContext ctx = new VelocityContext();
 		
-		Producteur producteur = c.getModeleContrat().getProducteur();
+		Producteur producteur = c.modeleContrat.producteur;
 		
 		VCBuilder.addAmap(ctx);
 		VCBuilder.addDateInfo(ctx);
 		VCBuilder.addAmapien(ctx, utilisateur);
-		VCBuilder.addContrat(ctx, c, em);
+		VCBuilder.addContrat(ctx, c.modeleContrat,c, em);
 		VCBuilder.addProducteur(ctx, producteur);
 		List<ProdUtilisateurDTO> refs=new ProducteurService().getReferents(em, producteur);
 		if (refs.size()>=1)
@@ -115,7 +115,7 @@ public class OGExemple extends AbstractOdtGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class,modeleContratId);
-		return "engagements-"+mc.getNom();
+		return "engagements-"+mc.nom;
 	}
 
 	@Override

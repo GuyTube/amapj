@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -145,7 +145,7 @@ public class PeriodiqueNotificationService
 		
 		message.setTitle(titre);
 		message.setContent(content);
-		message.setEmail(utilisateur.getEmail());
+		message.setEmail(utilisateur.email);
 		sendMessageAndMemorize(message,d,utilisateur.getId());
 		
 	}
@@ -196,7 +196,7 @@ public class PeriodiqueNotificationService
 	private String replaceWithContext(String in,EntityManager em,Date d,Utilisateur u,ParametresDTO param)
 	{
 		// Calcul du contexte
-		String link = param.getUrl()+"?username="+u.getEmail();
+		String link = param.getUrl()+"?username="+u.email;
 		
 		in = in.replaceAll("#NOM_AMAP#", param.nomAmap);
 		in = in.replaceAll("#VILLE_AMAP#", param.villeAmap);

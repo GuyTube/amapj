@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import fr.amapj.common.CollectionUtils;
 import fr.amapj.common.DateUtils;
@@ -56,6 +57,7 @@ import fr.amapj.service.services.mescontrats.ContratLigDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.service.services.utilisateur.util.UtilisateurUtil;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
+import fr.amapj.view.views.saisiecontrat.ContratAboManager;
 
 /**
  * Permet la gestion des modeles de contrat
@@ -104,13 +106,13 @@ public class GestionContratSigneService
 	{
 		ContratSigneDTO info = new ContratSigneDTO();
 
-		info.nomUtilisateur = contrat.getUtilisateur().getNom();
-		info.prenomUtilisateur = contrat.getUtilisateur().getPrenom();
-		info.idUtilisateur = contrat.getUtilisateur().getId();
+		info.nomUtilisateur = contrat.utilisateur.nom;
+		info.prenomUtilisateur = contrat.utilisateur.prenom;
+		info.idUtilisateur = contrat.utilisateur.getId();
 		info.idContrat = contrat.getId();
-		info.idModeleContrat = contrat.getModeleContrat().getId();
-		info.dateCreation = contrat.getDateCreation();
-		info.dateModification = contrat.getDateModification();
+		info.idModeleContrat = contrat.modeleContrat.getId();
+		info.dateCreation = contrat.dateCreation;
+		info.dateModification = contrat.dateModification;
 		info.mntCommande = getMontant(em, contrat);
 
 		info.nbChequePromis = getNbCheque(em, contrat, EtatPaiement.A_FOURNIR);
@@ -118,7 +120,7 @@ public class GestionContratSigneService
 		info.nbChequeRemis = getNbCheque(em, contrat, EtatPaiement.PRODUCTEUR);
 
 		int mntChequeRemis = getMontantChequeRemis(em, contrat);
-		info.mntAvoirInitial = contrat.getMontantAvoir();
+		info.mntAvoirInitial = contrat.montantAvoir;
 		info.mntSolde = info.mntAvoirInitial + mntChequeRemis - info.mntCommande;
 
 		return info;
@@ -231,9 +233,9 @@ public class GestionContratSigneService
 	{
 		ContratSigneDTO info = new ContratSigneDTO();
 
-		info.nomUtilisateur = contrat.getUtilisateur().getNom();
-		info.prenomUtilisateur = contrat.getUtilisateur().getPrenom();
-		info.mntAvoirInitial = contrat.getMontantAvoir();
+		info.nomUtilisateur = contrat.utilisateur.nom;
+		info.prenomUtilisateur = contrat.utilisateur.prenom;
+		info.mntAvoirInitial = contrat.montantAvoir;
 
 		return info;
 	}
@@ -257,9 +259,9 @@ public class GestionContratSigneService
 		// futur
 		for (ModeleContratDate modeleContratDate : dates)
 		{
-			if (modeleContratDate.getDateLiv().after(DateUtils.getDate()))
+			if (modeleContratDate.dateLiv.after(DateUtils.getDate()))
 			{
-				dto.dateDebut = modeleContratDate.getDateLiv();
+				dto.dateDebut = modeleContratDate.dateLiv;
 				break;
 			}
 		}
@@ -268,7 +270,7 @@ public class GestionContratSigneService
 		// arrivé à calculer une date de début
 		if ((dto.dateDebut != null) && (dates.size() >= 1))
 		{
-			dto.dateFin = dates.get(dates.size() - 1).getDateLiv();
+			dto.dateFin = dates.get(dates.size() - 1).dateLiv;
 		}
 		return dto;
 	}
@@ -306,7 +308,7 @@ public class GestionContratSigneService
 		buf.append("Les quantités des " + mcds.size() + " dates de livraisons suivantes vont être mises à zéro:<br/>");
 		for (ModeleContratDate modeleContratDate : mcds)
 		{
-			buf.append(" - " + df.format(modeleContratDate.getDateLiv()) + "<br/>");
+			buf.append(" - " + df.format(modeleContratDate.dateLiv) + "<br/>");
 		}
 		buf.append("<br/>");
 
@@ -322,8 +324,8 @@ public class GestionContratSigneService
 		buf.append("Les quantités suivantes vont être mises à zéro: ( " + qtes.size() + " produits)<br/>");
 		for (Object[] qte : qtes)
 		{
-			Produit prod = ((ModeleContratProduit) qte[1]).getProduit();
-			buf.append(" - " + qte[0] + " " + prod.getNom() + " , " + prod.getConditionnement() + "<br/>");
+			Produit prod = ((ModeleContratProduit) qte[1]).produit;
+			buf.append(" - " + qte[0] + " " + prod.nom + " , " + prod.conditionnement + "<br/>");
 		}
 		buf.append("<br/>");
 
@@ -439,7 +441,7 @@ public class GestionContratSigneService
 		for (ModeleContratDate mcd : mcds)
 		{
 			DeplacerDateLivraisonDTO.ModifDateLivraisonDTO mdl = new DeplacerDateLivraisonDTO.ModifDateLivraisonDTO();
-			mdl.dateLiv = mcd.getDateLiv();
+			mdl.dateLiv = mcd.dateLiv;
 			mdl.idModeleContratDate = mcd.getId();
 
 			dto.dateLivraisonDTOs.add(mdl);
@@ -454,7 +456,7 @@ public class GestionContratSigneService
 		EntityManager em = TransactionHelper.getEm();
 
 		ModeleContratDate mcd = em.find(ModeleContratDate.class, deplacerDto.selected.idModeleContratDate);
-		mcd.setDateLiv(deplacerDto.actualDate);
+		mcd.dateLiv = deplacerDto.actualDate;
 
 	}
 
@@ -501,10 +503,10 @@ public class GestionContratSigneService
 		for (LigneContratDTO lig : modeleContrat.produits)
 		{
 			ModeleContratProduit mcp = em.find(ModeleContratProduit.class, lig.idModeleContratProduit);
-			if (mcp.getPrix() != lig.prix)
+			if (mcp.prix != lig.prix)
 			{
-				buf1.append("<li>Le prix du \"" + mcp.getProduit().getNom() + "," + mcp.getProduit().getConditionnement() + "\" passe de "
-						+ ctc.convertToString(mcp.getPrix()) + " € à  " + ctc.convertToString(lig.prix) + " €</li>");
+				buf1.append("<li>Le prix du \"" + mcp.produit.nom + "," + mcp.produit.conditionnement + "\" passe de "
+						+ ctc.convertToString(mcp.prix) + " € à  " + ctc.convertToString(lig.prix) + " €</li>");
 				mcps.add(mcp.getId());
 			}
 		}
@@ -541,7 +543,7 @@ public class GestionContratSigneService
 		for (LigneContratDTO lig : modeleContrat.produits)
 		{
 			ModeleContratProduit mcp = em.find(ModeleContratProduit.class, lig.idModeleContratProduit);
-			mcp.setPrix(lig.prix);
+			mcp.prix = lig.prix;
 		}
 	}
 
@@ -561,7 +563,7 @@ public class GestionContratSigneService
 		Query q = em
 				.createQuery("select p from Produit p WHERE p.producteur=:prod and NOT EXISTS (select mcp from ModeleContratProduit mcp where mcp.produit = p and mcp.modeleContrat=:mc) ORDER BY p.nom,p.conditionnement");
 		q.setParameter("mc", mc);
-		q.setParameter("prod", mc.getProducteur());
+		q.setParameter("prod", mc.producteur);
 		List<Produit> us = q.getResultList();
 		return us;
 	}
@@ -584,10 +586,10 @@ public class GestionContratSigneService
 		for (LigneContratDTO lig : modeleContrat.getProduits())
 		{
 			ModeleContratProduit mcp = new ModeleContratProduit();
-			mcp.setIndx(index);
-			mcp.setModeleContrat(mc);
-			mcp.setPrix(lig.getPrix().intValue());
-			mcp.setProduit(em.find(Produit.class, lig.produitId));
+			mcp.indx = index;
+			mcp.modeleContrat = mc;
+			mcp.prix = lig.getPrix().intValue();
+			mcp.produit = em.find(Produit.class, lig.produitId);
 
 			em.persist(mcp);
 
@@ -613,9 +615,9 @@ public class GestionContratSigneService
 		for (Long idModeleContratProduit : modeleContratProduitsToSuppress)
 		{
 			ModeleContratProduit mcp = em.find(ModeleContratProduit.class, idModeleContratProduit);
-			Produit produit = mcp.getProduit();
+			Produit produit = mcp.produit;
 
-			buf.append("<li>" + produit.getNom() + "," + produit.getConditionnement() + "</li>");
+			buf.append("<li>" + produit.nom + "," + produit.conditionnement + "</li>");
 		}
 		buf.append("</ul><br/>");
 
@@ -676,7 +678,7 @@ public class GestionContratSigneService
 		for (LigneContratDTO lig : modeleContrat.getProduits())
 		{
 			ModeleContratProduit mcp = em.find(ModeleContratProduit.class, lig.idModeleContratProduit);
-			mcp.setIndx(index);
+			mcp.indx = index;
 
 			index++;
 		}
@@ -723,8 +725,8 @@ public class GestionContratSigneService
 		buf.append("<br/>");
 
 		// On recherche la liste des utilisateurs impactés 
-		List<Utilisateur> utilisateurs = CollectionUtils.selectDistinct(toDelete, e->e.getContrat().getUtilisateur());
-		CollectionUtils.sort(utilisateurs,e->e.getNom(),e->e.getPrenom());
+		List<Utilisateur> utilisateurs = CollectionUtils.selectDistinct(toDelete, e->e.contrat.utilisateur);
+		CollectionUtils.sort(utilisateurs,e->e.nom,e->e.prenom);
 		
 		buf.append(UtilisateurUtil.getUtilisateurImpactes(utilisateurs));
 		
@@ -762,9 +764,9 @@ public class GestionContratSigneService
 		G1D<Produit, ContratCell> c1 = new G1D<Produit, ContratCell>();
 		
 		c1.fill(toDelete);
-		c1.groupBy(e->e.getModeleContratProduit().getProduit());
+		c1.groupBy(e->e.modeleContratProduit.produit);
 		
-		c1.sortLigAdvanced(e->e.getModeleContratProduit().getIndx(),true);
+		c1.sortLigAdvanced(e->e.modeleContratProduit.indx,true);
 		
 		c1.compute();
 		
@@ -777,9 +779,9 @@ public class GestionContratSigneService
 		{
 			Produit prod = produits.get(i);
 			List<ContratCell> cells = c1.getCell(i);
-			int qte = CollectionUtils.accumulateInt(cells, e->e.getQte()); 
+			int qte = CollectionUtils.accumulateInt(cells, e->e.qte); 
 		
-			buf.append(" - " + qte + " " + prod.getNom() + " , " + prod.getConditionnement() + "<br/>");
+			buf.append(" - " + qte + " " + prod.nom + " , " + prod.conditionnement + "<br/>");
 		}
 		buf.append("<br/>");
 		
@@ -868,7 +870,49 @@ public class GestionContratSigneService
 	}
 	
 	
+	// Modification des regeles de gestion des jokers
 
+	/**
+	 * Permet de connaitre les impacts de de la modification des règles de gestion des jokers
+	 */
+	@DbRead
+	public String getModifJokerInfo(ModeleContratDTO modeleContrat)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		ModeleContrat mc  =em.find(ModeleContrat.class, modeleContrat.id);
+
+		StringBuilder buf = new StringBuilder();
+		
+		TypedQuery<Contrat> q = em.createQuery("select c from Contrat c  where c.modeleContrat=:mc order by c.utilisateur.nom, c.utilisateur.prenom",Contrat.class);
+		q.setParameter("mc", mc);
+
+		List<Contrat> cs = q.getResultList();
+		List<Utilisateur> utilisateurs = new ArrayList<Utilisateur>();
+		
+		for (Contrat c : cs)
+		{
+			String msg = isJokerConforme(c,modeleContrat);
+			if (msg!=null)
+			{
+				Utilisateur u = c.utilisateur;
+				buf.append("Le contrat de "+u.nom+" "+u.prenom+" est non conforme :"+msg+"<br/>");
+				utilisateurs.add(u);
+			}
+		}
+		
+		buf.append("<br/><br/>");
+		
+		//
+		buf.append(UtilisateurUtil.getUtilisateurImpactes(utilisateurs));
+		return buf.toString();
+	}
+
+
+	private String isJokerConforme(Contrat c, ModeleContratDTO modeleContrat)
+	{
+		ContratDTO dto = new MesContratsService().loadContrat(c.modeleContrat.id, c.getId());
+		return new ContratAboManager().isConforme(dto,modeleContrat.jokerNbMin,modeleContrat.jokerNbMax);
+	}
 
 	// REQUETAGE DIVERS
 

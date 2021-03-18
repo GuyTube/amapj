@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,13 +24,19 @@ import java.io.File;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.common.CollectionUtils;
@@ -46,12 +52,15 @@ import fr.amapj.model.engine.transaction.DbUtil;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.NewTransaction;
 import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.fichierbase.EtatUtilisateur;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.model.models.saas.AppInstance;
 import fr.amapj.service.engine.appinitializer.AppInitializer;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.DataBaseResponseDTO;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.ResponseDTO;
 import fr.amapj.service.services.appinstance.SqlRequestDTO.SqlType;
+import fr.amapj.service.services.logview.LogViewService;
+import fr.amapj.service.services.logview.StatInstanceDTO;
 import fr.amapj.service.services.mailer.MailerCounter;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
@@ -112,11 +121,11 @@ public class AppInstanceService
 		AppInstanceDTO dto = new AppInstanceDTO();
 		
 		dto.id = a.getId();
-		dto.nomInstance = a.getNomInstance();
-		dto.dateCreation = a.getDateCreation();
-		dto.dbms = a.getDbms();
-		dto.dbUserName = a.getDbUserName();
-		dto.dbPassword = a.getDbPassword();		
+		dto.nomInstance = a.nomInstance;
+		dto.dateCreation = a.dateCreation;
+		dto.dbms = a.dbms;
+		dto.dbUserName = a.dbUserName;
+		dto.dbPassword = a.dbPassword;		
 		addInfo(dto, connected);
 		return dto;
 	}
@@ -187,11 +196,11 @@ public class AppInstanceService
 			{
 				AppInstance a = new AppInstance();
 
-				a.setNomInstance(appInstanceDTO.nomInstance);
-				a.setDateCreation(DateUtils.getDate());
-				a.setDbms(appInstanceDTO.dbms);
-				a.setDbUserName(appInstanceDTO.dbUserName);
-				a.setDbPassword(appInstanceDTO.dbPassword);
+				a.nomInstance = appInstanceDTO.nomInstance;
+				a.dateCreation = DateUtils.getDate();
+				a.dbms = appInstanceDTO.dbms;
+				a.dbUserName = appInstanceDTO.dbUserName;
+				a.dbPassword = appInstanceDTO.dbPassword;
 						
 				em.persist(a);
 
@@ -325,7 +334,7 @@ public class AppInstanceService
 		List<SudoUtilisateurDTO> res = new ArrayList<SudoUtilisateurDTO>();
 		ParametresDTO param = new ParametresService().getParametres();
 		
-		List<UtilisateurDTO> utilisateurDTOs =  new UtilisateurService().getAllUtilisateurs(true);
+		List<UtilisateurDTO> utilisateurDTOs =  new UtilisateurService().getAllUtilisateurs(null);
 		for (UtilisateurDTO utilisateur : utilisateurDTOs)
 		{
 			SudoUtilisateurDTO dto = new SudoUtilisateurDTO();
@@ -337,10 +346,13 @@ public class AppInstanceService
 			res.add(dto);
 		}
 		
-		// TODO trier suivant la logique voulue
+		// Tri pour avoir les administrateurs en premier, puis les tresoriers , puis par ordre alphabetique
+		CollectionUtils.sort(res, e->!e.roles.contains("ADMIN"),e->!e.roles.contains("TRESORIER"),e->e.nom,e->e.prenom);	
 		
 		return res;
 	}
+
+
 
 	/**
 	 * 
@@ -466,7 +478,7 @@ public class AppInstanceService
 
 	
 	/**
-	 * Permet de recuperer les mails de tous les tresoriers et adminitrateurs sur toutes les bases 
+	 * Permet de recuperer les mails de tous les adminitrateurs sur toutes les bases 
 	 * @return
 	 */
 	public String getAllMails()
@@ -484,10 +496,58 @@ public class AppInstanceService
 		String dbName = DbUtil.getCurrentDb().getDbName();
 		
 		//Query q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleAdmin a) OR u.id in (select t.utilisateur.id from RoleTresorier t)  order by u.nom,u.prenom");
-		Query q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleAdmin a) order by u.nom,u.prenom");
+		Query q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleAdmin a) and u.etatUtilisateur = :etat order by u.nom,u.prenom");
+		q.setParameter("etat", EtatUtilisateur.ACTIF);
 		List<Utilisateur> us = q.getResultList();
-		str.append(CollectionUtils.asStringFinalSep(us, ",",t->"\""+dbName+"\" <"+t.getEmail()+">"));
+		str.append(CollectionUtils.asStringFinalSep(us, ",",t->"\""+dbName+"\" <"+t.email+">"));
 		
 		return null;
 	}
+	
+	
+	
+	/**
+	 * Permet de recuperer des infos générales sur toutes les instances 
+	 * @return
+	 */
+	public String getStatInfo()
+	{
+		AdminTresorierDataDTO data = new AdminTresorierDataDTO();
+		data.extractionDate = new Date();
+		
+		// Recuperation des statistiques sur les acces
+		List<StatInstanceDTO> statAccess = new LogViewService().getStatInstance();
+		
+		SpecificDbUtils.executeInAllDb(()->appendStatInfo(data,statAccess),false);
+		
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		
+		return gson.toJson(data);
+	}
+	
+	@DbRead
+	private Void appendStatInfo(AdminTresorierDataDTO data, List<StatInstanceDTO> statAccess)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		String dbName = DbUtil.getCurrentDb().getDbName();
+		
+		AdminTresorierDataDTO.InstanceDTO stat = new AdminTresorierDataDTO.InstanceDTO();
+		
+		stat.code = dbName;
+		stat.nom = new ParametresService().getParametres().nomAmap;
+		stat.nbAccessLastMonth = statAccess.stream().filter(e->e.nomInstance.equals(dbName)).findFirst().map(e->e.detail[0].nbAccess).orElse(0);
+		
+		TypedQuery<Utilisateur> q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleAdmin a) and u.etatUtilisateur = :etat order by u.nom,u.prenom",Utilisateur.class);
+		q.setParameter("etat", EtatUtilisateur.ACTIF);
+		stat.admins = q.getResultList().stream().map(e->new AdminTresorierDataDTO.ContactDTO(e.nom, e.prenom, e.email)).collect(Collectors.toList());
+		
+		q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleTresorier a) and u.etatUtilisateur = :etat order by u.nom,u.prenom",Utilisateur.class);
+		q.setParameter("etat", EtatUtilisateur.ACTIF);
+		stat.tresoriers = q.getResultList().stream().map(e->new AdminTresorierDataDTO.ContactDTO(e.nom, e.prenom, e.email)).collect(Collectors.toList());
+				
+		data.instances.add(stat);
+		
+		return null;
+	}
+	
 }

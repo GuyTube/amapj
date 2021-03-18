@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,6 +20,8 @@
  */
  package fr.amapj.model.models.fichierbase;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -29,12 +31,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
 import fr.amapj.model.engine.Mdm;
+import fr.amapj.model.models.contrat.modele.EtatModeleContrat;
 import fr.amapj.model.models.editionspe.EditionSpecifique;
 import fr.amapj.model.models.param.ChoixOuiNon;
 import fr.amapj.model.models.param.EtatModule;
@@ -91,6 +96,18 @@ public class Producteur implements Identifiable
 	
 	@NotNull
 	public int delaiModifContrat;
+	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	// Permet de savoir l'état du modele de contrat
+	public EtatProducteur etat = EtatProducteur.ACTIF;
+	
+	@NotNull
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date dateCreation;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date dateModification;
 	
 
 	@Override

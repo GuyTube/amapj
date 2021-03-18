@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -108,7 +108,7 @@ public class MesLivraisonsService
 	}
 	
 
-	private List<PeriodePermanenceDate> getAllDistributionsForUtilisateur(EntityManager em, Date dateDebut, Date dateFin,Utilisateur utilisateur)
+	public List<PeriodePermanenceDate> getAllDistributionsForUtilisateur(EntityManager em, Date dateDebut, Date dateFin,Utilisateur utilisateur)
 	{
 		Query q = em.createQuery("select distinct(du.periodePermanenceDate) from PermanenceCell du WHERE " +
 				"du.periodePermanenceDate.periodePermanence.etat=:etat and " +
@@ -146,26 +146,26 @@ public class MesLivraisonsService
 	
 	private void addCell(ContratCell cell, MesLivraisonsDTO res)
 	{
-		JourLivraisonsDTO jour = findJour(cell.getModeleContratDate().getDateLiv(),res);
-		ProducteurLivraisonsDTO producteurs = findProducteurLivraison(cell.getModeleContratDate(),cell.getModeleContratDate().getModeleContrat(),jour);
+		JourLivraisonsDTO jour = findJour(cell.modeleContratDate.dateLiv,res);
+		ProducteurLivraisonsDTO producteurs = findProducteurLivraison(cell.modeleContratDate,cell.modeleContratDate.modeleContrat,jour);
 		
 		QteProdDTO qteProdDTO = findQteProdDTO(producteurs.produits,cell);
-		qteProdDTO.qte = qteProdDTO.qte+cell.getQte();
+		qteProdDTO.qte = qteProdDTO.qte+cell.qte;
 	}
 
 	private QteProdDTO findQteProdDTO(List<QteProdDTO> produits, ContratCell cell)
 	{
 		for (QteProdDTO qteProdDTO : produits)
 		{
-			if (qteProdDTO.idProduit.equals(cell.getModeleContratProduit().getProduit().getId()))
+			if (qteProdDTO.idProduit.equals(cell.modeleContratProduit.produit.getId()))
 			{
 				return qteProdDTO;
 			}
 		}
 		QteProdDTO qteProdDTO = new QteProdDTO();
-		qteProdDTO.conditionnementProduit = cell.getModeleContratProduit().getProduit().getConditionnement();
-		qteProdDTO.nomProduit = cell.getModeleContratProduit().getProduit().getNom();
-		qteProdDTO.idProduit = cell.getModeleContratProduit().getProduit().getId();
+		qteProdDTO.conditionnementProduit = cell.modeleContratProduit.produit.conditionnement;
+		qteProdDTO.nomProduit = cell.modeleContratProduit.produit.nom;
+		qteProdDTO.idProduit = cell.modeleContratProduit.produit.getId();
 		
 		produits.add(qteProdDTO);
 		
@@ -203,8 +203,8 @@ public class MesLivraisonsService
 			}
 		}
 		ProducteurLivraisonsDTO producteur = new ProducteurLivraisonsDTO();
-		producteur.producteur = modeleContrat.getProducteur().nom;
-		producteur.modeleContrat = modeleContrat.getNom();
+		producteur.producteur = modeleContrat.producteur.nom;
+		producteur.modeleContrat = modeleContrat.nom;
 		producteur.idModeleContrat = modeleContrat.getId();
 		producteur.idModeleContratDate = modeleContratDate.getId();
 		jour.producteurs.add(producteur);

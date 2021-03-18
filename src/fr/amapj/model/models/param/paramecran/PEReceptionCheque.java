@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -39,6 +39,15 @@ public class PEReceptionCheque  extends AbstractParamEcran
 	public ChoixOuiNon saisieCommentaire2 = ChoixOuiNon.NON;
 	
 	public String libSaisieCommentaire2 = "Numéro chèque";
+	
+	public ChoixOuiNon saisieCommentaire3 = ChoixOuiNon.NON;
+	
+	public String libSaisieCommentaire3 = "Nom sur le chèque";
+	
+	public ChoixOuiNon saisieCommentaire4 = ChoixOuiNon.NON;
+	
+	public String libSaisieCommentaire4 = "Divers...";
+	
 
 	public ChoixOuiNon getSaisieCommentaire1()
 	{
@@ -88,6 +97,46 @@ public class PEReceptionCheque  extends AbstractParamEcran
 	public void setSaisieAvoirNegatif(ChoixOuiNon saisieAvoirNegatif) 
 	{
 		this.saisieAvoirNegatif = saisieAvoirNegatif;
+	}
+
+	public ChoixOuiNon getSaisieCommentaire3() 
+	{
+		return saisieCommentaire3;
+	}
+
+	public void setSaisieCommentaire3(ChoixOuiNon saisieCommentaire3) 
+	{
+		this.saisieCommentaire3 = saisieCommentaire3;
+	}
+
+	public String getLibSaisieCommentaire3() 
+	{
+		return libSaisieCommentaire3;
+	}
+
+	public void setLibSaisieCommentaire3(String libSaisieCommentaire3) 
+	{
+		this.libSaisieCommentaire3 = libSaisieCommentaire3;
+	}
+
+	public ChoixOuiNon getSaisieCommentaire4() 
+	{
+		return saisieCommentaire4;
+	}
+
+	public void setSaisieCommentaire4(ChoixOuiNon saisieCommentaire4) 
+	{
+		this.saisieCommentaire4 = saisieCommentaire4;
+	}
+
+	public String getLibSaisieCommentaire4() 
+	{
+		return libSaisieCommentaire4;
+	}
+
+	public void setLibSaisieCommentaire4(String libSaisieCommentaire4) 
+	{
+		this.libSaisieCommentaire4 = libSaisieCommentaire4;
 	}
 	
 	

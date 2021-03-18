@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -42,6 +42,8 @@ import fr.amapj.service.services.editionspe.EditionSpeService;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.mescontrats.ContratDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
+import fr.amapj.service.services.parametres.ParametresDTO;
+import fr.amapj.service.services.parametres.ParametresService;
 
 
 /**
@@ -95,7 +97,7 @@ public class EGFeuilleDistributionProducteur extends AbstractExcelGenerator
 		int nbColGauche = 3;
 
 		//
-		Producteur p = mc.getProducteur();
+		Producteur p = mc.producteur;
 		
 		SimpleDateFormat df = new SimpleDateFormat("dd MMMMM");
 		SimpleDateFormat df3 = new SimpleDateFormat("dd MMMMM yyyy");
@@ -143,8 +145,10 @@ public class EGFeuilleDistributionProducteur extends AbstractExcelGenerator
 		List<ModeleContratDate> ds = new ArrayList<>();
 		ds.add(date);
 		
-		String firstLine = "FEUILLE DE DISTRIBUTION PRODUCTEUR DU "+df3.format(date.getDateLiv());
-		String sheetName = df.format(date.getDateLiv());
+		ParametresDTO param = new ParametresService().getParametres();
+		
+		String firstLine = param.nomAmap+" - Feuille de distribution producteur du "+df3.format(date.dateLiv);
+		String sheetName = df.format(date.dateLiv);
 		
 		grilleTool.performSheet(et,firstLine,sheetName,mc,prods,ds,utilisateurs,nbColGauche,contrats);
 		
@@ -183,13 +187,13 @@ public class EGFeuilleDistributionProducteur extends AbstractExcelGenerator
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
 		if (modeleContratDateId==null)
 		{
-			return "distri-"+mc.getNom();
+			return "distri-"+mc.nom;
 		}
 		else
 		{
 			ModeleContratDate date = em.find(ModeleContratDate.class, modeleContratDateId);
 			SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-			return "distri-"+mc.getNom()+"-"+df.format(date.getDateLiv());
+			return "distri-"+mc.nom+"-"+df.format(date.dateLiv);
 		}
 	}
 
@@ -205,7 +209,7 @@ public class EGFeuilleDistributionProducteur extends AbstractExcelGenerator
 		{
 			ModeleContratDate date = em.find(ModeleContratDate.class, modeleContratDateId);
 			SimpleDateFormat df = new SimpleDateFormat("dd MMMMM yyyy");
-			return "la feuille de distribution producteur du "+df.format(date.getDateLiv());
+			return "la feuille de distribution producteur du "+df.format(date.dateLiv);
 		}
 	}
 	

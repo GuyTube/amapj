@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -28,7 +28,6 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import fr.amapj.model.engine.Identifiable;
-import fr.amapj.model.engine.Mdm;
 import fr.amapj.model.models.fichierbase.Produit;
 
 @Entity
@@ -37,42 +36,24 @@ public class ModeleContratProduit implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 
 	@NotNull
 	@ManyToOne
-	private ModeleContrat modeleContrat;
+	public ModeleContrat modeleContrat;
 	
 	@NotNull
 	@ManyToOne
-	private Produit produit;
+	public Produit produit;
 	
 	@NotNull
 	// Numéro d'ordre 
-	private int indx;
+	public int indx;
 	
 	@NotNull
 	// Prix en centimes d'euros, dans l'unité du produit
-	private int prix;
+	public int prix;
 	
-	
-	public enum P implements Mdm
-	{
-		ID("id") , MODELECONTRAT("modeleContrat") , PRODUIT("produit") , INDX("indx") ;
-		
-		private String propertyId;   
-		   
-	    P(String propertyId) 
-	    {
-	        this.propertyId = propertyId;
-	    }
-	    public String prop() 
-	    { 
-	    	return propertyId; 
-	    }
-		
-	} ;
-
 
 	public Long getId()
 	{
@@ -83,53 +64,5 @@ public class ModeleContratProduit implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
-	}
-
-
-	public ModeleContrat getModeleContrat()
-	{
-		return modeleContrat;
-	}
-
-
-	public void setModeleContrat(ModeleContrat modeleContrat)
-	{
-		this.modeleContrat = modeleContrat;
-	}
-
-
-	public Produit getProduit()
-	{
-		return produit;
-	}
-
-
-	public void setProduit(Produit produit)
-	{
-		this.produit = produit;
-	}
-
-
-	public int getPrix()
-	{
-		return prix;
-	}
-
-
-	public void setPrix(int prix)
-	{
-		this.prix = prix;
-	}
-
-
-	public int getIndx()
-	{
-		return indx;
-	}
-
-
-	public void setIndx(int indx)
-	{
-		this.indx = indx;
 	}
 }

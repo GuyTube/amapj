@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -44,32 +44,6 @@ public class PdfHtmlUtils
 		
 		return content.substring(endBody1+1, startBody2);	
 	}	
-	
-	/**
-	 * Generation de l'entete d'un document dans le but de l'imprimer 
-	 */
-	static public String generateHeaderAndBodyLineForPrinting(Imprimable imprimable)
-	{
-		StringBuffer buf = new StringBuffer();
-		
-		buf.append("<!DOCTYPE html>");
-		buf.append("<html>");
-		buf.append("<head>");
-		buf.append("<meta charset=\"utf-8\">");
-		buf.append("<title></title>");
-		buf.append("</head>");
-		buf.append(generateBodyLineForPrinting(imprimable));
-		
-		return buf.toString();
-	}
-	
-	
-	
-	static public String generateBodyLineForPrinting(Imprimable imprimable)
-	{
-		// Pour l'impression, le body contient uniquement la font par defaut, les marges seront gérées par la ligne de commande
-		return "<body style=\"font-family:sans-serif;font-size:10pt;\">";	
-	}
 	
 	
 	/**

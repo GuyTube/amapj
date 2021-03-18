@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -37,23 +37,15 @@ import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratSummaryDTO;
 import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
 import fr.amapj.service.services.mescontrats.CartePrepayeeDTO;
+import fr.amapj.service.services.mescontrats.ContratStatusService;
 import fr.amapj.service.services.mescontrats.MesCartesPrepayeesService;
-import fr.amapj.service.services.mescontrats.MesContratsService;
 
 /**
- * Permet la gestion des modeles de contrat
- * 
- *  
- *
+ * Permet la gestion de l'historisation des contrats des utilisateurs
  */
 public class HistoriqueContratsService
 {
-	public HistoriqueContratsService()
-	{
 
-	}
-
-	
 	// PARTIE HISTORIQUE DES CONTRATS
 	
 	/**
@@ -65,9 +57,9 @@ public class HistoriqueContratsService
 		Date now = DateUtils.getDate();
 		EntityManager em = TransactionHelper.getEm();
 		
-		MesContratsService mesContratsService = new MesContratsService();
 		GestionContratSigneService gestionContratSigneService = new GestionContratSigneService();
 		MesCartesPrepayeesService mesCartesPrepayeesService = new MesCartesPrepayeesService();
+		ContratStatusService statusService = new ContratStatusService();
 
 		List<HistoriqueContratDTO> res = new ArrayList<>();
 
@@ -83,10 +75,10 @@ public class HistoriqueContratsService
 		{
 			// Si ce contrat est en historique
 			
-			ModeleContrat mc = contrat.getModeleContrat();
+			ModeleContrat mc = contrat.modeleContrat;
 			CartePrepayeeDTO cartePrepayeeDTO = mesCartesPrepayeesService.computeCartePrepayee(mc,em,now);
-			boolean isModifiable = mesContratsService.isModifiable(mc,em,cartePrepayeeDTO,now);
-			if (mesContratsService.isHistorique(contrat,em,now,isModifiable)==true)
+			boolean isModifiable = statusService.isModifiable(mc,em,cartePrepayeeDTO,now);
+			if (statusService.isHistorique(contrat,em,now,isModifiable)==true)
 			{
 	
 				// Appel du service modele de contrat pour avoir toutes les infos
@@ -95,12 +87,12 @@ public class HistoriqueContratsService
 	
 				HistoriqueContratDTO dto = new HistoriqueContratDTO();
 				
-				dto.nomContrat = contrat.getModeleContrat().getNom();
-				dto.nomProducteur = contrat.getModeleContrat().getProducteur().nom;
+				dto.nomContrat = contrat.modeleContrat.nom;
+				dto.nomProducteur = contrat.modeleContrat.producteur.nom;
 				dto.dateDebut = summaryDTO.dateDebut;
 				dto.dateFin = summaryDTO.dateFin;
-				dto.dateCreation = contrat.getDateCreation();
-				dto.dateModification = contrat.getDateModification();
+				dto.dateCreation = contrat.dateCreation;
+				dto.dateModification = contrat.dateModification;
 				dto.montant = gestionContratSigneService.getMontant(em, contrat);
 				
 				dto.idContrat = contrat.getId();
@@ -113,8 +105,5 @@ public class HistoriqueContratsService
 		
 		return res;
 	}
-	
-	
-	
 
 }

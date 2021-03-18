@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -32,7 +32,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
-import fr.amapj.model.engine.Mdm;
 
 @Entity
 public class Produit  implements Identifiable
@@ -40,45 +39,27 @@ public class Produit  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 
 	@NotNull
 	@Size(min = 1, max = 255)
 	@Column(length = 255)
-	private String nom;
+	public String nom;
 	
 	@NotNull
 	@Size(min = 1, max = 500)
 	@Column(length = 500)
-	private String conditionnement;
+	public String conditionnement;
 	
 
 	@NotNull
 	@ManyToOne
-	private Producteur producteur;
+	public Producteur producteur;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
-    private TypFacturation typFacturation = TypFacturation.UNITE;
+	public TypFacturation typFacturation = TypFacturation.UNITE;
 	
-	
-	
-	public enum P implements Mdm
-	{
-		ID("id") , NOM("nom") , CONDITIONNEMENT("conditionnement") , PRODUCTEUR("producteur") , TYPFACTURATION("typFacturation")  ;
-		
-		private String propertyId;   
-		   
-	    P(String propertyId) 
-	    {
-	        this.propertyId = propertyId;
-	    }
-	    public String prop() 
-	    { 
-	    	return propertyId; 
-	    }
-		
-	} ;
 	
 	
 	
@@ -94,48 +75,5 @@ public class Produit  implements Identifiable
 		this.id = id;
 	}
 
-	public String getNom()
-	{
-		return nom;
-	}
-
-	public void setNom(String nom)
-	{
-		this.nom = nom;
-	}
-
-	public Producteur getProducteur()
-	{
-		return producteur;
-	}
-
-	public void setProducteur(Producteur producteur)
-	{
-		this.producteur = producteur;
-	}
-
-	public TypFacturation getTypFacturation()
-	{
-		return typFacturation;
-	}
-
-	public void setTypFacturation(TypFacturation typFacturation)
-	{
-		this.typFacturation = typFacturation;
-	}
-
-	public String getConditionnement()
-	{
-		return conditionnement;
-	}
-
-	public void setConditionnement(String conditionnement)
-	{
-		this.conditionnement = conditionnement;
-	}
-	
-	
-	
-	
 	
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -127,7 +127,7 @@ public class EGStatAnnuelleProducteur extends AbstractExcelGenerator
 	@Override
 	public String getNameToDisplay(EntityManager em)
 	{
-		return "les statistiques producteurs par annee";
+		return "Montant livré par chaque producteur, une colonne par année civile";
 	}
 	
 	@Override

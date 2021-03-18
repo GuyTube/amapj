@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -45,7 +45,10 @@ public class ParametresDTO
 	
 	public int sendingMailNbMax;
 	
+	public String sendingMailFooter;
+	
 	public String mailCopyTo;
+	
 	
 	public String url;
 	
@@ -276,5 +279,16 @@ public class ParametresDTO
 		this.mailCopyTo = mailCopyTo;
 	}
 
+	public String getSendingMailFooter()
+	{
+		return sendingMailFooter;
+	}
+
+	public void setSendingMailFooter(String sendingMailFooter)
+	{
+		this.sendingMailFooter = sendingMailFooter;
+	}
+
+	
 	
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -20,41 +20,20 @@
  */
  package fr.amapj.service.services.moncompte;
 
-import org.apache.logging.log4j.LogManager;import org.apache.logging.log4j.Logger;
-
 import javax.persistence.EntityManager;
 
-import fr.amapj.model.engine.transaction.DbRead;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
 import fr.amapj.model.models.fichierbase.Utilisateur;
-import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.service.services.utilisateur.UtilisateurDTO;
-import fr.amapj.service.services.utilisateur.UtilisateurService;
 
 public class MonCompteService
 {
 	private final static Logger logger = LogManager.getLogger();
 
-	public MonCompteService()
-	{
-
-	}
-
-	/**
-	 * Permet de récuperer les infos de l'utilisateur courant
-	 */
-	@DbRead
-	public UtilisateurDTO getUtilisateurInfo()
-	{
-		EntityManager em = TransactionHelper.getEm();
-	
-		Long id = SessionManager.getUserId();
-		Utilisateur u = em.find(Utilisateur.class, id);
-		UtilisateurDTO dto = new UtilisateurService().createUtilisateurDto(em, u);
-		return dto;
-
-	}
 
 	/**
 	 * Permet de changer le password
@@ -74,7 +53,7 @@ public class MonCompteService
 			return false;
 		}
 
-		r.setEmail(newEmail);
+		r.email = newEmail;
 		return true;
 
 	}
@@ -88,11 +67,11 @@ public class MonCompteService
 		
 		Utilisateur u = em.find(Utilisateur.class, dto.id);
 
-		u.setNumTel1(dto.numTel1);
-		u.setNumTel2(dto.numTel2);
-		u.setLibAdr1(dto.libAdr1);
-		u.setCodePostal(dto.codePostal);
-		u.setVille(dto.ville);
+		u.numTel1 = dto.numTel1;
+		u.numTel2 = dto.numTel2;
+		u.libAdr1 = dto.libAdr1;
+		u.codePostal = dto.codePostal;
+		u.ville = dto.ville;
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -30,6 +30,7 @@ import javax.persistence.Query;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import fr.amapj.common.CollectionUtils;
 import fr.amapj.common.DateUtils;
 import fr.amapj.model.engine.tools.TestTools;
 import fr.amapj.model.engine.transaction.Call;
@@ -44,7 +45,6 @@ import fr.amapj.service.services.mailer.MailerMessage;
 import fr.amapj.service.services.mailer.MailerService;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
-import fr.amapj.service.services.permanence.detailperiode.DetailPeriodePermanenceService;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceDateDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceService;
 import fr.amapj.service.services.utilisateur.util.UtilisateurUtil;
@@ -132,7 +132,7 @@ public class PermanenceNotificationService
 		
 		message.setTitle(titre);
 		message.setContent(content);
-		message.setEmail(utilisateur.getEmail());
+		message.setEmail(utilisateur.email);
 		sendMessageAndMemorize(message,pc.getId());
 		
 	}
@@ -184,11 +184,17 @@ public class PermanenceNotificationService
 
 	private String replaceWithContext(String in,PermanenceCell dpu,EntityManager em,Utilisateur u,ParametresDTO param)
 	{
+		// Si le champ a été laissé vide, on positione une valeur par défaut 
+		if (in==null || in.trim().length()==0)
+		{
+			in = "Permanence AMAP";
+		}
+		
 		// Calcul du contexte
 		SimpleDateFormat df = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
 		
 		PeriodePermanenceDateDTO permanenceDTO = new PeriodePermanenceService().loadOneDatePermanence(dpu.periodePermanenceDate.id);
-		String link = param.getUrl()+"?username="+u.getEmail();
+		String link = param.getUrl()+"?username="+u.email;
 		
 		in = in.replaceAll("#NOM_AMAP#", param.nomAmap);
 		in = in.replaceAll("#VILLE_AMAP#", param.villeAmap);
@@ -196,6 +202,12 @@ public class PermanenceNotificationService
 		
 		in = in.replaceAll("#DATE_PERMANENCE#", df.format(dpu.periodePermanenceDate.datePerm));
 		in = in.replaceAll("#PERSONNES#", permanenceDTO.getNomInscrit());
+		
+		in = in.replaceAll("#PERSONNES_AVEC_ROLES#", permanenceDTO.getNomInscritWithRoles());
+		
+		in = in.replaceAll("#ROLES#", permanenceDTO.getRolesAsString(u.id));
+		
+		
 		
 		return in;
 		

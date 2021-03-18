@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -46,24 +46,24 @@ public class RemiseProducteur  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 	
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date dateCreation;
+	public Date dateCreation;
 	
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date dateRemise;
+	public Date dateRemise;
 	
 	@NotNull
 	@ManyToOne
-	private ModeleContratDatePaiement datePaiement;
+	public ModeleContratDatePaiement datePaiement;
 	
 	
 	// Montant de la remise en centimes
 	@NotNull
-	private int montant=0;
+	public int montant=0;
 
 
 	public Long getId()
@@ -75,54 +75,6 @@ public class RemiseProducteur  implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
-	}
-
-
-	public Date getDateCreation()
-	{
-		return dateCreation;
-	}
-
-
-	public void setDateCreation(Date dateCreation)
-	{
-		this.dateCreation = dateCreation;
-	}
-
-
-	public Date getDateRemise()
-	{
-		return dateRemise;
-	}
-
-
-	public void setDateRemise(Date dateRemise)
-	{
-		this.dateRemise = dateRemise;
-	}
-
-
-	public ModeleContratDatePaiement getDatePaiement()
-	{
-		return datePaiement;
-	}
-
-
-	public void setDatePaiement(ModeleContratDatePaiement datePaiement)
-	{
-		this.datePaiement = datePaiement;
-	}
-
-
-	public int getMontant()
-	{
-		return montant;
-	}
-
-
-	public void setMontant(int montant)
-	{
-		this.montant = montant;
 	}
 	
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -80,6 +80,22 @@ public class PeriodePermanenceUpdateService
 		
 	}
 
+	
+	/**
+	 * Modification des regles d'inscription 
+	 * @param dto
+	 */
+	@DbWrite
+	public void updateRegleInscription(PeriodePermanenceDTO dto)
+	{
+		EntityManager em = TransactionHelper.getEm(); 
+		PeriodePermanence pp = em.find(PeriodePermanence.class,dto.id);
+		
+		pp.regleInscription = dto.regleInscription;
+		
+	}
+	
+	
 
 	/**
 	 * Ajouter des dates 
@@ -271,11 +287,11 @@ public class PeriodePermanenceUpdateService
 	{
 		if (newDetail.nbParticipation>oldDetail.nbParticipation)
 		{
-			return "L'utilisateur "+u.getNom() + " " + u.getPrenom()+" doit faire "+(newDetail.nbParticipation-oldDetail.nbParticipation)+" participations supplémentaires";
+			return "L'utilisateur "+u.nom + " " + u.prenom+" doit faire "+(newDetail.nbParticipation-oldDetail.nbParticipation)+" participations supplémentaires";
 		}
 		
 		
-		String str = "L'utilisateur "+u.getNom() + " " + u.getPrenom()+" doit faire "+(oldDetail.nbParticipation-newDetail.nbParticipation)+" participations en moins.";
+		String str = "L'utilisateur "+u.nom + " " + u.prenom+" doit faire "+(oldDetail.nbParticipation-newDetail.nbParticipation)+" participations en moins.";
 		
 		UnePeriodePermanenceDTO cpts = new MesPermanencesService().loadCompteurPeriodePermanence(idPeriodePermanence, u.getId());
 		
@@ -351,13 +367,13 @@ public class PeriodePermanenceUpdateService
 		
 		if (dates.size()==0)
 		{
-			return "L'utilisateur "+u.getNom() + " " + u.getPrenom()+" n'était pas inscrit.";
+			return "L'utilisateur "+u.nom + " " + u.prenom+" n'était pas inscrit.";
 		}
 		else
 		{
 			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yy");
 			
-			String str = "L'utilisateur "+u.getNom() + " " + u.getPrenom()+" était inscrit "+dates.size()+" fois :";
+			String str = "L'utilisateur "+u.nom + " " + u.prenom+" était inscrit "+dates.size()+" fois :";
 			str = str +CollectionUtils.asStdString(dates, e->df.format(e.datePerm));
 			str = str+". Ces incriptions vont être effacées.";
 			

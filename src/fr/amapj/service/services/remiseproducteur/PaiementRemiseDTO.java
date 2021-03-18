@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -19,9 +19,6 @@
  * 
  */
  package fr.amapj.service.services.remiseproducteur;
-
-import javax.persistence.Column;
-import javax.validation.constraints.Size;
 
 import fr.amapj.model.models.contrat.reel.EtatPaiement;
 
@@ -47,6 +44,10 @@ public class PaiementRemiseDTO
 	public String commentaire1;
 
 	public String commentaire2;
+	
+	public String commentaire3;
+
+	public String commentaire4;
 	
 	
 

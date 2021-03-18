@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -21,32 +21,11 @@
  package fr.amapj.service.services.edgenerator.velocity;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.EntityManager;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-import fr.amapj.common.StringUtils;
-import fr.amapj.model.models.contrat.reel.Contrat;
 import fr.amapj.model.models.cotisation.PeriodeCotisation;
 import fr.amapj.model.models.cotisation.PeriodeCotisationUtilisateur;
-import fr.amapj.service.services.gestioncontrat.GestionContratService;
-import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
-import fr.amapj.service.services.gestioncontrat.ModeleContratSummaryDTO;
-import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
-import fr.amapj.service.services.mescontrats.ContratColDTO;
-import fr.amapj.service.services.mescontrats.ContratDTO;
-import fr.amapj.service.services.mescontrats.ContratLigDTO;
-import fr.amapj.service.services.mescontrats.DatePaiementDTO;
-import fr.amapj.service.services.mescontrats.InfoPaiementDTO;
-import fr.amapj.service.services.mescontrats.MesContratsService;
-import fr.amapj.service.services.mespaiements.MesPaiementsService;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
 
@@ -64,15 +43,9 @@ public class VCAdhesion
 	
 	private String montantConseille;
 	
-	private String dateDebutInscription;
-	
-	private String dateFinInscription;
-	
 	private String textPaiement;
 	
 	private String libCheque;
-	
-	private String dateRemiseCheque;
 	
 	private String dateAdhesion;
 	
@@ -81,21 +54,18 @@ public class VCAdhesion
 	public void load(PeriodeCotisationUtilisateur pcu,EntityManager em)
 	{
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-		PeriodeCotisation pc = pcu.getPeriodeCotisation();
+		PeriodeCotisation pc = pcu.periodeCotisation;
 		CurrencyTextFieldConverter ctc = new CurrencyTextFieldConverter();
 	
-		nomPeriode = s(pc.getNom());
-		dateDebut = df.format(pc.getDateDebut());
-		dateFin = df.format(pc.getDateFin());
-		montantAdhesion = ctc.convertToString(pcu.getMontantAdhesion());
-		montantMini = ctc.convertToString(pc.getMontantMini());
-		montantConseille = ctc.convertToString(pc.getMontantConseille());
-		dateDebutInscription = df.format(pc.getDateDebutInscription());
-		dateFinInscription = df.format(pc.getDateFinInscription());
-		textPaiement = s(pc.getTextPaiement());
-		libCheque = s(pc.getLibCheque());
-		dateRemiseCheque = df.format(pc.getDateRemiseCheque());
-		dateAdhesion = df.format(pcu.getDateAdhesion());
+		nomPeriode = s(pc.nom);
+		dateDebut = df.format(pc.dateDebut);
+		dateFin = df.format(pc.dateFin);
+		montantAdhesion = ctc.convertToString(pcu.montantAdhesion);
+		montantMini = ctc.convertToString(pc.montantMini);
+		montantConseille = ctc.convertToString(pc.montantConseille);
+		textPaiement = s(pc.textPaiement);
+		libCheque = s(pc.libCheque);
+		dateAdhesion = df.format(pcu.dateAdhesion);
 	}
 
 	/**
@@ -170,26 +140,6 @@ public class VCAdhesion
 		this.montantConseille = montantConseille;
 	}
 
-	public String getDateDebutInscription()
-	{
-		return dateDebutInscription;
-	}
-
-	public void setDateDebutInscription(String dateDebutInscription)
-	{
-		this.dateDebutInscription = dateDebutInscription;
-	}
-
-	public String getDateFinInscription()
-	{
-		return dateFinInscription;
-	}
-
-	public void setDateFinInscription(String dateFinInscription)
-	{
-		this.dateFinInscription = dateFinInscription;
-	}
-
 	public String getTextPaiement()
 	{
 		return textPaiement;
@@ -208,16 +158,6 @@ public class VCAdhesion
 	public void setLibCheque(String libCheque)
 	{
 		this.libCheque = libCheque;
-	}
-
-	public String getDateRemiseCheque()
-	{
-		return dateRemiseCheque;
-	}
-
-	public void setDateRemiseCheque(String dateRemiseCheque)
-	{
-		this.dateRemiseCheque = dateRemiseCheque;
 	}
 
 	public String getDateAdhesion()

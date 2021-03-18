@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -35,7 +35,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
-import fr.amapj.model.engine.Mdm;
 
 /**
  * Suivi des accès à l'application, au niveau du master
@@ -47,77 +46,59 @@ public class LogAccess  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String ip;
+	public String ip;
 	
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String browser;
+	public String browser;
 	
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String nom;
+	public String nom;
 	
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String prenom;
+	public String prenom;
 	
-	private Long idUtilisateur;
+	public Long idUtilisateur;
 	
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date dateIn;
+	public Date dateIn;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date dateOut;
+	public Date dateOut;
 	
 	// Nombre de secondes pendant lequel l'utilisateur est actif
-	private int activityTime;
+	public int activityTime;
 	
 	// Nom de la base de données associée
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String dbName;
+	public String dbName;
 	
 	// Nom du fichier de log associé
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String logFileName;
+	public String logFileName;
 	
 	// Type du log : user ou deamon
 	@NotNull
 	@Enumerated(EnumType.STRING)
-    private TypLog typLog = TypLog.USER;
+	public TypLog typLog = TypLog.USER;
 	
 	// nb d'erreur
 	@NotNull
-	private int nbError=0;
+	public int nbError=0;
 	
 	// 0 si cas classique, 1 si sudo
-	private int sudo=0;
+	public int sudo=0;
 	
 	
-	public enum P implements Mdm
-	{
-		ID("id");
-		
-		private String propertyId;   
-		   
-	    P(String propertyId) 
-	    {
-	        this.propertyId = propertyId;
-	    }
-	    public String prop() 
-	    { 
-	    	return propertyId; 
-	    }
-		
-	}
-
-
 	// Getters and setters
 
 	public Long getId()
@@ -130,183 +111,6 @@ public class LogAccess  implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
-	}
-
-
-
-	public String getIp()
-	{
-		return ip;
-	}
-
-
-
-	public void setIp(String ip)
-	{
-		this.ip = ip;
-	}
-
-
-
-	public String getBrowser()
-	{
-		return browser;
-	}
-
-
-
-	public void setBrowser(String browser)
-	{
-		this.browser = browser;
-	}
-
-	public Date getDateIn()
-	{
-		return dateIn;
-	}
-
-
-
-	public void setDateIn(Date dateIn)
-	{
-		this.dateIn = dateIn;
-	}
-
-
-
-	public Date getDateOut()
-	{
-		return dateOut;
-	}
-
-
-
-	public void setDateOut(Date dateOut)
-	{
-		this.dateOut = dateOut;
-	}
-
-
-
-	public String getNom()
-	{
-		return nom;
-	}
-
-
-
-	public void setNom(String nom)
-	{
-		this.nom = nom;
-	}
-
-
-
-	public String getPrenom()
-	{
-		return prenom;
-	}
-
-
-
-	public void setPrenom(String prenom)
-	{
-		this.prenom = prenom;
-	}
-
-
-
-	public Long getIdUtilisateur()
-	{
-		return idUtilisateur;
-	}
-
-
-
-	public void setIdUtilisateur(Long idUtilisateur)
-	{
-		this.idUtilisateur = idUtilisateur;
-	}
-
-
-
-	public String getDbName()
-	{
-		return dbName;
-	}
-
-
-
-	public void setDbName(String dbName)
-	{
-		this.dbName = dbName;
-	}
-
-
-
-	public String getLogFileName()
-	{
-		return logFileName;
-	}
-
-
-
-	public void setLogFileName(String logFileName)
-	{
-		this.logFileName = logFileName;
-	}
-
-
-
-	public int getActivityTime()
-	{
-		return activityTime;
-	}
-
-
-
-	public void setActivityTime(int activityTime)
-	{
-		this.activityTime = activityTime;
-	}
-
-
-
-	public TypLog getTypLog()
-	{
-		return typLog;
-	}
-
-
-
-	public void setTypLog(TypLog typLog)
-	{
-		this.typLog = typLog;
-	}
-
-
-
-	public int getNbError()
-	{
-		return nbError;
-	}
-
-	public void setNbError(int nbError)
-	{
-		this.nbError = nbError;
-	}
-
-
-
-	public int getSudo()
-	{
-		return sudo;
-	}
-
-
-	public void setSudo(int sudo)
-	{
-		this.sudo = sudo;
 	}
 	
 }

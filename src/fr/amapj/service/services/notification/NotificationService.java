@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,47 +24,19 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import fr.amapj.service.engine.deamons.DeamonsContext;
-import fr.amapj.service.engine.deamons.DeamonsImpl;
 import fr.amapj.service.engine.deamons.DeamonsUtils;
 
 
 public class NotificationService implements Job
 {
 	
-	public NotificationService()
-	{
-		
-	}
-	
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException
 	{
 		DeamonsUtils.executeAsDeamon(getClass(), 
-		new DeamonsImpl()
-		{
-			@Override
-			public void perform(DeamonsContext deamonsContext)
-			{
-				new ProducteurNotificationService().sendProducteurNotification();
-			}
-		},
-		new DeamonsImpl()
-		{
-			@Override
-			public void perform(DeamonsContext deamonsContext)
-			{
-				new PermanenceNotificationService().sendPermanenceNotification();
-			}
-		},
-		new DeamonsImpl()
-		{
-			@Override
-			public void perform(DeamonsContext deamonsContext)
-			{
-				new PeriodiqueNotificationService().sendPermanenceNotification();
-			}
-		}
-		);
+				e->new ProducteurNotificationService().sendProducteurNotification(e),
+				e->new PermanenceNotificationService().sendPermanenceNotification(),
+				e->new PeriodiqueNotificationService().sendPermanenceNotification());
+			
 	}
 }

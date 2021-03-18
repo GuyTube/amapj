@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -46,36 +46,36 @@ public class PeriodeCotisationUtilisateur  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 
 	@NotNull
 	@ManyToOne
-	private PeriodeCotisation periodeCotisation;
+	public PeriodeCotisation periodeCotisation;
 	
 	@NotNull
 	@ManyToOne
-	private Utilisateur utilisateur;
+	public Utilisateur utilisateur;
 	
 	// Date d'adhesion par l'amapien
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date dateAdhesion;
+	public Date dateAdhesion;
 	
 	// Date de reception du chèque par le tresorier
 	@Temporal(TemporalType.DATE)
-	private Date dateReceptionCheque;
+	public Date dateReceptionCheque;
 
 	// Montant de de l'adhesion en centimes
 	@NotNull
-	private int montantAdhesion=0;
+	public int montantAdhesion=0;
 	
 	// Etat du paiement
 	@NotNull
-	private EtatPaiementAdhesion etatPaiementAdhesion= EtatPaiementAdhesion.A_FOURNIR;
+	public EtatPaiementAdhesion etatPaiementAdhesion= EtatPaiementAdhesion.A_FOURNIR;
 	
 	// Etat du paiement
 	@NotNull
-	private TypePaiementAdhesion typePaiementAdhesion= TypePaiementAdhesion.CHEQUE;
+	public TypePaiementAdhesion typePaiementAdhesion= TypePaiementAdhesion.CHEQUE;
 
 	public Long getId()
 	{
@@ -85,77 +85,6 @@ public class PeriodeCotisationUtilisateur  implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
-	}
-
-	public PeriodeCotisation getPeriodeCotisation()
-	{
-		return periodeCotisation;
-	}
-
-	public void setPeriodeCotisation(PeriodeCotisation periodeCotisation)
-	{
-		this.periodeCotisation = periodeCotisation;
-	}
-
-	public Utilisateur getUtilisateur()
-	{
-		return utilisateur;
-	}
-
-	public void setUtilisateur(Utilisateur utilisateur)
-	{
-		this.utilisateur = utilisateur;
-	}
-
-
-	public int getMontantAdhesion()
-	{
-		return montantAdhesion;
-	}
-
-	public void setMontantAdhesion(int montantAdhesion)
-	{
-		this.montantAdhesion = montantAdhesion;
-	}
-
-	public EtatPaiementAdhesion getEtatPaiementAdhesion()
-	{
-		return etatPaiementAdhesion;
-	}
-
-	public void setEtatPaiementAdhesion(EtatPaiementAdhesion etatPaiementAdhesion)
-	{
-		this.etatPaiementAdhesion = etatPaiementAdhesion;
-	}
-
-	public TypePaiementAdhesion getTypePaiementAdhesion()
-	{
-		return typePaiementAdhesion;
-	}
-
-	public void setTypePaiementAdhesion(TypePaiementAdhesion typePaiementAdhesion)
-	{
-		this.typePaiementAdhesion = typePaiementAdhesion;
-	}
-
-	public Date getDateAdhesion()
-	{
-		return dateAdhesion;
-	}
-
-	public void setDateAdhesion(Date dateAdhesion)
-	{
-		this.dateAdhesion = dateAdhesion;
-	}
-
-	public Date getDateReceptionCheque()
-	{
-		return dateReceptionCheque;
-	}
-
-	public void setDateReceptionCheque(Date dateReceptionCheque)
-	{
-		this.dateReceptionCheque = dateReceptionCheque;
 	}
 	
 	

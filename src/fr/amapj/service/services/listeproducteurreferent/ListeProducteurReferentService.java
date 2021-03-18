@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -24,11 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import fr.amapj.common.StringUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.fichierbase.EtatProducteur;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.service.services.producteur.ProducteurService;
 
@@ -40,11 +41,6 @@ import fr.amapj.service.services.producteur.ProducteurService;
  */
 public class ListeProducteurReferentService
 {
-
-	public ListeProducteurReferentService()
-	{
-
-	}
 
 	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES PRODUCTEURS
 
@@ -58,11 +54,10 @@ public class ListeProducteurReferentService
 		
 		List<DetailProducteurDTO> res = new ArrayList<DetailProducteurDTO>();
 		
-		Query q = em.createQuery("select p from Producteur p order by p.nom");
-
-		List<Producteur> ps = q.getResultList();
+		TypedQuery<Producteur> q = em.createQuery("select p from Producteur p where p.etat = :etat order by p.nom",Producteur.class);
+		q.setParameter("etat", EtatProducteur.ACTIF);
 		
-		for (Producteur producteur : ps)
+		for (Producteur producteur : q.getResultList())
 		{
 			DetailProducteurDTO dto = createDetailProducteurDTO(producteur,em);
 			res.add(dto);

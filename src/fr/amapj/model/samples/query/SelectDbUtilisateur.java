@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -57,7 +57,7 @@ public class SelectDbUtilisateur
 		List<Utilisateur> us = em.createQuery(cq).getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
+			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
 		}
 
 	}
@@ -81,7 +81,7 @@ public class SelectDbUtilisateur
 		List<Utilisateur> us = em.createQuery(cq).getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
+			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
 		}
 
 	}

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -59,7 +59,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
+			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
 		}
 	}
 	
@@ -76,7 +76,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
+			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
 		}
 	}
 	
@@ -97,7 +97,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
+			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
 		}
 
 	}
@@ -174,7 +174,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
+			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
 		}
 		
 		for (int i = 0; i < 10; i++)
@@ -197,7 +197,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
+			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
 		}
 		
 		

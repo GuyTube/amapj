@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -31,7 +31,12 @@ public enum TypePaiementAdhesion
 	CHEQUE ,
 	
 	// 
-	ESPECES
-	;
+	ESPECES , 
+	
+	//
+	VIREMENT, 
+	
+	//
+	INTERNET;
 
 }

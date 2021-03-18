@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -32,7 +32,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
-import fr.amapj.model.engine.Mdm;
 import fr.amapj.model.models.contrat.modele.ModeleContratDatePaiement;
 import fr.amapj.model.models.remise.RemiseProducteur;
 
@@ -46,61 +45,45 @@ public class Paiement  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 
 	@NotNull
 	@ManyToOne
-	private Contrat contrat;
+	public Contrat contrat;
 	
 	@NotNull
 	@ManyToOne
-	private ModeleContratDatePaiement modeleContratDatePaiement;
+	public ModeleContratDatePaiement modeleContratDatePaiement;
 
 	// Montant du paiement en centimes
 	@NotNull
-	private int montant;
+	public int montant;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	// Permet de savoir l'état du modele de contrat
-    private EtatPaiement etat = EtatPaiement.A_FOURNIR;
+	public EtatPaiement etat = EtatPaiement.A_FOURNIR;
 	
 	@ManyToOne
-	private RemiseProducteur remise;
+	public RemiseProducteur remise;
 	
 
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String commentaire1;
+	public String commentaire1;
 
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String commentaire2;
+	public String commentaire2;
 	
-	
-	public enum P implements Mdm
-	{
-		ID("id") , CONTRAT("contrat") ,  MODELECONTRATDATEPAIEMENT("modeleContratDatePaiement") , MONTANT("montant") ;
-		
-		private String propertyId;   
-		   
-	    P(String propertyId) 
-	    {
-	        this.propertyId = propertyId;
-	    }
-	    public String prop() 
-	    { 
-	    	return propertyId; 
-	    }
-		
-	} ;
-	
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
+	public String commentaire3;
 
-	public Paiement()
-	{
+	@Size(min = 0, max = 255)
+	@Column(length = 255)
+	public String commentaire4;
 		
-	}
-	
 
 	public Long getId()
 	{
@@ -110,76 +93,5 @@ public class Paiement  implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
-	}
-
-	public Contrat getContrat()
-	{
-		return contrat;
-	}
-
-	public void setContrat(Contrat contrat)
-	{
-		this.contrat = contrat;
-	}
-
-	public ModeleContratDatePaiement getModeleContratDatePaiement()
-	{
-		return modeleContratDatePaiement;
-	}
-
-	public void setModeleContratDatePaiement(ModeleContratDatePaiement modeleContratDatePaiement)
-	{
-		this.modeleContratDatePaiement = modeleContratDatePaiement;
-	}
-
-	public int getMontant()
-	{
-		return montant;
-	}
-
-	public void setMontant(int montant)
-	{
-		this.montant = montant;
-	}
-
-	public EtatPaiement getEtat()
-	{
-		return etat;
-	}
-
-	public void setEtat(EtatPaiement etat)
-	{
-		this.etat = etat;
-	}
-
-	public RemiseProducteur getRemise()
-	{
-		return remise;
-	}
-
-	public void setRemise(RemiseProducteur remise)
-	{
-		this.remise = remise;
-	}
-
-
-	public String getCommentaire1()
-	{
-		return commentaire1;
-	}
-
-	public void setCommentaire1(String commentaire1)
-	{
-		this.commentaire1 = commentaire1;
-	}
-
-	public String getCommentaire2()
-	{
-		return commentaire2;
-	}
-
-	public void setCommentaire2(String commentaire2)
-	{
-		this.commentaire2 = commentaire2;
 	}
 }

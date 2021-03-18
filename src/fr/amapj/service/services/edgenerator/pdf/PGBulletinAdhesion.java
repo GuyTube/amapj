@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -101,7 +101,7 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 	public AbstractPdfEditionSpeJson getEditionInNormalMode(EntityManager em)
 	{
 		PeriodeCotisation pc =  em.find(PeriodeCotisation.class, idPeriode);
-		EditionSpecifique editionSpecifique = pc.getBulletinAdhesion();
+		EditionSpecifique editionSpecifique = pc.bulletinAdhesion;
 		AbstractPdfEditionSpeJson bulletin = (AbstractPdfEditionSpeJson)  new EditionSpeService().load(editionSpecifique.id);
 		return bulletin;
 	}
@@ -129,7 +129,7 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 		PeriodeCotisationUtilisateur pcu = em.find(PeriodeCotisationUtilisateur.class, idPeriodeUtilisateur);
 		
 		//
-		if (pcu.getPeriodeCotisation().getId().equals(idPeriode)==false)
+		if (pcu.periodeCotisation.getId().equals(idPeriode)==false)
 		{
 			throw new AmapjRuntimeException("Incoherence");
 		}
@@ -186,7 +186,7 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 	{
 		VelocityContext ctx = new VelocityContext();
 		
-		Utilisateur utilisateur = pcu.getUtilisateur();
+		Utilisateur utilisateur = pcu.utilisateur;
 		
 		VCBuilder.addAmap(ctx);
 		VCBuilder.addDateInfo(ctx);
@@ -202,13 +202,13 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 		if (idPeriodeUtilisateur==null)
 		{
 			PeriodeCotisation pc =  em.find(PeriodeCotisation.class, idPeriode);
-			return "bulletin-adhesion-"+pc.getNom();	
+			return "bulletin-adhesion-"+pc.nom;	
 		}
 		else
 		{
 			PeriodeCotisationUtilisateur pcu =  em.find(PeriodeCotisationUtilisateur.class, idPeriodeUtilisateur);
-			Utilisateur u = pcu.getUtilisateur();
-			return "bulletin-adhesion-"+pcu.getPeriodeCotisation().getNom()+"-"+u.getNom()+" "+u.getPrenom();
+			Utilisateur u = pcu.utilisateur;
+			return "bulletin-adhesion-"+pcu.periodeCotisation.nom+"-"+u.nom+" "+u.prenom;
 		}
 		
 	}
@@ -219,13 +219,13 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 		if (idPeriodeUtilisateur==null)
 		{
 			PeriodeCotisation pc =  em.find(PeriodeCotisation.class, idPeriode);
-			return "la liste des bulletins d'adhésion pour "+pc.getNom();
+			return "la liste des bulletins d'adhésion pour "+pc.nom;
 		}
 		else
 		{
 			PeriodeCotisationUtilisateur pcu =  em.find(PeriodeCotisationUtilisateur.class, idPeriodeUtilisateur);
-			Utilisateur u = pcu.getUtilisateur();
-			return "le bulletin d'adhesion "+pcu.getPeriodeCotisation().getNom()+" pour "+u.getNom()+" "+u.getPrenom();
+			Utilisateur u = pcu.utilisateur;
+			return "le bulletin d'adhesion "+pcu.periodeCotisation.nom+" pour "+u.nom+" "+u.prenom;
 		}
 	}
 	

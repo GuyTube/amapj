@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -125,24 +125,11 @@ public class CalculAutoPeriodePermanenceService
 			{
 				if (cell.idUtilisateur!=null)
 				{
-					PeriodePermanenceUtilisateurDTO util = findPeriodePermanenceUtilisateurDTO(dto,cell.idUtilisateur);
+					PeriodePermanenceUtilisateurDTO util = dto.findPeriodePermanenceUtilisateurDTO(cell.idUtilisateur);
 					util.nbParticipation--;
 				}
 			}
 		}
-	}
-	
-
-	private PeriodePermanenceUtilisateurDTO findPeriodePermanenceUtilisateurDTO(PeriodePermanenceDTO dto, Long idUtilisateur)
-	{
-		for (PeriodePermanenceUtilisateurDTO utilisateur : dto.utilisateurs)
-		{
-			if (utilisateur.idUtilisateur==idUtilisateur)
-			{
-				return utilisateur;
-			}
-		}
-		throw new AmapjRuntimeException();
 	}
 	
 	

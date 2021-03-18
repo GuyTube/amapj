@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -45,31 +45,31 @@ public class AppInstance  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 
 	@NotNull
 	@Size(min = 0, max = 255)
 	@Column(length = 255) 
-	private String nomInstance;
+	public String nomInstance;
 	
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date dateCreation;
+	public Date dateCreation;
 	
 	@NotNull
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String dbms;
+	public String dbms;
 	
 	// Utilisé uniquement pour les base de données externe
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String dbUserName;
+	public String dbUserName;
 	
 	// Utilisé uniquement pour les base de données externe
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	private String dbPassword;
+	public String dbPassword;
 	
 
 	public Long getId()
@@ -80,56 +80,6 @@ public class AppInstance  implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
-	}
-
-	public String getNomInstance()
-	{
-		return nomInstance;
-	}
-
-	public void setNomInstance(String nomInstance)
-	{
-		this.nomInstance = nomInstance;
-	}
-
-	public Date getDateCreation()
-	{
-		return dateCreation;
-	}
-
-	public void setDateCreation(Date dateCreation)
-	{
-		this.dateCreation = dateCreation;
-	}
-
-	public String getDbUserName()
-	{
-		return dbUserName;
-	}
-
-	public void setDbUserName(String dbUserName)
-	{
-		this.dbUserName = dbUserName;
-	}
-
-	public String getDbPassword()
-	{
-		return dbPassword;
-	}
-
-	public void setDbPassword(String dbPassword)
-	{
-		this.dbPassword = dbPassword;
-	}
-
-	public String getDbms()
-	{
-		return dbms;
-	}
-
-	public void setDbms(String dbms)
-	{
-		this.dbms = dbms;
 	}
 
 	

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -37,7 +37,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
-import fr.amapj.model.engine.Mdm;
 
 @Entity
 @Table( uniqueConstraints=
@@ -50,47 +49,54 @@ public class Utilisateur  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 
 	@NotNull
 	@Size(min = 1, max = 100)
 	@Column(length = 100)
-	private String prenom;
+	public String prenom;
 	
 	@NotNull
 	@Size(min = 1, max = 100)
 	@Column(length = 100)
-	private String nom;
+	public String nom;
 	
 	@Size(min = 0, max = 150)
 	@Column(length = 150)
 	// Contient l'adresse e mail
-	private String email;
+	public String email;
 	
 	@Size(min = 0, max = 150)
 	@Column(length = 150)
 	// Contient le password encrypté
-	private String password;
+	public String password;
 	
 	@Size(min = 0, max = 150)
 	@Column(length = 150)
 	// Contient le salt permettant d'encrypter le password 
-	private String salt;
+	public String salt;
 	
 	@Size(min = 0, max = 150)
 	@Column(length = 150)
 	// Contient le slat calculé à la demande du reset du password 
-	private String resetPasswordSalt;
+	public String resetPasswordSalt;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	// Contient le slat calculé à la demande du reset du password 
-	private Date resetPasswordDate;
+	public Date resetPasswordDate;
 	
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	// Permet d'indiquer si cet utilisateur est actif ou inactif
-    private EtatUtilisateur etatUtilisateur = EtatUtilisateur.ACTIF;
+	public EtatUtilisateur etatUtilisateur = EtatUtilisateur.ACTIF;
+	
+	@NotNull
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date dateCreation;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date dateModification;
 	
 	
 	// Liste des élements d'informations générales
@@ -98,40 +104,20 @@ public class Utilisateur  implements Identifiable
 	
 	@Size(min = 0, max = 25)
 	// numéro de  téléphone 1
-	private String numTel1;
+	public String numTel1;
 	
 	@Size(min = 0, max = 25)
 	// numéro de  téléphone 2
-	private String numTel2;
+	public String numTel2;
 	
 	@Size(min = 0, max = 150)
-	private String libAdr1;
+	public String libAdr1;
 	
 	@Size(min = 0, max = 150)
-	private String codePostal;
+	public String codePostal;
 
 	@Size(min = 0, max = 150)
-	private String ville;
-	
-	
-	public enum P implements Mdm
-	{
-		ID("id") , PRENOM("prenom") , NOM("nom") , EMAIL("email") , PASSWORD("password") , RESETPASSWORDSALT("resetPasswordSalt") ;
-		
-		private String propertyId;   
-		   
-	    P(String propertyId) 
-	    {
-	        this.propertyId = propertyId;
-	    }
-	    public String prop() 
-	    { 
-	    	return propertyId; 
-	    }
-		
-	} ;
-	
-	
+	public String ville;
 	
 
 	// Getters ans setters
@@ -144,138 +130,6 @@ public class Utilisateur  implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
-	}
-
-	public String getPrenom()
-	{
-		return prenom;
-	}
-
-	public void setPrenom(String prenom)
-	{
-		this.prenom = prenom;
-	}
-
-	public String getNom()
-	{
-		return nom;
-	}
-
-	public void setNom(String nom)
-	{
-		this.nom = nom;
-	}
-
-	public String getEmail()
-	{
-		return email;
-	}
-
-	public void setEmail(String email)
-	{
-		this.email = email;
-	}
-
-	public String getPassword()
-	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
-	}
-
-	
-
-	public String getSalt()
-	{
-		return salt;
-	}
-
-	public void setSalt(String salt)
-	{
-		this.salt = salt;
-	}
-
-	public String getResetPasswordSalt()
-	{
-		return resetPasswordSalt;
-	}
-
-	public void setResetPasswordSalt(String resetPasswordSalt)
-	{
-		this.resetPasswordSalt = resetPasswordSalt;
-	}
-
-	public Date getResetPasswordDate()
-	{
-		return resetPasswordDate;
-	}
-
-	public void setResetPasswordDate(Date resetPasswordDate)
-	{
-		this.resetPasswordDate = resetPasswordDate;
-	}
-
-	public EtatUtilisateur getEtatUtilisateur()
-	{
-		return etatUtilisateur;
-	}
-
-	public void setEtatUtilisateur(EtatUtilisateur etatUtilisateur)
-	{
-		this.etatUtilisateur = etatUtilisateur;
-	}
-
-	public String getNumTel1()
-	{
-		return numTel1;
-	}
-
-	public void setNumTel1(String numTel1)
-	{
-		this.numTel1 = numTel1;
-	}
-
-	public String getNumTel2()
-	{
-		return numTel2;
-	}
-
-	public void setNumTel2(String numTel2)
-	{
-		this.numTel2 = numTel2;
-	}
-
-	public String getLibAdr1()
-	{
-		return libAdr1;
-	}
-
-	public void setLibAdr1(String libAdr1)
-	{
-		this.libAdr1 = libAdr1;
-	}
-
-	public String getCodePostal()
-	{
-		return codePostal;
-	}
-
-	public void setCodePostal(String codePostal)
-	{
-		this.codePostal = codePostal;
-	}
-
-	public String getVille()
-	{
-		return ville;
-	}
-
-	public void setVille(String ville)
-	{
-		this.ville = ville;
 	}	
 
 }

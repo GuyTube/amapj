@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -104,7 +104,7 @@ public class LogDeleteService implements Job
 		for (LogAccess logAccess : ps)
 		{
 			deleteLogFile(logAccess);
-			logAccess.setLogFileName(null);
+			logAccess.logFileName = null;
 			nbFile++;
 		}
 		
@@ -115,7 +115,7 @@ public class LogDeleteService implements Job
 	{
 		try
 		{
-			Path path = Paths.get(AmapJLogManager.getFullFileName(logAccess.getLogFileName()));
+			Path path = Paths.get(AmapJLogManager.getFullFileName(logAccess.logFileName));
 			Files.delete(path);
 		} 
 		catch (IOException e)
@@ -197,9 +197,9 @@ public class LogDeleteService implements Job
 		
 		for (LogAccess logAccess : ps)
 		{
-			logAccess.setDateOut(ref);
+			logAccess.dateOut = ref;
 			// On poistionne une valeur arbitraire à 1 minute
-			logAccess.setActivityTime(60);
+			logAccess.activityTime = 60;
 		}
 		
 	}

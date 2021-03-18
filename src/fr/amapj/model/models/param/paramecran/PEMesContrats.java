@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -37,9 +37,6 @@ public class PEMesContrats  extends AbstractParamEcran
 	public PresentationImpressionContrat presentationImpressionContrat = PresentationImpressionContrat.ENGAGEMENT_FIRST;
 	
 	
-	// Indique si l'amapein peut imprimer son bulletin d'adhesion 
-	public ImpressionContrat canPrintAdhesion = ImpressionContrat.TOUJOURS;
-
 	public ImpressionContrat getCanPrintContrat()
 	{
 		return canPrintContrat;
@@ -69,17 +66,4 @@ public class PEMesContrats  extends AbstractParamEcran
 	{
 		this.presentationImpressionContrat = presentationImpressionContrat;
 	}
-
-	public ImpressionContrat getCanPrintAdhesion()
-	{
-		return canPrintAdhesion;
-	}
-
-	public void setCanPrintAdhesion(ImpressionContrat canPrintAdhesion)
-	{
-		this.canPrintAdhesion = canPrintAdhesion;
-	}
-
-	
-	
 }

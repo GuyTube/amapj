@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -45,14 +45,28 @@ public class VCPersonne
 
 	public void load(Utilisateur u)
 	{
-		nom = s(u.getNom());
-		prenom = s(u.getPrenom());
-		email = s(u.getEmail());
-		numTel1 = s(u.getNumTel1());
-		numTel2 = s(u.getNumTel2());
-		libAdr1 = s(u.getLibAdr1());
-		codePostal = s(u.getCodePostal());
-		ville = s(u.getVille());
+		if (u!=null)
+		{
+			nom = s(u.nom);
+			prenom = s(u.prenom);
+			email = s(u.email);
+			numTel1 = s(u.numTel1);
+			numTel2 = s(u.numTel2);
+			libAdr1 = s(u.libAdr1);
+			codePostal = s(u.codePostal);
+			ville = s(u.ville);
+		}
+		else
+		{
+			nom = "";
+			prenom = "";
+			email = "";
+			numTel1 = "";
+			numTel2 = "";
+			libAdr1 = "";
+			codePostal = "";
+			ville = "";
+		}
 	}
 	
 	/**

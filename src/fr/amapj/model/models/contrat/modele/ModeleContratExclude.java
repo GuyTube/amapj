@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -28,7 +28,6 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import fr.amapj.model.engine.Identifiable;
-import fr.amapj.model.engine.Mdm;
 
 
 /**
@@ -43,38 +42,18 @@ public class ModeleContratExclude implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public Long id;
 
 	@NotNull
 	@ManyToOne
-	private ModeleContrat modeleContrat;
+	public ModeleContrat modeleContrat;
 	
 	@ManyToOne
-	private ModeleContratProduit produit;
+	public ModeleContratProduit produit;
 	
 	@NotNull
 	@ManyToOne
-	private ModeleContratDate date;
-	
-	
-	
-	public enum P implements Mdm
-	{
-		ID("id") , MODELECONTRAT("modeleContrat") , PRODUIT("produit") , DATE("date") ;
-		
-		private String propertyId;   
-		   
-	    P(String propertyId) 
-	    {
-	        this.propertyId = propertyId;
-	    }
-	    public String prop() 
-	    { 
-	    	return propertyId; 
-	    }
-		
-	}
-
+	public ModeleContratDate date;
 
 
 	public Long getId()
@@ -83,51 +62,8 @@ public class ModeleContratExclude implements Identifiable
 	}
 
 
-
 	public void setId(Long id)
 	{
 		this.id = id;
 	}
-
-
-
-	public ModeleContrat getModeleContrat()
-	{
-		return modeleContrat;
-	}
-
-
-
-	public void setModeleContrat(ModeleContrat modeleContrat)
-	{
-		this.modeleContrat = modeleContrat;
-	}
-
-
-
-	public ModeleContratProduit getProduit()
-	{
-		return produit;
-	}
-
-
-
-	public void setProduit(ModeleContratProduit produit)
-	{
-		this.produit = produit;
-	}
-
-
-
-	public ModeleContratDate getDate()
-	{
-		return date;
-	}
-
-
-
-	public void setDate(ModeleContratDate date)
-	{
-		this.date = date;
-	} ;
 }

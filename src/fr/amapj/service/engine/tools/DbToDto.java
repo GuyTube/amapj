@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2016 Emmanuel BRUN (contact@amapj.fr)
+ *  Copyright 2013-2050 Emmanuel BRUN (contact@amapj.fr)
  * 
  *  This file is part of AmapJ.
  *  
@@ -22,8 +22,10 @@
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 public class DbToDto
 {
@@ -66,6 +68,25 @@ public class DbToDto
 	static public interface ToDTO<MODEL,DTO>
 	{
 		public DTO toDTO(MODEL t);
+	}
+	
+	
+	public static <DB, DTO> List<DTO> convert(List<DB> toConvert, Function<DB, DTO> toDTO)
+	{
+		List<DTO> DTOList = new ArrayList<>();
+		for(DB db : toConvert) 
+		{
+			DTOList.add(toDTO.apply(db));
+		}
+		return DTOList;
+	}
+	
+	
+	public static <DB, DTO> List<DTO> convert(TypedQuery<DB> q, Function<DB, DTO> toDTO)
+	{
+		List<DB> toConvert = q.getResultList();
+		
+		return convert(toConvert, toDTO);
 	}
 	
 }
