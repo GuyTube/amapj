@@ -46,36 +46,36 @@ public class PeriodeCotisationUtilisateur  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Long id;
+	private Long id;
 
 	@NotNull
 	@ManyToOne
-	public PeriodeCotisation periodeCotisation;
+	private PeriodeCotisation periodeCotisation;
 	
 	@NotNull
 	@ManyToOne
-	public Utilisateur utilisateur;
+	private Utilisateur utilisateur;
 	
 	// Date d'adhesion par l'amapien
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
-	public Date dateAdhesion;
+	private Date dateAdhesion;
 	
 	// Date de reception du chèque par le tresorier
 	@Temporal(TemporalType.DATE)
-	public Date dateReceptionCheque;
+	private Date dateReceptionCheque;
 
 	// Montant de de l'adhesion en centimes
 	@NotNull
-	public int montantAdhesion=0;
+	private int montantAdhesion=0;
 	
 	// Etat du paiement
 	@NotNull
-	public EtatPaiementAdhesion etatPaiementAdhesion= EtatPaiementAdhesion.A_FOURNIR;
+	private EtatPaiementAdhesion etatPaiementAdhesion= EtatPaiementAdhesion.A_FOURNIR;
 	
 	// Etat du paiement
 	@NotNull
-	public TypePaiementAdhesion typePaiementAdhesion= TypePaiementAdhesion.CHEQUE;
+	private TypePaiementAdhesion typePaiementAdhesion= TypePaiementAdhesion.CHEQUE;
 
 	public Long getId()
 	{
@@ -85,6 +85,77 @@ public class PeriodeCotisationUtilisateur  implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+	public PeriodeCotisation getPeriodeCotisation()
+	{
+		return periodeCotisation;
+	}
+
+	public void setPeriodeCotisation(PeriodeCotisation periodeCotisation)
+	{
+		this.periodeCotisation = periodeCotisation;
+	}
+
+	public Utilisateur getUtilisateur()
+	{
+		return utilisateur;
+	}
+
+	public void setUtilisateur(Utilisateur utilisateur)
+	{
+		this.utilisateur = utilisateur;
+	}
+
+
+	public int getMontantAdhesion()
+	{
+		return montantAdhesion;
+	}
+
+	public void setMontantAdhesion(int montantAdhesion)
+	{
+		this.montantAdhesion = montantAdhesion;
+	}
+
+	public EtatPaiementAdhesion getEtatPaiementAdhesion()
+	{
+		return etatPaiementAdhesion;
+	}
+
+	public void setEtatPaiementAdhesion(EtatPaiementAdhesion etatPaiementAdhesion)
+	{
+		this.etatPaiementAdhesion = etatPaiementAdhesion;
+	}
+
+	public TypePaiementAdhesion getTypePaiementAdhesion()
+	{
+		return typePaiementAdhesion;
+	}
+
+	public void setTypePaiementAdhesion(TypePaiementAdhesion typePaiementAdhesion)
+	{
+		this.typePaiementAdhesion = typePaiementAdhesion;
+	}
+
+	public Date getDateAdhesion()
+	{
+		return dateAdhesion;
+	}
+
+	public void setDateAdhesion(Date dateAdhesion)
+	{
+		this.dateAdhesion = dateAdhesion;
+	}
+
+	public Date getDateReceptionCheque()
+	{
+		return dateReceptionCheque;
+	}
+
+	public void setDateReceptionCheque(Date dateReceptionCheque)
+	{
+		this.dateReceptionCheque = dateReceptionCheque;
 	}
 	
 	

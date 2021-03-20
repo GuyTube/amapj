@@ -32,6 +32,7 @@ import fr.amapj.model.models.editionspe.EditionSpecifique;
 import fr.amapj.model.models.editionspe.emargement.FeuilleEmargementJson;
 import fr.amapj.model.models.editionspe.emargement.FormatFeuilleEmargement;
 import fr.amapj.model.models.editionspe.emargement.TypFeuilleEmargement;
+import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 import fr.amapj.service.engine.generator.excel.ExcelFormat;
 import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
@@ -48,12 +49,14 @@ public class EGFeuilleEmargement extends AbstractExcelGenerator
 	private Long editionSpecifiqueId;
 	private Date ref;
 	private String suffix;
+	private Producteur p;
 	
-	public EGFeuilleEmargement(Long editionSpecifiqueId,Date ref,String suffix)
+	public EGFeuilleEmargement(Long editionSpecifiqueId,Date ref,String suffix, Producteur p)
 	{
 		this.suffix = suffix;
 		this.editionSpecifiqueId = editionSpecifiqueId;
 		this.ref = ref ;
+		this.p = p;
 	}
 	
 	@Override
@@ -67,11 +70,11 @@ public class EGFeuilleEmargement extends AbstractExcelGenerator
 
 		if (planningJson.getFormat()==FormatFeuilleEmargement.GRILLE)
 		{
-			new EGFeuilleEmargementGrille().fillExcelFile(em, et,planningJson,libInfo);
+			new EGFeuilleEmargementGrille().fillExcelFile(em, et,planningJson,libInfo, p);
 		}
 		else
 		{
-			new EGFeuilleEmargementListe().fillExcelFile(em, et,planningJson,libInfo);
+			new EGFeuilleEmargementListe().fillExcelFile(em, et,planningJson,libInfo, p);
 		}
 	}
 	
@@ -160,7 +163,7 @@ public class EGFeuilleEmargement extends AbstractExcelGenerator
 	public static void main(String[] args) throws IOException
 	{
 		Date d = DateUtils.addMonth(DateUtils.getDate(), 1);
-		new EGFeuilleEmargement(10301L,d,"").test();
+		new EGFeuilleEmargement(10301L,d,"",null).test();
 	}
 	
 

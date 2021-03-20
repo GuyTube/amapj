@@ -23,12 +23,17 @@
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 
+import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
 import fr.amapj.service.services.mescontrats.ContratColDTO;
 import fr.amapj.service.services.mescontrats.ContratDTO;
+import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.GridSizeCalculator;
 import fr.amapj.view.engine.grid.integergrid.PopupIntegerGrid;
@@ -47,6 +52,8 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.SaisieContratData;
  */
 public class PopupSaisieQteContratPanier extends PopupIntegerGrid implements PopupListener
 {	
+	private final static Logger logger = LogManager.getLogger();
+
 	SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 	
 	private ContratDTO contratDTO;
@@ -179,6 +186,13 @@ public class PopupSaisieQteContratPanier extends PopupIntegerGrid implements Pop
 		{
 			str = str+"<b>"+nbLivraison+" livraisons , prix total de "+new CurrencyTextFieldConverter().convertToString(nbLivraison*col.prix)+" €</b>";
 		}
+		if(col.stockMax != null && col.stockMax != 0) {
+			MesContratsService s = new MesContratsService();
+			long nb = s.getMaxStockCommande(contratDTO.modeleContratId,col.modeleContratProduitId);
+			int qteCde = (int) nb;
+			//int qteCde = 0;
+			str = str+"<br/><span style='color:red'><b>Attention, stocks limités. Il en reste "+(col.stockMax-qteCde)+" sur "+col.stockMax+".</span>";
+		}
 		
 		return str;
 	}
@@ -235,7 +249,16 @@ public class PopupSaisieQteContratPanier extends PopupIntegerGrid implements Pop
 		
 		// On copie dans le contratDto
 		contratDTO.qte = qte;
-			
+		
+		MesContratsService mcs = new MesContratsService();
+		msg = mcs.checkQteProd(contratDTO);
+		if (msg!=null)
+		{
+			contratDTO.qte = null;
+			MessagePopup.open(new MessagePopup("Impossible de continuer",ContentMode.HTML,ColorStyle.RED,msg));
+			return false;
+		}		
+	
 		//
 		data.validate();
 		return true;

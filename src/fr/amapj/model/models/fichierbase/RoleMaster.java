@@ -28,6 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import fr.amapj.model.engine.Identifiable;
+import fr.amapj.model.engine.Mdm;
 
 @Entity
 /**
@@ -39,14 +40,33 @@ public class RoleMaster implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Long id;
+	private Long id;
 
 	@NotNull
 	@ManyToOne
-	public Utilisateur utilisateur;
+	private Utilisateur utilisateur;
+	
+
+	public enum P implements Mdm
+	{ 
+		ID("id") ,  UTILISATEUR("utilisateur") ;
+	
+		private String propertyId;   
+	   
+	    P(String propertyId) 
+	    {
+	        this.propertyId = propertyId;
+	    }
+	    public String prop() 
+	    { 
+	    	return propertyId; 
+	    }
+	} ;
+
 	
 	
-	// Getters ans setters
+	
+	// Getters and setters
 	
 	public Long getId()
 	{
@@ -56,6 +76,16 @@ public class RoleMaster implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+	public Utilisateur getUtilisateur()
+	{
+		return utilisateur;
+	}
+
+	public void setUtilisateur(Utilisateur utilisateur)
+	{
+		this.utilisateur = utilisateur;
 	}
 
 	

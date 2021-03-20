@@ -144,7 +144,7 @@ public class ProducteurNotificationService
 				dests.addAll(referents);
 				
 				// On supprime les utilisateurs dont l'email se termine par #
-				dests = CollectionUtils.filter(dests, u->UtilisateurUtil.canSendMailTo(u.email)==true);
+				dests = CollectionUtils.filter(dests, u->UtilisateurUtil.canSendMailTo(u.getEmail())==true);
 				
 				// On réalise l'envoi 
 				if (users.size()>0)
@@ -204,23 +204,23 @@ public class ProducteurNotificationService
 		SimpleDateFormat df = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
 		ParametresDTO param = new ParametresService().getParametres();
 	
-		message.setTitle(param.nomAmap+" - Feuille de livraison du "+df.format(modeleContratDate.dateLiv));
+		message.setTitle(param.nomAmap+" - Feuille de livraison du "+df.format(modeleContratDate.getDateLiv()));
 		message.setContent(getMessageContent(modeleContratDate,param,df));
-		AbstractExcelGenerator generator = new EGFeuilleDistributionProducteur(modeleContratDate.modeleContrat.getId(), modeleContratDate.getId());
+		AbstractExcelGenerator generator = new EGFeuilleDistributionProducteur(modeleContratDate.getModeleContrat().getId(), modeleContratDate.getId());
 		message.addAttachement(new MailerAttachement(generator));
 
 		for (Utilisateur utilisateur : users)
 		{
 			try
 			{
-				message.setEmail(utilisateur.email);
+				message.setEmail(utilisateur.getEmail());
 				sendMessageAndMemorize(message,modeleContratDate.getId(),utilisateur.getId());
 			}
 			catch(Exception e)
 			{
 				// En cas d'erreur, on intercepte l'exception pour permettre la notification des autres destinatires
 				deamonsContext.nbError++;
-				logger.error("Erreur pour notifier  "+utilisateur.email+"\n"+StackUtils.asString(e));
+				logger.error("Erreur pour notifier  "+utilisateur.getEmail()+"\n"+StackUtils.asString(e));
 			}
 		}
 	}
@@ -270,12 +270,12 @@ public class ProducteurNotificationService
 		buf.append("Bonjour ,");
 		buf.append("<br/>");
 		buf.append("<br/>");
-		buf.append("Vous trouverez ci joint la feuille de livraison pour le "+df.format(modeleContratDate.dateLiv));
+		buf.append("Vous trouverez ci joint la feuille de livraison pour le "+df.format(modeleContratDate.getDateLiv()));
 		buf.append("<br/>");
 		buf.append("<br/>");
-		buf.append("Nom du contrat : "+modeleContratDate.modeleContrat.nom);
+		buf.append("Nom du contrat : "+modeleContratDate.getModeleContrat().getNom());
 		buf.append("<br/>");
-		buf.append("Nom du producteur : "+modeleContratDate.modeleContrat.producteur.nom);
+		buf.append("Nom du producteur : "+modeleContratDate.getModeleContrat().getProducteur().nom);
 		buf.append("<br/>");
 		buf.append("Si vous souhaitez accéder à l'application : <a href=\""+link+"\">Cliquez ici </a>");
 		buf.append("<br/>");

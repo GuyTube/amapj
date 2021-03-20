@@ -57,8 +57,8 @@ public class GestionContratSigneUpdateService
 	public void addOneDateLiv(EntityManager em,Date datLiv,ModeleContrat mc)
 	{
 		ModeleContratDate md = new ModeleContratDate();
-		md.modeleContrat = mc;
-		md.dateLiv = datLiv;
+		md.setModeleContrat(mc);
+		md.setDateLiv(datLiv);
 		em.persist(md);
 	}
 	
@@ -130,25 +130,27 @@ public class GestionContratSigneUpdateService
 	}
 
 
-	public void addOneProduit(EntityManager em, Long produitId, Integer prix, int index, ModeleContrat mc)
+	public void addOneProduit(EntityManager em, Long produitId, Integer prix, Integer nbMaxParLivraison, int index, ModeleContrat mc)
 	{	
 		ModeleContratProduit mcp = new ModeleContratProduit();
-		mcp.indx = index;
-		mcp.modeleContrat = mc;
-		mcp.prix = prix;
-		mcp.produit = em.find(Produit.class, produitId);
+		mcp.setIndx(index);
+		mcp.setModeleContrat(mc);
+		mcp.setPrix(prix);
+		mcp.setProduit(em.find(Produit.class, produitId));
+		mcp.setNbMaxParLivraison(nbMaxParLivraison);
 
 		em.persist(mcp);
 		
 	}
 
 
-	public void updateModeleContratProduit(EntityManager em, Long idModeleContratProduit, Integer prix, int index)
+	public void updateModeleContratProduit(EntityManager em, Long idModeleContratProduit, Integer prix, Integer nbMaxParLivraison, int index)
 	{
 		ModeleContratProduit mcp = em.find(ModeleContratProduit.class, idModeleContratProduit);
 
-		mcp.indx = index;
-		mcp.prix = prix;
+		mcp.setIndx(index);
+		mcp.setPrix(prix);
+		mcp.setNbMaxParLivraison(nbMaxParLivraison);
 
 	}
 

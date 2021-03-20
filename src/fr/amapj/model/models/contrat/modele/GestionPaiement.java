@@ -31,7 +31,10 @@ public enum GestionPaiement
 	NON_GERE,
 	
 	// gestion standard
-	GESTION_STANDARD;
+	GESTION_STANDARD,
+	
+	// gestion des cartes prépayées
+	CARTE_PREPAYEE;
 	
 	static public class MetaData extends MetaDataEnum
 	{
@@ -42,7 +45,8 @@ public enum GestionPaiement
 		
 			
 			add(NON_GERE,"Pas de gestion des paiements","Dans ce mode, vous ne gérez pas les paiements avec AmapJ. Par contre, en fin de saisie du contrat, vous pouvez afficher un message spécifique qui vous permettra d'indiquer comment se fait le paiement.");
-			add(GESTION_STANDARD,"Gestion standard","Dans ce mode, l'adhérent va pouvoir saisir ces paiements, et le référent pourra ensuite collecter les chèques et faire les remises au producteur") ;
+			add(GESTION_STANDARD,"Gestion standard","Dans ce mode, l'adhérent va pouvoir saisir ses paiements, et le référent pourra ensuite collecter les chèques et faire les remises au producteur") ;
+			add(CARTE_PREPAYEE,"Gestion par carte prépayée","Dans ce mode, l'adhérent va devoir acheter une carte prépayée pour pouvoir payer les produits. Le référents devra récupérer les paiements effectifs des cartes prépayées et les remettre au producteur") ;
 			
 		}
 	}	

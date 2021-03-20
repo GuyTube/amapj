@@ -36,7 +36,8 @@ public class NotificationService implements Job
 		DeamonsUtils.executeAsDeamon(getClass(), 
 				e->new ProducteurNotificationService().sendProducteurNotification(e),
 				e->new PermanenceNotificationService().sendPermanenceNotification(),
-				e->new PeriodiqueNotificationService().sendPermanenceNotification());
+				e->new PeriodiqueNotificationService().sendPermanenceNotification(),
+				e->new AdherentNotificationService().sendAdherentNotification(e));
 			
 	}
 }

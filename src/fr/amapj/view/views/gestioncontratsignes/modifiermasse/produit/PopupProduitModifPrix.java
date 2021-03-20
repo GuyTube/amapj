@@ -82,8 +82,9 @@ public class PopupProduitModifPrix extends WizardFormPopup
 		if (nbInscrits==0)
 		{
 			str = "Aucun adhérent n'est inscrit à ce contrat. Vous pouvez donc modifier les prix librement.";
-		}
-		else
+		} else if (modeleContrat.gestionPaiement!=GestionPaiement.CARTE_PREPAYEE) {
+			str = "Dans le cas des cartes prépayées, la modification des prix peut forcer les adhérents à racheter une carte prépayée.";
+		} else
 		{
 			
 			str = ""+nbInscrits+" adhérents ont déjà souscrits à ce contrat.<br/>"+

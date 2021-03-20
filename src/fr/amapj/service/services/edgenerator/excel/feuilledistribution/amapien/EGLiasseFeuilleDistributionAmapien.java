@@ -63,8 +63,8 @@ public class EGLiasseFeuilleDistributionAmapien  extends AbstractExcelGenerator
 		
 		for (Contrat contrat : contrats)
 		{
-			Utilisateur u = contrat.utilisateur;
-			new EGFeuilleDistributionAmapien(EGMode.STD,modeleContratId,contrat.getId()).addOnePage(em, et, u.nom+" "+u.prenom);
+			Utilisateur u = contrat.getUtilisateur();
+			new EGFeuilleDistributionAmapien(EGMode.STD,modeleContratId,contrat.getId()).addOnePage(em, et, u.getNom()+" "+u.getPrenom());
 		}
 		
 		// Si pas de contrats : on met une feuille avec cette info, sinon le fichier est illisible 
@@ -76,8 +76,8 @@ public class EGLiasseFeuilleDistributionAmapien  extends AbstractExcelGenerator
 			
 			// Ligne 1 à 5
 			et.addRow("AUCUN CONTRAT SIGNE !!!",et.grasGaucheNonWrappe);
-			et.addRow(mc.nom,et.grasGaucheNonWrappe);
-			et.addRow(mc.description,et.grasGaucheNonWrappe);
+			et.addRow(mc.getNom(),et.grasGaucheNonWrappe);
+			et.addRow(mc.getDescription(),et.grasGaucheNonWrappe);
 			et.addRow("Extrait le "+df1.format(DateUtils.getDate()),et.grasGaucheNonWrappe);
 		}
 		
@@ -102,7 +102,7 @@ public class EGLiasseFeuilleDistributionAmapien  extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		return "distri-amapien-"+mc.nom;
+		return "distri-amapien-"+mc.getNom();
 	}
 
 

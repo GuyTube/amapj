@@ -81,7 +81,7 @@ public class EditionSpeService
 
 		ModeleContrat mc = em.find(ModeleContrat.class, idModeleContrat);
 
-		if (mc.producteur.etiquette == null)
+		if (mc.getProducteur().etiquette == null)
 		{
 			return false;
 		}
@@ -101,7 +101,7 @@ public class EditionSpeService
 
 		ModeleContrat mc = em.find(ModeleContrat.class, idModeleContrat);
 
-		if (mc.producteur.engagement == null)
+		if (mc.getProducteur().engagement == null)
 		{
 			return false;
 		}

@@ -22,9 +22,11 @@
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.server.Sizeable.Unit;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.RichTextArea;
 
+import fr.amapj.model.models.param.ModeleEmailEnum;
 import fr.amapj.model.models.param.SmtpType;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
@@ -91,7 +93,11 @@ public class PopupSaisieParametres extends WizardFormPopup
 		// 
 		addTextField("Nom de l'AMAP", "nomAmap");
 		
-		addTextField("Ville de l'AMAP", "villeAmap");		
+		addTextField("Ville de l'AMAP", "villeAmap");
+		
+		addTextField("Lieu de livraison", "lieuLivraison");
+		
+		addTextField("Heure de livraison", "heureLivraison");
 	}
 	
 	private void addFieldMailInfo()
@@ -135,10 +141,11 @@ public class PopupSaisieParametres extends WizardFormPopup
 		
 		addIntegerField("Délai en jours entre la permanence et l'envoi du mail", "delaiMailRappelPermanence");
 		
-		addTextField("Titre du mail de rappel pour les permanences", "titreMailRappelPermanence");
+		addLabel("Pour configurer le message de rappel des permanences veuillez vous rendre dans 'Changer les modèles de mails'. Le modèle à modifier se nomme <b>"+ModeleEmailEnum.NOTIFICATION_PERMANENCE.name()+".</b>", ContentMode.HTML);
+		//addTextField("Titre du mail de rappel pour les permanences", "titreMailRappelPermanence");
 		
-		RichTextArea f =  addRichTextAeraField("Contenu du mail de rappel pour les permanences", "contenuMailRappelPermanence");
-		f.setHeight(8, Unit.CM);
+		//RichTextArea f =  addRichTextAeraField("Contenu du mail de rappel pour les permanences", "contenuMailRappelPermanence");
+		//f.setHeight(8, Unit.CM);
 
 	}
 	
@@ -152,10 +159,12 @@ public class PopupSaisieParametres extends WizardFormPopup
 		
 		addIntegerField("Numéro du jour dans le mois où le mail sera envoyé", "numJourDansMois");
 		
-		addTextField("Titre du mail périodique", "titreMailPeriodique");
+		addLabel("Pour configurer le message periodique veuillez vous rendre dans 'Changer les modèles de mails'. Le modèle à modifier se nomme <b>"+ModeleEmailEnum.NOTIFICATION_PERIODIQUE.name()+".</b>", ContentMode.HTML);
+
+		//addTextField("Titre du mail périodique", "titreMailPeriodique");
 		
-		RichTextArea f =  addRichTextAeraField("Contenu du mail périodique", "contenuMailPeriodique");
-		f.setHeight(8, Unit.CM);
+		//RichTextArea f =  addRichTextAeraField("Contenu du mail périodique", "contenuMailPeriodique");
+		//f.setHeight(8, Unit.CM);
 
 	}
 	

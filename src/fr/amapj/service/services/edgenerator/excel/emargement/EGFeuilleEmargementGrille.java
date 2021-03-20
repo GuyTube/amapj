@@ -34,6 +34,7 @@ import fr.amapj.model.models.contrat.reel.ContratCell;
 import fr.amapj.model.models.editionspe.emargement.ContenuCellule;
 import fr.amapj.model.models.editionspe.emargement.FeuilleEmargementJson;
 import fr.amapj.model.models.editionspe.emargement.ParametresProduitsJson;
+import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.model.models.fichierbase.Produit;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
@@ -53,7 +54,7 @@ public class EGFeuilleEmargementGrille
 	{
 	}
 	
-	public void fillExcelFile(EntityManager em,ExcelGeneratorTool et,FeuilleEmargementJson planningJson, LibInfo libInfo)
+	public void fillExcelFile(EntityManager em,ExcelGeneratorTool et,FeuilleEmargementJson planningJson, LibInfo libInfo, Producteur p)
 	{
 		//
 		SimpleDateFormat df = new SimpleDateFormat("dd MMMMM");
@@ -171,8 +172,8 @@ public class EGFeuilleEmargementGrille
 		{
 			et.setRowHeigthInMm(hauteurLigne);
 		}
-		et.setCell(0, utilisateur.nom, et.switchGray(et.grasGaucheWrappeBordure,numLigne));
-		et.setCell(1, utilisateur.prenom, et.switchGray(et.nonGrasGaucheBordure,numLigne));
+		et.setCell(0, utilisateur.getNom(), et.switchGray(et.grasGaucheWrappeBordure,numLigne));
+		et.setCell(1, utilisateur.getPrenom(), et.switchGray(et.nonGrasGaucheBordure,numLigne));
 		
 		int index = 2;
 		for (int i = 0; i < qtes.length; i++)
@@ -202,11 +203,11 @@ public class EGFeuilleEmargementGrille
 		}
 		
 		// Numéro de telephone 1
-		et.setCell(index, utilisateur.numTel1, et.switchGray(et.nonGrasCentreBordure,numLigne));
+		et.setCell(index, utilisateur.getNumTel1(), et.switchGray(et.nonGrasCentreBordure,numLigne));
 		
 		// Numéro de telephone 2
 		index++;
-		et.setCell(index, utilisateur.numTel2, et.switchGray(et.nonGrasCentreBordure,numLigne));
+		et.setCell(index, utilisateur.getNumTel2(), et.switchGray(et.nonGrasCentreBordure,numLigne));
 		
 		// Commentaire
 		index++;
@@ -232,7 +233,7 @@ public class EGFeuilleEmargementGrille
 			int index = findIndex(prodCols,cc);
 			if (index!=-1)
 			{
-				res[index]=res[index]+cc.qte;
+				res[index]=res[index]+cc.getQte();
 			}
 		}
 		
@@ -249,8 +250,8 @@ public class EGFeuilleEmargementGrille
 			ProduitColonne produitColonne= prodCols.get(i);
 			
 			if (	(produitColonne.idProduit!=null) 
-				&&  (produitColonne.idProduit.contains(cc.modeleContratProduit.produit.getId())) 
-				&&	(cc.modeleContratDate.dateLiv.equals(produitColonne.dateColonne.date))    )
+				&&  (produitColonne.idProduit.contains(cc.getModeleContratProduit().getProduit().getId())) 
+				&&	(cc.getModeleContratDate().getDateLiv().equals(produitColonne.dateColonne.date))    )
 			{
 				return i;
 			}

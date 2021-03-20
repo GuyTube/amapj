@@ -46,7 +46,7 @@ public class SDModeleContrat implements SearcherDefinition
 	public String toString(Identifiable identifiable)
 	{
 		ModeleContrat u = (ModeleContrat) identifiable;
-		return u.nom;
+		return u.getNom();
 	}
 	
 

@@ -61,32 +61,34 @@ public class ParametresService
 		Parametres param = findParam(em);
 		
 		ParametresDTO dto = new ParametresDTO();
-		dto.nomAmap = param.nomAmap;
-		dto.villeAmap = param.villeAmap;
-		dto.smtpType = param.smtpType;
-		dto.sendingMailUsername = param.sendingMailUsername;
-		dto.sendingMailPassword = param.sendingMailPassword;
-		dto.sendingMailNbMax = param.sendingMailNbMax;
-		dto.sendingMailFooter = param.sendingMailFooter;
-		dto.mailCopyTo = param.mailCopyTo;
-		dto.url = param.url;
-		dto.backupReceiver = param.backupReceiver;
 		
-		dto.etatPlanningDistribution = param.etatPlanningDistribution;
-		dto.etatGestionCotisation = param.etatGestionCotisation;
-		dto.delaiMailRappelPermanence = param.delaiMailRappelPermanence;
-		dto.envoiMailRappelPermanence = param.envoiMailRappelPermanence;
-		dto.titreMailRappelPermanence = param.titreMailRappelPermanence;
-		dto.contenuMailRappelPermanence = param.contenuMailRappelPermanence;
+		dto.nomAmap = param.getNomAmap();
+		dto.villeAmap = param.getVilleAmap();
+		dto.lieuLivraison = param.getLieuLivraison();
+		dto.heureLivraison = param.getHeureLivraison();
+		dto.smtpType = param.getSmtpType();
+		dto.sendingMailUsername = param.getSendingMailUsername();
+		dto.sendingMailPassword = param.getSendingMailPassword();
+		dto.sendingMailNbMax = param.getSendingMailNbMax();
+		dto.mailCopyTo = param.getMailCopyTo();
+		dto.url = param.getUrl();
+		dto.backupReceiver = param.getBackupReceiver();
 		
-		dto.envoiMailPeriodique = param.envoiMailPeriodique;
-		dto.numJourDansMois = param.numJourDansMois;
-		dto.titreMailPeriodique = param.titreMailPeriodique;
-		dto.contenuMailPeriodique = param.contenuMailPeriodique;
+		dto.etatPlanningDistribution = param.getEtatPlanningDistribution();
+		dto.etatGestionCotisation = param.getEtatGestionCotisation();
+		dto.delaiMailRappelPermanence = param.getDelaiMailRappelPermanence();
+		dto.envoiMailRappelPermanence = param.getEnvoiMailRappelPermanence();
+		dto.titreMailRappelPermanence = param.getTitreMailRappelPermanence();
+		dto.contenuMailRappelPermanence = param.getContenuMailRappelPermanence();
+		
+		dto.envoiMailPeriodique = param.getEnvoiMailPeriodique();
+		dto.numJourDansMois = param.getNumJourDansMois();
+		dto.titreMailPeriodique = param.getTitreMailPeriodique();
+		dto.contenuMailPeriodique = param.getContenuMailPeriodique();
 			
 		// Champs calculés
 		dto.serviceMailActif = false;
-		if ((param.sendingMailUsername!=null) && (param.sendingMailUsername.length()>0))
+		if ((param.getSendingMailUsername()!=null) && (param.getSendingMailUsername().length()>0))
 		{
 			dto.serviceMailActif = true;
 		}
@@ -94,8 +96,8 @@ public class ParametresService
 		return dto;
 		
 	}
-	
-	
+
+
 	/**
 	 * Permet de charger les paramètres relatifs à l'archivage
 	 */
@@ -106,9 +108,9 @@ public class ParametresService
 		Parametres param = findParam(em);
 		
 		ParametresArchivageDTO dto = new ParametresArchivageDTO();
-		dto.archivageContrat = param.archivageContrat;
-		dto.suppressionContrat = param.suppressionContrat;
-		dto.archivageUtilisateur = param.archivageUtilisateur;
+		dto.archivageContrat = param.getArchivageContrat();
+		dto.suppressionContrat = param.getSuppressionContrat();
+		dto.archivageUtilisateur = param.getArchivageUtilisateur();
 		dto.archivageProducteur = param.archivageProducteur;
 		dto.suppressionPeriodeCotisation = param.suppressionPeriodeCotisation;
 		dto.suppressionPeriodePermanence = param.suppressionPeriodePermanence;
@@ -139,46 +141,32 @@ public class ParametresService
 	{
 		EntityManager em = TransactionHelper.getEm();
 		
-		Parametres param = findParam(em);
+		Parametres param = em.find(Parametres.class, ID_PARAM);
 		
-		param.nomAmap = dto.nomAmap;
-		param.villeAmap = dto.villeAmap;
-		param.smtpType = dto.smtpType;
-		param.sendingMailUsername = dto.sendingMailUsername;
-		param.sendingMailPassword = dto.sendingMailPassword;
-		param.sendingMailNbMax = dto.sendingMailNbMax;
-		param.sendingMailFooter = dto.sendingMailFooter;
-		param.mailCopyTo = dto.mailCopyTo;
-		param.url = dto.url;
-		param.backupReceiver = dto.backupReceiver;
+		param.setNomAmap(dto.nomAmap);
+		param.setVilleAmap(dto.villeAmap);
+		param.setHeureLivraison(dto.heureLivraison);
+		param.setLieuLivraison(dto.lieuLivraison);
+		param.setSmtpType(dto.smtpType);
+		param.setSendingMailUsername(dto.sendingMailUsername);
+		param.setSendingMailPassword(dto.sendingMailPassword);
+		param.setSendingMailNbMax(dto.sendingMailNbMax);
+		param.setMailCopyTo(dto.mailCopyTo);
+		param.setUrl(dto.url);
+		param.setBackupReceiver(dto.backupReceiver);
 		
-		param.etatPlanningDistribution = dto.etatPlanningDistribution;
-		param.etatGestionCotisation = dto.etatGestionCotisation;
-		param.delaiMailRappelPermanence = dto.delaiMailRappelPermanence;
-		param.envoiMailRappelPermanence = dto.envoiMailRappelPermanence;
-		param.titreMailRappelPermanence = dto.titreMailRappelPermanence;
-		param.contenuMailRappelPermanence = dto.contenuMailRappelPermanence;
+		param.setEtatPlanningDistribution(dto.etatPlanningDistribution);
+		param.setEtatGestionCotisation(dto.etatGestionCotisation);
+		param.setDelaiMailRappelPermanence(dto.delaiMailRappelPermanence);
+		param.setEnvoiMailRappelPermanence(dto.envoiMailRappelPermanence);
+		param.setTitreMailRappelPermanence(dto.titreMailRappelPermanence);
+		param.setContenuMailRappelPermanence(dto.contenuMailRappelPermanence);
 		
-		param.envoiMailPeriodique = dto.envoiMailPeriodique;
-		param.numJourDansMois = dto.numJourDansMois;
-		param.titreMailPeriodique = dto.titreMailPeriodique;
-		param.contenuMailPeriodique = dto.contenuMailPeriodique;
+		param.setEnvoiMailPeriodique(dto.envoiMailPeriodique);
+		param.setNumJourDansMois(dto.numJourDansMois);
+		param.setTitreMailPeriodique(dto.titreMailPeriodique);
+		param.setContenuMailPeriodique(dto.contenuMailPeriodique);
 		
-	}
-	
-	@DbWrite
-	public void updateParametresArchivage(ParametresArchivageDTO dto)
-	{
-		EntityManager em = TransactionHelper.getEm();
-		
-		Parametres param = findParam(em);
-		
-		param.archivageContrat = dto.archivageContrat;
-		param.suppressionContrat = dto.suppressionContrat;
-		param.archivageUtilisateur = dto.archivageUtilisateur;
-		param.archivageProducteur = dto.archivageProducteur;
-		param.suppressionPeriodeCotisation = dto.suppressionPeriodeCotisation;
-		param.suppressionPeriodePermanence = dto.suppressionPeriodePermanence;
 	}
 	
 	
@@ -327,5 +315,21 @@ public class ParametresService
 		
 		return ret;
 	}
+	
+	@DbWrite
+	public void updateParametresArchivage(ParametresArchivageDTO dto)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		Parametres param = findParam(em);
+		
+		param.archivageContrat = dto.archivageContrat;
+		param.suppressionContrat = dto.suppressionContrat;
+		param.archivageUtilisateur = dto.archivageUtilisateur;
+		param.archivageProducteur = dto.archivageProducteur;
+		param.suppressionPeriodeCotisation = dto.suppressionPeriodeCotisation;
+		param.suppressionPeriodePermanence = dto.suppressionPeriodePermanence;
+	}
+	
 		
 }

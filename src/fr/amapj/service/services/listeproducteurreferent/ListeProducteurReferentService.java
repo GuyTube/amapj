@@ -79,6 +79,8 @@ public class ListeProducteurReferentService
 		
 		dto.referents = new ProducteurService().getReferents(em, producteur);
 		
+		dto.emailContact = producteur.emailContact;
+		
 		return dto;
 	}
 

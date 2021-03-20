@@ -66,6 +66,11 @@ public class Producteur implements Identifiable
 	@Column(length = 2048)
 	public String description;
 	
+	/*Adresse email de contact lors des envois de mail*/
+	@Size(min = 1, max = 150)
+	@Column(length = 150)
+	public String emailContact;
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	public ChoixOuiNon feuilleDistributionGrille;
@@ -122,6 +127,14 @@ public class Producteur implements Identifiable
 		this.id = id;
 	}
 	
-	
+	public String getEmailContact()
+	{
+		return emailContact;
+	}
+
+	public void setEmailContact(String emailContact)
+	{
+		this.emailContact = emailContact;
+	}
 	
 }

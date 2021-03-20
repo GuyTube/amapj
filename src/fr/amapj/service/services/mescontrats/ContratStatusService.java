@@ -134,7 +134,7 @@ public class ContratStatusService
 	 */
 	private boolean isInscriptionNonTerminee(ModeleContrat modeleContrat,Date now)
 	{
-		Date dateFinInscription = modeleContrat.dateFinInscription;
+		Date dateFinInscription = modeleContrat.getDateFinInscription();
 		Date d = DateUtils.addHour(dateFinInscription,23);
 		d = DateUtils.addMinute(d, 59);
 		return  d.after(now);
@@ -159,14 +159,14 @@ public class ContratStatusService
 		}
 
 		
-		NatureContrat nature = contrat.modeleContrat.nature;
+		NatureContrat nature = contrat.getModeleContrat().nature;
 	
 		// Cas de la carte prépayée 
 		if (nature==NatureContrat.CARTE_PREPAYEE)
 		{
 			// On verifie si il y a des lignes non modifiables avec des quantités non nulles
 			Date d = DateUtils.suppressTime(now);
-			d = DateUtils.addDays(d, contrat.modeleContrat.cartePrepayeeDelai);
+			d = DateUtils.addDays(d, contrat.getModeleContrat().cartePrepayeeDelai);
 			
 			Query q = em.createQuery("select count(cc) from ContratCell cc  WHERE cc.contrat=:c and cc.modeleContratDate.dateLiv<=:d");
 			q.setParameter("c",contrat);

@@ -37,6 +37,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
+import fr.amapj.model.engine.Mdm;
 
 @Entity
 @Table( uniqueConstraints=
@@ -64,8 +65,13 @@ public class Utilisateur  implements Identifiable
 	@Size(min = 0, max = 150)
 	@Column(length = 150)
 	// Contient l'adresse e mail
-	public String email;
+	private String email;
 	
+	@Size(min = 0, max = 150)
+	@Column(length = 150)
+	// Contient l'adresse e mail du conjoint
+	private String emailConjoint;
+
 	@Size(min = 0, max = 150)
 	@Column(length = 150)
 	// Contient le password encrypté
@@ -119,6 +125,26 @@ public class Utilisateur  implements Identifiable
 	@Size(min = 0, max = 150)
 	public String ville;
 	
+	
+	public enum P implements Mdm
+	{
+		ID("id") , PRENOM("prenom") , NOM("nom") , EMAIL("email") , EMAILCONJOINT("emailConjoint") , PASSWORD("password") , RESETPASSWORDSALT("resetPasswordSalt") ;
+		
+		private String propertyId;   
+		   
+	    P(String propertyId) 
+	    {
+	        this.propertyId = propertyId;
+	    }
+	    public String prop() 
+	    { 
+	    	return propertyId; 
+	    }
+		
+	} ;
+	
+	
+	
 
 	// Getters ans setters
 
@@ -130,6 +156,168 @@ public class Utilisateur  implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+	public String getPrenom()
+	{
+		return prenom;
+	}
+
+	public void setPrenom(String prenom)
+	{
+		this.prenom = prenom;
+	}
+
+	public String getNom()
+	{
+		return nom;
+	}
+
+	public void setNom(String nom)
+	{
+		this.nom = nom;
+	}
+
+	public String getEmail()
+	{
+		// En renvoie toujours le mail en minuscules pour éviter de
+		// considérer deux mails identiques comme différents
+		return email != null ? this.email.toLowerCase():null;
+	}
+
+	public void setEmail(String email)
+	{
+		// En stock toujours le mail en minuscules pour éviter de
+		// considérer deux mails identiques comme différents
+		this.email = email != null ? email.toLowerCase():null;
+	}
+
+	public String getEmailConjoint()
+	{
+		return emailConjoint;
+	}
+
+	public void setEmailConjoint(String emailConjoint)
+	{
+		this.emailConjoint = emailConjoint;
+	}
+
+	public String getPassword()
+	{
+		return password;
+	}
+
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
+
+	
+
+	public String getSalt()
+	{
+		return salt;
+	}
+
+	public void setSalt(String salt)
+	{
+		this.salt = salt;
+	}
+
+	public String getResetPasswordSalt()
+	{
+		return resetPasswordSalt;
+	}
+
+	public void setResetPasswordSalt(String resetPasswordSalt)
+	{
+		this.resetPasswordSalt = resetPasswordSalt;
+	}
+
+	public Date getResetPasswordDate()
+	{
+		return resetPasswordDate;
+	}
+
+	public void setResetPasswordDate(Date resetPasswordDate)
+	{
+		this.resetPasswordDate = resetPasswordDate;
+	}
+
+	public EtatUtilisateur getEtatUtilisateur()
+	{
+		return etatUtilisateur;
+	}
+
+	public void setEtatUtilisateur(EtatUtilisateur etatUtilisateur)
+	{
+		this.etatUtilisateur = etatUtilisateur;
+	}
+
+	public String getNumTel1()
+	{
+		return numTel1;
+	}
+
+	public void setNumTel1(String numTel1)
+	{
+		this.numTel1 = numTel1;
+	}
+
+	public String getNumTel2()
+	{
+		return numTel2;
+	}
+
+	public void setNumTel2(String numTel2)
+	{
+		this.numTel2 = numTel2;
+	}
+
+	public String getLibAdr1()
+	{
+		return libAdr1;
+	}
+
+	public void setLibAdr1(String libAdr1)
+	{
+		this.libAdr1 = libAdr1;
+	}
+
+	public String getCodePostal()
+	{
+		return codePostal;
+	}
+
+	public Date getDateCreation() {
+		return dateCreation;
+	}
+
+	public void setDateCreation(Date dateCreation) {
+		this.dateCreation = dateCreation;
+	}
+
+	public Date getDateModification() {
+		return dateModification;
+	}
+
+	public void setDateModification(Date dateModification) {
+		this.dateModification = dateModification;
+	}
+
+	public void setCodePostal(String codePostal)
+	{
+		this.codePostal = codePostal;
+	}
+
+	public String getVille()
+	{
+		return ville;
+	}
+
+	public void setVille(String ville)
+	{
+		this.ville = ville;
 	}	
 
 }

@@ -26,10 +26,11 @@ import fr.amapj.service.services.permanence.role.PermanenceRoleDTO;
 import fr.amapj.service.services.permanence.role.PermanenceRoleService;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
+import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
+import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 
 
 /**

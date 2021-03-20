@@ -101,7 +101,7 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 	public AbstractPdfEditionSpeJson getEditionInNormalMode(EntityManager em)
 	{
 		PeriodeCotisation pc =  em.find(PeriodeCotisation.class, idPeriode);
-		EditionSpecifique editionSpecifique = pc.bulletinAdhesion;
+		EditionSpecifique editionSpecifique = pc.getBulletinAdhesion();
 		AbstractPdfEditionSpeJson bulletin = (AbstractPdfEditionSpeJson)  new EditionSpeService().load(editionSpecifique.id);
 		return bulletin;
 	}
@@ -129,7 +129,7 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 		PeriodeCotisationUtilisateur pcu = em.find(PeriodeCotisationUtilisateur.class, idPeriodeUtilisateur);
 		
 		//
-		if (pcu.periodeCotisation.getId().equals(idPeriode)==false)
+		if (pcu.getPeriodeCotisation().getId().equals(idPeriode)==false)
 		{
 			throw new AmapjRuntimeException("Incoherence");
 		}
@@ -186,7 +186,7 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 	{
 		VelocityContext ctx = new VelocityContext();
 		
-		Utilisateur utilisateur = pcu.utilisateur;
+		Utilisateur utilisateur = pcu.getUtilisateur();
 		
 		VCBuilder.addAmap(ctx);
 		VCBuilder.addDateInfo(ctx);
@@ -202,13 +202,13 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 		if (idPeriodeUtilisateur==null)
 		{
 			PeriodeCotisation pc =  em.find(PeriodeCotisation.class, idPeriode);
-			return "bulletin-adhesion-"+pc.nom;	
+			return "bulletin-adhesion-"+pc.getNom();	
 		}
 		else
 		{
 			PeriodeCotisationUtilisateur pcu =  em.find(PeriodeCotisationUtilisateur.class, idPeriodeUtilisateur);
-			Utilisateur u = pcu.utilisateur;
-			return "bulletin-adhesion-"+pcu.periodeCotisation.nom+"-"+u.nom+" "+u.prenom;
+			Utilisateur u = pcu.getUtilisateur();
+			return "bulletin-adhesion-"+pcu.getPeriodeCotisation().getNom()+"-"+u.getNom()+" "+u.getPrenom();
 		}
 		
 	}
@@ -219,13 +219,13 @@ public class PGBulletinAdhesion extends TestablePdfGenerator
 		if (idPeriodeUtilisateur==null)
 		{
 			PeriodeCotisation pc =  em.find(PeriodeCotisation.class, idPeriode);
-			return "la liste des bulletins d'adhésion pour "+pc.nom;
+			return "la liste des bulletins d'adhésion pour "+pc.getNom();
 		}
 		else
 		{
 			PeriodeCotisationUtilisateur pcu =  em.find(PeriodeCotisationUtilisateur.class, idPeriodeUtilisateur);
-			Utilisateur u = pcu.utilisateur;
-			return "le bulletin d'adhesion "+pcu.periodeCotisation.nom+" pour "+u.nom+" "+u.prenom;
+			Utilisateur u = pcu.getUtilisateur();
+			return "le bulletin d'adhesion "+pcu.getPeriodeCotisation().getNom()+" pour "+u.getNom()+" "+u.getPrenom();
 		}
 	}
 	

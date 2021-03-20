@@ -42,24 +42,24 @@ public class ProducteurUtilisateur implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Long id;	
+	private Long id;	
 	
 	@NotNull
 	@ManyToOne
-	public Producteur producteur;
+	private Producteur producteur;
 	
 	@NotNull
 	@ManyToOne
-	public Utilisateur utilisateur;
+	private Utilisateur utilisateur;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	// Permet d'indiquer si cet utilisateur souhaite être notifié
-	public EtatNotification notification;
+    private EtatNotification notification;
 	
 	@NotNull
 	// Numéro d'ordre 
-	public int indx;
+	private int indx;
 		
 	
 	// Getters ans setters
@@ -72,6 +72,46 @@ public class ProducteurUtilisateur implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+	public Producteur getProducteur()
+	{
+		return producteur;
+	}
+
+	public void setProducteur(Producteur producteur)
+	{
+		this.producteur = producteur;
+	}
+
+	public Utilisateur getUtilisateur()
+	{
+		return utilisateur;
+	}
+
+	public void setUtilisateur(Utilisateur utilisateur)
+	{
+		this.utilisateur = utilisateur;
+	}
+
+	public EtatNotification getNotification()
+	{
+		return notification;
+	}
+
+	public void setNotification(EtatNotification notification)
+	{
+		this.notification = notification;
+	}
+
+	public int getIndx()
+	{
+		return indx;
+	}
+
+	public void setIndx(int indx)
+	{
+		this.indx = indx;
 	}
 
 

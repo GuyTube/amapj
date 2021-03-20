@@ -122,36 +122,28 @@ public class DemoService
 		p.setId(1L);
 		
 		// Etape 1 - Nom et ville Amap
-		p.nomAmap = dto.nomAmap;
-		p.villeAmap = dto.villeAmap;
+		p.setNomAmap(dto.nomAmap);
+		p.setVilleAmap(dto.villeAmap);
 		
 		// Etape 2 - Les mails 
-		p.smtpType = dto.smtpType;
-		p.sendingMailUsername = dto.adrMailSrc;
-		p.sendingMailPassword = "";
-		p.sendingMailFooter = "Merci de ne pas répondre à ce message.<br/>Pour toute demande, merci de contacter votre Amap avec son mail habituel.<br/>";
-		p.sendingMailNbMax = dto.nbMailMax;
-		p.url = dto.url;
-		p.mailCopyTo = "";
-		p.backupReceiver = "";
+		p.setSmtpType(dto.smtpType);
+		p.setSendingMailUsername(dto.adrMailSrc);
+		p.setSendingMailPassword("");
+		p.setSendingMailNbMax(dto.nbMailMax);
+		p.setUrl(dto.url);
+		p.setMailCopyTo("");
+		p.setBackupReceiver("");
 		
 		// Etape 3
-		p.etatPlanningDistribution = EtatModule.INACTIF;
-		p.envoiMailRappelPermanence = ChoixOuiNon.NON;
+		p.setEtatPlanningDistribution(EtatModule.INACTIF);
+		p.setEnvoiMailRappelPermanence(ChoixOuiNon.NON);
 		
 		// Etape 4
-		p.envoiMailPeriodique = ChoixOuiNon.NON;
+		p.setEnvoiMailPeriodique(ChoixOuiNon.NON);
 		
 		// Etape 5
-		p.etatGestionCotisation = EtatModule.ACTIF;
+		p.setEtatGestionCotisation(EtatModule.INACTIF);
 		
-		// Parametres d'archivage 
-		p.archivageContrat=180;
-		p.suppressionContrat=730;
-		p.archivageUtilisateur=90;
-		p.archivageProducteur=365;
-		p.suppressionPeriodePermanence=730;
-		p.suppressionPeriodeCotisation=1095;
 		
 		em.persist(p);
 
@@ -194,11 +186,11 @@ public class DemoService
 	private void createRoleUtilisateur(EntityManager em)
 	{
 		RoleTresorier rt = new RoleTresorier();
-		rt.utilisateur = em.find(Utilisateur.class, new Long(1051));
+		rt.setUtilisateur(em.find(Utilisateur.class, new Long(1051)));
 		em.persist(rt);
 		
 		RoleAdmin ra = new RoleAdmin();
-		ra.utilisateur = em.find(Utilisateur.class, new Long(1052));
+		ra.setUtilisateur(em.find(Utilisateur.class, new Long(1052)));
 		em.persist(ra);
 		
 	}
@@ -208,10 +200,9 @@ public class DemoService
 		Utilisateur u = new Utilisateur();
 		
 		u.setId(new Long(id));
-		u.nom = nom;
-		u.prenom = prenom;
-		u.email = email;
-		u.dateCreation = DateUtils.getDate();
+		u.setNom(nom);
+		u.setPrenom(prenom);
+		u.setEmail(email);
 		
 		em.persist(u);
 		
@@ -228,7 +219,7 @@ public class DemoService
 		insertUtilisateur(em, 1052, dto.user1Nom, dto.user1Prenom, dto.user1Email, dto.password);
 		
 		RoleAdmin ra = new RoleAdmin();
-		ra.utilisateur = em.find(Utilisateur.class, new Long(1052));
+		ra.setUtilisateur(em.find(Utilisateur.class, new Long(1052)));
 		em.persist(ra);
 		
 	}
@@ -239,9 +230,9 @@ public class DemoService
 	{
 		AppInstance app = new AppInstance();
 		
-		app.dateCreation = DateUtils.getDate();
-		app.dbms = "hi";
-		app.nomInstance = "amap1";
+		app.setDateCreation(DateUtils.getDate());
+		app.setDbms("hi");
+		app.setNomInstance("amap1");
 		em.persist(app);
 		
 	}
@@ -270,9 +261,9 @@ public class DemoService
 		em.persist(p);
 		
 		ProducteurUtilisateur pu  =new ProducteurUtilisateur();
-		pu.notification = EtatNotification.SANS_NOTIFICATION_MAIL;
-		pu.producteur = p;
-		pu.utilisateur = em.find(Utilisateur.class, new Long(idUtilisateur));
+		pu.setNotification(EtatNotification.SANS_NOTIFICATION_MAIL);
+		pu.setProducteur(p);
+		pu.setUtilisateur(em.find(Utilisateur.class, new Long(idUtilisateur)));
 		
 		em.persist(pu);
 		
@@ -333,9 +324,9 @@ public class DemoService
 		Produit p = new Produit();
 		
 		p.setId(new Long(idProduit));
-		p.nom = nom;
-		p.conditionnement = cond;
-		p.producteur = em.find(Producteur.class, new Long(idProducteur));
+		p.setNom(nom);
+		p.setConditionnement(cond);
+		p.setProducteur(em.find(Producteur.class, new Long(idProducteur)));
 		
 		em.persist(p);
 		

@@ -41,6 +41,7 @@ import fr.amapj.view.views.parametres.paramecran.PELivraisonAmapienEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PELivraisonProducteurEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PEMesContratsEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PEMesLivraisonsEditorPart;
+import fr.amapj.view.views.parametres.paramecran.PEPermanencesEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PEReceptionChequeEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PESaisiePaiementEditorPart;
 import fr.amapj.view.views.parametres.paramecran.PESyntheseMultiContratEditorPart;
@@ -88,6 +89,7 @@ public class ParametresView extends BackOfficeLongView implements PopupListener
 
 		
 		addButton("Changer les paramètres généraux",e->handleChangerParam());
+		addButton("Changer les modèles de mails",e->handleChangerModeleEmail());
 			
 		
 		
@@ -131,6 +133,11 @@ public class ParametresView extends BackOfficeLongView implements PopupListener
 	{
 		FormPopup.open(new PopupSaisieParametres(dto),this);
 		
+	}
+	
+	private void handleChangerModeleEmail() {
+		FormPopup.open(new PopupConfigModeleEmail(),this);
+
 	}
 	
 

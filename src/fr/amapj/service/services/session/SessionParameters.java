@@ -55,11 +55,15 @@ public class SessionParameters
 	
 	public String userEmail;
 	
+	public String emailConjoint;
+	
 	public Date dateConnexion;
 	
 	public Long logId;
 	
 	public boolean isSudo;
+	
+	public Long producteurId;
 	
 	public ContratSelectorSessionInfo contratSelectorSessionInfo = new ContratSelectorSessionInfo();
 	

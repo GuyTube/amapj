@@ -107,10 +107,12 @@ public class PeriodePermanenceService
 
 		dto.pourcentageInscription = getPourcentageInscription(p,em);
 		
+		dto.setLimitNbPermanenceUtil(p.getLimitNbPermanenceUtil());
+		
+		
 		return dto;
 	}
 	
-	// REQUETAGE DE TOUTES LES INFORMATIONS PERMANENCE D'UN UTILISATEUR
 	
 	/**
 	 * Retourne la liste des permanences sur lesquelles l'utilisateur est rattaché
@@ -213,8 +215,8 @@ public class PeriodePermanenceService
 			Utilisateur u = pc.periodePermanenceUtilisateur.utilisateur;
 			
 			pcDto.idUtilisateur = u.getId();
-			pcDto.nom = u.nom;
-			pcDto.prenom = u.prenom;
+			pcDto.nom = u.getNom();
+			pcDto.prenom = u.getPrenom();
 			pcDto.idPeriodePermanenceUtilisateur = pc.periodePermanenceUtilisateur.id;
 		}
 		
@@ -283,8 +285,8 @@ public class PeriodePermanenceService
 		
 		adto.idPeriodePermanenceUtilisateur = ppu.id;
 		adto.idUtilisateur = ppu.utilisateur.getId();
-		adto.nom = ppu.utilisateur.nom;
-		adto.prenom = ppu.utilisateur.prenom;
+		adto.nom = ppu.utilisateur.getNom();
+		adto.prenom = ppu.utilisateur.getPrenom();
 		adto.nbParticipation = ppu.nbParticipation;
 		
 		return adto;
@@ -318,6 +320,7 @@ public class PeriodePermanenceService
 		dto.pourcentageInscription = getPourcentageInscription(p,em);
 		dto.regleInscription = p.regleInscription;
 		
+		dto.setLimitNbPermanenceUtil(p.getLimitNbPermanenceUtil());
 		return dto;
 	}
 	
@@ -492,6 +495,7 @@ public class PeriodePermanenceService
 		p.etat = EtatPeriodePermanence.CREATION;
 		p.nature = dto.nature;
 		p.regleInscription = dto.regleInscription;
+		p.setLimitNbPermanenceUtil(dto.getLimitNbPermanenceUtil());
 		
 		em.persist(p);
 
@@ -758,8 +762,8 @@ public class PeriodePermanenceService
 		PeriodePermanenceUtilisateurDTO e = new PeriodePermanenceUtilisateurDTO();
 		
 		e.idUtilisateur = utilisateur.getId();
-		e.nom = utilisateur.nom;
-		e.prenom = utilisateur.prenom;
+		e.nom = utilisateur.getNom();
+		e.prenom = utilisateur.getPrenom();
 		
 		return e;
 	}

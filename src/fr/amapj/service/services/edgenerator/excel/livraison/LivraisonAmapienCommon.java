@@ -69,7 +69,7 @@ public class LivraisonAmapienCommon
 		
 		// 
 		c1.fill(cells);
-		c1.groupBy(e->e.modeleContratDate.dateLiv);
+		c1.groupBy(e->e.getModeleContratDate().dateLiv);
 		
 		// Pas de tri sur les lignes
 		// Pas de tri sur les cellules
@@ -188,14 +188,14 @@ public class LivraisonAmapienCommon
 		
 		// 
 		c1.fill(contratCells);
-		c1.groupBy(e->e.modeleContratDate.modeleContrat);
+		c1.groupBy(e->e.getModeleContratDate().modeleContrat);
 		
 		// Tri par producteur puis par nom de contrat (si plusieurs contrats pour un même producteur : ils se suivent) 
 		c1.sortLig(e->e.producteur.nom,true);
 		c1.sortLig(e->e.nom,true);
 
 		// tri sur les cellules sur le rang dans le contrat
-		c1.sortCell(e->e.modeleContratProduit.indx, true);
+		c1.sortCell(e->e.getModeleContratProduit().getIndx(), true);
 		
 		// Calcul des données
 		c1.compute();

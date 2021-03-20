@@ -28,14 +28,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import fr.amapj.common.DateUtils;
+import fr.amapj.common.Dictionary;
 import fr.amapj.model.engine.tools.TestTools;
 import fr.amapj.model.engine.transaction.Call;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.NewTransaction;
 import fr.amapj.model.engine.transaction.TransactionHelper;
 import fr.amapj.model.models.fichierbase.EtatUtilisateur;
+import fr.amapj.model.models.fichierbase.ModeleEmail;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.model.models.param.ChoixOuiNon;
+import fr.amapj.model.models.param.ModeleEmailEnum;
 import fr.amapj.model.models.stats.NotificationDone;
 import fr.amapj.model.models.stats.TypNotificationDone;
 import fr.amapj.service.services.mailer.MailerMessage;
@@ -79,7 +82,7 @@ public class PeriodiqueNotificationService
 			return;
 		}
 		
-		// On recherche la liste des utilisateurs qui n'ont pas eu de notification ce jour là et qui sont actif
+		// On recherche la liste des utilisateurs qui n'ont pas eu de notification ce jour là et qui sont actifs
 		List<Utilisateur> utilisateurs = getUtilisateursActifWithNoNotification(d,em);
 		
 		for (Utilisateur utilisateur : utilisateurs)
@@ -139,13 +142,16 @@ public class PeriodiqueNotificationService
 	{	
 		// Construction du message
 		MailerMessage message  = new MailerMessage();
-		
-		String titre = replaceWithContext(param.titreMailPeriodique, em, d, utilisateur,param);
-		String content = replaceWithContext(param.contenuMailPeriodique, em, d, utilisateur,param);
+		ModeleEmail periodiqueEmail = MailerService.getModeleEmail(ModeleEmailEnum.NOTIFICATION_PERIODIQUE);
+		Dictionary dictionary = new Dictionary(utilisateur);
+		String titre = dictionary.substitue(periodiqueEmail.getTitre());
+				//param.getTitreMailPeriodique());
+		String content = dictionary.substitue(periodiqueEmail.getContenu());
+				//param.getContenuMailPeriodique());
 		
 		message.setTitle(titre);
 		message.setContent(content);
-		message.setEmail(utilisateur.email);
+		message.setEmail(utilisateur.getEmail());
 		sendMessageAndMemorize(message,d,utilisateur.getId());
 		
 	}
@@ -192,11 +198,11 @@ public class PeriodiqueNotificationService
 
 
 
-	
+	/*
 	private String replaceWithContext(String in,EntityManager em,Date d,Utilisateur u,ParametresDTO param)
 	{
 		// Calcul du contexte
-		String link = param.getUrl()+"?username="+u.email;
+		String link = param.getUrl()+"?username="+u.getEmail();
 		
 		in = in.replaceAll("#NOM_AMAP#", param.nomAmap);
 		in = in.replaceAll("#VILLE_AMAP#", param.villeAmap);
@@ -205,7 +211,7 @@ public class PeriodiqueNotificationService
 		
 		return in;
 		
-	}
+	}*/
 	
 	public static void main(String[] args)
 	{

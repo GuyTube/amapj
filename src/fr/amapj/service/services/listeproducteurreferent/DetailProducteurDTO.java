@@ -43,6 +43,8 @@ public class DetailProducteurDTO
 	//  
 	public List<ProdUtilisateurDTO> utilisateurs;
 	
+	public String emailContact;
+	
 	
 
 }

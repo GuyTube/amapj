@@ -31,6 +31,8 @@ public class PEMesLivraisons  extends AbstractParamEcran
 	// Mode de l'affichage  
 	public GapViewer modeAffichage = GapViewer.WEEK;
 	
+	public ChoixOuiNon afficheFeuilleEmargement = ChoixOuiNon.NON;
+
 	/** PAGE COURANTE */
 	
 	// Possibilite d'imprimer le contenu de la page en cours 
@@ -212,6 +214,15 @@ public class PEMesLivraisons  extends AbstractParamEcran
 	public void setTrimestrePdfEditionId(Long trimestrePdfEditionId)
 	{
 		this.trimestrePdfEditionId = trimestrePdfEditionId;
+	}
+
+
+	public ChoixOuiNon getAfficheFeuilleEmargement() {
+		return afficheFeuilleEmargement;
+	}
+
+	public void setAfficheFeuilleEmargement(ChoixOuiNon afficheFeuilleEmargement) {
+		this.afficheFeuilleEmargement = afficheFeuilleEmargement;
 	}
 
 

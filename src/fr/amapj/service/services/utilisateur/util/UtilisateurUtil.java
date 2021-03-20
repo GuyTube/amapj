@@ -57,7 +57,7 @@ public class UtilisateurUtil
 	 */
 	static public boolean canSendMailTo(Utilisateur u)
 	{
-		return canSendMailTo(u.email);
+		return canSendMailTo(u.getEmail());
 	}
 	
 	/**
@@ -131,7 +131,7 @@ public class UtilisateurUtil
 			{
 				warning = "<b>Utilisateur sans e mail !</b>";
 			}
-			buf.append(" - " + utilisateur.nom + " " + utilisateur.prenom + warning + "<br/>");
+			buf.append(" - " + utilisateur.getNom() + " " + utilisateur.getPrenom() + warning + "<br/>");
 		}
 		buf.append("<br/>");
 
@@ -140,7 +140,7 @@ public class UtilisateurUtil
 		{
 			if (UtilisateurUtil.canSendMailTo(utilisateur))
 			{
-				buf.append(utilisateur.email + ";");
+				buf.append(utilisateur.getEmail() + ";");
 			}
 		}
 		return buf.toString();
@@ -176,12 +176,12 @@ public class UtilisateurUtil
 			if (UtilisateurUtil.canSendMailTo(utilisateur))
 			{
 				res.nbUtilisateurAvecEmail++;
-				res.utilisateurAvecEmail = res.utilisateurAvecEmail + utilisateur.email+";";
+				res.utilisateurAvecEmail = res.utilisateurAvecEmail + utilisateur.getEmail()+";";
 			}
 			else
 			{
 				res.nbUtilisateurSansEmail++;
-				res.utilisateurSansEmail =  res.utilisateurSansEmail + utilisateur.nom + " " + utilisateur.prenom+";";
+				res.utilisateurSansEmail =  res.utilisateurSansEmail + utilisateur.getNom() + " " + utilisateur.getPrenom()+";";
 			}
 		}
 		return res;

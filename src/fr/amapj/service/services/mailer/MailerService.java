@@ -20,7 +20,11 @@
  */
  package fr.amapj.service.services.mailer;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -35,14 +39,33 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.formula.functions.T;
 
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.model.engine.tools.TestTools;
+import fr.amapj.model.engine.transaction.DbRead;
+import fr.amapj.model.engine.transaction.DbWrite;
+import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.acces.RoleList;
+import fr.amapj.model.models.contrat.modele.ModeleContrat;
+import fr.amapj.model.models.fichierbase.ExpediteurAmap;
+import fr.amapj.model.models.fichierbase.HistoriqueEmail;
+import fr.amapj.model.models.fichierbase.ModeleEmail;
+import fr.amapj.model.models.param.ModeleEmailEnum;
+import fr.amapj.model.models.param.Parametres;
+import fr.amapj.service.engine.tools.DbToDto;
+import fr.amapj.service.services.gestioncontrat.GestionContratService;
+import fr.amapj.service.services.gestioncontrat.ModeleContratSummaryDTO;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
+import fr.amapj.service.services.producteur.ProducteurDTO;
 import fr.amapj.view.engine.ui.AppConfiguration;
 
 /**
@@ -53,10 +76,6 @@ import fr.amapj.view.engine.ui.AppConfiguration;
 public class MailerService
 {
 	private final static Logger logger = LogManager.getLogger();
-	
-	public static final String HTML_MAIL_HEADER = "<html><head></head><body>";
-	
-	public static final String HTML_MAIL_FOOTER = "</body></html>";
 
 
 	public MailerService()
@@ -154,11 +173,12 @@ public class MailerService
 	 */
 	public void sendHtmlMail(MailerMessage mailerMessage)
 	{
+	
 		ParametresDTO param = new ParametresService().getParametres();
 		
 		if (MailerCounter.isAllowed(param)==false)	
 		{
-			throw new AmapjRuntimeException("Impossible d'envoyer un mail car le quota par jour est dépassé (quota = "+param.sendingMailNbMax+" )");
+			throw new AmapjRuntimeException("Impossible d'envoyer un mail car le quota par jour est dépassé (quota = "+param.getSendingMailNbMax()+" )");
 		}
 		
 		try
@@ -202,7 +222,123 @@ public class MailerService
 	}
 	
 	
+	@DbRead
+	public List<HistoriqueEmailDTO> getHistoriqueMail(List<RoleList> roles, ProducteurDTO producteur) {
+		StringBuffer roleList = new StringBuffer();
+		for( RoleList role : roles ) {
+			if( roleList.length()!=0 )
+				roleList.append(",");
+			roleList.append("\""+role.name()+"\"");
+		}
+		List<HistoriqueEmailDTO> res = null;
+		String whereClause = "";
+		if( roles.contains(RoleList.ADMIN) || roles.contains(RoleList.TRESORIER) || roles.contains(RoleList.REFERENT)) {
+			whereClause = "where hm.roleExpediteur in ("+roleList+")";
+		} else if (roles.contains(RoleList.PRODUCTEUR) && producteur != null && producteur.getEmailContact() != null) {
+			whereClause = "where hm.adresseExpediteur=\""+producteur.getEmailContact()+"\" or (hm.roleExpediteur=\"PRODUCTEUR\" and hm.expediteurAmap!=null)";
+		} else { // Au cas où on arriverait là sans le rôle adéquat
+			whereClause = " where 1=2";
+		}
+		try {
+			EntityManager em = TransactionHelper.getEm();
+			Query q = em.createQuery("select hm from HistoriqueEmail hm "+whereClause);
+			HistoriqueEmailService service = new HistoriqueEmailService();
+			res= DbToDto.transform(q, (HistoriqueEmail hm)->service.createHistoriqueEmailDto(em, hm));
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
 	
+	@DbRead
+	public static ModeleEmail getModeleEmail(ModeleEmailEnum designation) {
+		if( designation == null )
+			return null;
+		
+		EntityManager em = TransactionHelper.getEm();
+		Query q = em.createQuery("select m from ModeleEmail m where m.designation=:designation");
+		q.setParameter("designation", designation);
+		List<ModeleEmail> res = q.getResultList();
+		if( res != null && res.size()>0 )
+			return res.get(0);
+		return null;
+	}
+	
+	@DbRead
+	public static List<ModeleEmail> getAllModeleEmail() {
+		EntityManager em = TransactionHelper.getEm();
+		Query q = em.createQuery("select m from ModeleEmail m");
+		List<ModeleEmail> res = q.getResultList();
+		return res;
+	}
+	
+	@DbRead
+	public static ModeleEmailDTO getModeleEmailDTO(Long id) {
+		EntityManager em = TransactionHelper.getEm();
+
+		ModeleEmail me = em.find(ModeleEmail.class, id);
+		if( me != null ) {
+			return modeleEmail2DTO(me);
+		}
+		return null;
+	}
+	
+	@DbRead
+	public static ModeleEmailDTO getModeleEmailDTO(ModeleEmailEnum des) {
+		ModeleEmail me = getModeleEmail(des);
+
+		return modeleEmail2DTO(me);
+	}
+	
+	private static ModeleEmailDTO modeleEmail2DTO( ModeleEmail me ) {
+		if( me != null ) {
+			ModeleEmailDTO it = new ModeleEmailDTO();
+			it.setContenuEmail(me.getContenu());
+			it.setDesignation(me.getDesignation());
+			it.setTitreEmail(me.getTitre());
+			it.setId(me.getId());
+			return it;
+		}
+		return null;
+	}
+	
+	@DbWrite
+	public static void updateModeleEmail(ModeleEmailDTO med ) {
+		EntityManager em = TransactionHelper.getEm();
+		
+		ModeleEmail me = em.find(ModeleEmail.class, med.getId());
+		
+		me.setContenu(med.getContenuEmail());
+		me.setTitre(med.getTitreEmail());
+
+	}
+	
+	@DbRead
+	public static ExpediteurAmap getExpediteurAmap(Long id) {
+		if( id == null )
+			return null;
+		
+		EntityManager em = TransactionHelper.getEm();
+
+		return em.find(ExpediteurAmap.class, id);
+	}
+	
+	@DbWrite
+	public static void saveMail(HistoriqueEmail message) {
+		EntityManager em = TransactionHelper.getEm();
+		em.persist(message);
+	}
+	
+	@DbWrite
+	public static void deleteEmail(Long id) {
+		EntityManager em = TransactionHelper.getEm();
+		try {
+			HistoriqueEmail hm = em.find(HistoriqueEmail.class, id);
+			em.remove(hm);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	private String buildHtlmContent(MailerMessage mailerMessage, ParametresDTO param)
 	{

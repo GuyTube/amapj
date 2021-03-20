@@ -36,6 +36,8 @@ import fr.amapj.view.views.archivage.contrat.ArchivageContratListPart;
 import fr.amapj.view.views.archivage.gestion.GestionArchivageView;
 import fr.amapj.view.views.archivage.producteur.ArchivageProducteurListPart;
 import fr.amapj.view.views.archivage.utilisateur.ArchivageUtilisateurListPart;
+import fr.amapj.view.views.carteprepayee.CartesPrepayeesAdminView;
+import fr.amapj.view.views.carteprepayee.MesCartesPrepayeesView;
 import fr.amapj.view.views.compte.MonCompteView;
 import fr.amapj.view.views.contratsamapien.ContratsAmapienListPart;
 import fr.amapj.view.views.cotisation.bilan.BilanCotisationView;
@@ -53,7 +55,7 @@ import fr.amapj.view.views.listeproducteurreferent.ListeProducteurReferentView;
 import fr.amapj.view.views.livraisonamapien.LivraisonAmapienView;
 import fr.amapj.view.views.logview.LogView;
 import fr.amapj.view.views.logview.StatAccessView;
-import fr.amapj.view.views.mesadhesions.MesAdhesionsView;
+import fr.amapj.view.views.mescontrats.ContratsASouscrire;
 import fr.amapj.view.views.mescontrats.MesContratsView;
 import fr.amapj.view.views.meslivraisons.MesLivraisonsView;
 import fr.amapj.view.views.mespaiements.MesPaiementsView;
@@ -68,9 +70,11 @@ import fr.amapj.view.views.producteur.livraison.ProducteurLivraisonsView;
 import fr.amapj.view.views.produit.ProduitListPart;
 import fr.amapj.view.views.receptioncheque.ReceptionChequeListPart;
 import fr.amapj.view.views.remiseproducteur.RemiseProducteurListPart;
+import fr.amapj.view.views.sendmail.ListeMessagesEnvoyesView;
 import fr.amapj.view.views.sendmail.SendMailView;
 import fr.amapj.view.views.suiviacces.SuiviAccesView;
 import fr.amapj.view.views.synthesemulticontrat.SyntheseMultiContratView;
+import fr.amapj.view.views.tableaudebord.TableauDeBordView;
 import fr.amapj.view.views.utilisateur.UtilisateurListPart;
 import fr.amapj.view.views.visiteamap.VisiteAmapView;
 
@@ -100,13 +104,14 @@ public class MenuInfo
 		
 		
 		menus.add(new MenuDescription(MenuList.MES_CONTRATS,MesContratsView.class));
+		menus.add(new MenuDescription(MenuList.CONTRATS_A_SOUSCRIRE,ContratsASouscrire.class));
 		menus.add(new MenuDescription(MenuList.MES_LIVRAISONS,  MesLivraisonsView.class));
 		menus.add(new MenuDescription(MenuList.MES_PAIEMENTS,  MesPaiementsView.class));
 		menus.add(new MenuDescription(MenuList.MES_ADHESIONS,  MesAdhesionsView.class,RoleList.ADHERENT,ModuleList.GESTION_COTISATION));
+		menus.add(new MenuDescription(MenuList.MES_CARTES_PREPAYEES,  MesCartesPrepayeesView.class));
 		menus.add(new MenuDescription(MenuList.MON_COMPTE,  MonCompteView.class));
-		// TODO menus.add(new MenuDescription(MenuList.VISITE_AMAP,  VisiteAmapView.class));
 		menus.add(new MenuDescription(MenuList.LISTE_PRODUCTEUR_REFERENT,  ListeProducteurReferentView.class));
-		menus.add(new MenuDescription(MenuList.LISTE_ADHERENTS,  ListeAdherentsView.class));
+		menus.add(new MenuDescription(MenuList.LISTE_ADHERENTS,  ListeAdherentsView.class, RoleList.ADHERENT));
 		menus.add(new MenuDescription(MenuList.MES_PERMANENCES,  MesPermanencesView.class , RoleList.ADHERENT , ModuleList.PLANNING_DISTRIBUTION));
 		
 		
@@ -114,6 +119,12 @@ public class MenuInfo
 		menus.add(new MenuDescription(MenuList.HISTORIQUE_CONTRATS, HistoriqueContratsView.class).setCategorie("HISTORIQUE"));
 		menus.add(new MenuDescription(MenuList.HISTORIQUE_PAIEMENTS,  HistoriquePaiementsView.class));
 		
+		// Partie messagerie. Nouvelle catégorie accessible à tous les rôles
+		// sauf les adhérents simples
+		ArrayList<RoleList> excluded = new ArrayList<RoleList>();
+		excluded.add(RoleList.ADHERENT);
+		menus.add(new MenuDescription(MenuList.HISTORIQUE_MAIL, ListeMessagesEnvoyesView.class).setCategorie("MESSAGERIE").setRolesExclus(excluded));
+
 		// Partie producteurs
 		menus.add(new MenuDescription(MenuList.LIVRAISONS_PRODUCTEUR, ProducteurLivraisonsView.class, RoleList.PRODUCTEUR ).setCategorie("PRODUCTEUR"));
 		menus.add(new MenuDescription(MenuList.CONTRATS_PRODUCTEUR, ProducteurContratListPart.class , RoleList.PRODUCTEUR));
@@ -121,6 +132,7 @@ public class MenuInfo
 		// Partie référents
 		menus.add(new MenuDescription(MenuList.GESTION_CONTRAT, GestionContratListPart.class , RoleList.REFERENT ).setCategorie("REFERENT"));
 		menus.add(new MenuDescription(MenuList.GESTION_CONTRAT_SIGNES,  GestionContratSignesListPart.class , RoleList.REFERENT ));
+		menus.add(new MenuDescription(MenuList.CARTES_PREPAYEES_ADMIN, CartesPrepayeesAdminView.class, RoleList.REFERENT));
 		menus.add(new MenuDescription(MenuList.RECEPTION_CHEQUES, ReceptionChequeListPart.class, RoleList.REFERENT));
 		menus.add(new MenuDescription(MenuList.REMISE_PRODUCTEUR, RemiseProducteurListPart.class, RoleList.REFERENT));
 		menus.add(new MenuDescription(MenuList.PRODUIT, ProduitListPart.class , RoleList.REFERENT));
@@ -136,6 +148,7 @@ public class MenuInfo
 		// Partie trésorier
 		menus.add(new MenuDescription(MenuList.UTILISATEUR, UtilisateurListPart.class, RoleList.TRESORIER ).setCategorie("TRESORIER"));
 		menus.add(new MenuDescription(MenuList.PRODUCTEUR, ProducteurListPart.class, RoleList.TRESORIER));
+		menus.add(new MenuDescription(MenuList.TABLEAU_DE_BORD, TableauDeBordView.class, RoleList.TRESORIER));
 		menus.add(new MenuDescription(MenuList.BILAN_COTISATION, BilanCotisationView.class, RoleList.TRESORIER , ModuleList.GESTION_COTISATION));
 		menus.add(new MenuDescription(MenuList.RECEPTION_COTISATION, ReceptionCotisationView.class, RoleList.TRESORIER , ModuleList.GESTION_COTISATION));
 		menus.add(new MenuDescription(MenuList.IMPORT_DONNEES, ImportDonneesView.class, RoleList.TRESORIER));
@@ -157,7 +170,6 @@ public class MenuInfo
 		menus.add(new MenuDescription(MenuList.LISTE_ADMIN, DroitsAdministrateurListPart.class, RoleList.ADMIN));
 		menus.add(new MenuDescription(MenuList.MAINTENANCE, MaintenanceView.class, RoleList.ADMIN));
 		menus.add(new MenuDescription(MenuList.ENVOI_MAIL, SendMailView.class, RoleList.ADMIN));
-		
 		
 		// Partie master
 		menus.add(new MenuDescription(MenuList.LISTE_APP_INSTANCE, AppInstanceListPart.class, RoleList.MASTER).setCategorie("MASTER"));
@@ -181,7 +193,7 @@ public class MenuInfo
 		
 		for (MenuDescription mn : menus)
 		{
-			if ( mn.hasRole(roles) && mn.hasModule(param) && mn.complyParamEcan(roles,dtos)) 
+			if ( !mn.hasRoleExclus(roles) && mn.hasRole(roles) && mn.hasModule(param) && mn.complyParamEcan(roles,dtos)) 
 			{
 				res.add(mn);
 			}

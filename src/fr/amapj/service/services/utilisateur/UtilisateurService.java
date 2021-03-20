@@ -39,6 +39,8 @@ import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
 import fr.amapj.model.models.acces.RoleList;
 import fr.amapj.model.models.fichierbase.EtatUtilisateur;
+import fr.amapj.model.models.fichierbase.PreferenceUtilisateur;
+import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.model.models.fichierbase.Produit;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.model.models.permanence.periode.PeriodePermanenceUtilisateur;
@@ -48,8 +50,6 @@ import fr.amapj.service.services.access.AccessManagementService;
 import fr.amapj.service.services.archivage.tools.SuppressionState;
 import fr.amapj.service.services.archivage.tools.SuppressionState.SStatus;
 import fr.amapj.service.services.authentification.PasswordManager;
-import fr.amapj.service.services.gestioncotisation.GestionCotisationService;
-import fr.amapj.service.services.gestioncotisation.PeriodeCotisationUtilisateurDTO;
 import fr.amapj.service.services.mailer.MailerMessage;
 import fr.amapj.service.services.mailer.MailerService;
 import fr.amapj.service.services.notification.DeleteNotificationService;
@@ -71,16 +71,12 @@ import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
  * 
  */
 public class UtilisateurService
-{
-	
-	
+{	
 	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES UTILISATEURS
 	
 	/**
 	 * Permet de charger la liste de tous les utilisateurs
 	 * dans une transaction en lecture
-	 * 
-	 * si etat = null, alors on charge tous les utilisateurs, quelque soit leur etat
 	 */
 	@DbRead
 	public List<UtilisateurDTO> getAllUtilisateurs(EtatUtilisateur etat)
@@ -96,19 +92,18 @@ public class UtilisateurService
 		UtilisateurDTO dto = new UtilisateurDTO();
 		
 		dto.id = u.getId();
-		dto.nom = u.nom;
-		dto.prenom = u.prenom;
+		dto.nom = u.getNom();
+		dto.prenom = u.getPrenom();
 		dto.roles = new AccessManagementService().getRoleAsString(em,u);
-		dto.email = u.email;
-		dto.etatUtilisateur = u.etatUtilisateur;
-		dto.dateCreation = u.dateCreation;
-		dto.dateModification = u.dateModification;
+		dto.email = u.getEmail();
+		dto.emailConjoint = u.getEmailConjoint();
+		dto.etatUtilisateur = u.getEtatUtilisateur();
 		
-		dto.numTel1 = u.numTel1;
-		dto.numTel2 = u.numTel2;
-		dto.libAdr1 = u.libAdr1;
-		dto.codePostal = u.codePostal;
-		dto.ville = u.ville;
+		dto.numTel1 = u.getNumTel1();
+		dto.numTel2 = u.getNumTel2();
+		dto.libAdr1 = u.getLibAdr1();
+		dto.codePostal = u.getCodePostal();
+		dto.ville = u.getVille();
 		
 		return dto;
 	}
@@ -131,20 +126,135 @@ public class UtilisateurService
 		EntityManager em = TransactionHelper.getEm();
 		
 		Utilisateur u = em.find(Utilisateur.class, dto.id);
-		u.nom = dto.nom;
-		u.prenom = dto.prenom;
-		u.email = dto.email;
-		u.dateModification = DateUtils.getDate();
+		u.setNom(dto.nom);
+		u.setPrenom(dto.prenom);
+		u.setEmail(dto.email);
+		u.setEmailConjoint(dto.emailConjoint);
 		
-		u.numTel1 = dto.numTel1;
-		u.numTel2 = dto.numTel2;
-		u.libAdr1 = dto.libAdr1;
-		u.codePostal = dto.codePostal;
-		u.ville = dto.ville;
+		u.setNumTel1(dto.numTel1);
+		u.setNumTel2(dto.numTel2);
+		u.setLibAdr1(dto.libAdr1);
+		u.setCodePostal(dto.codePostal);
+		u.setVille(dto.ville);
 		
 	}
 
+	@DbRead
+	public boolean conjointPreference(Utilisateur u) {
+		// On récupère la préférence à créer ou modifier
+		List<String> prefs = getUserPreferenceValue(u, PreferenceUtilisateurEnum.PREF_MAIL_CONJOINT);
+		if(prefs.size() > PreferenceUtilisateurEnum.PREF_MAIL_CONJOINT.getMax() ) {
+			System.out.println("TROP DE PREFS");
+			return false;
+		} else if(prefs.size() == 1) {
+			return prefs.get(0) == "OUI" ? true : false;
+		}
+		return false;
+	}
 	
+	@DbRead
+	public List<String> getUserPreferenceValue(UtilisateurDTO udto, PreferenceUtilisateurEnum pref) {
+		EntityManager em = TransactionHelper.getEm();
+		Utilisateur u = em.find(Utilisateur.class, udto.getId());
+		return getUserPreferenceValue(u, pref);
+	}
+
+	@DbRead
+	public List<String> getUserPreferenceValue(Utilisateur u, PreferenceUtilisateurEnum pref) {
+		
+		EntityManager em = TransactionHelper.getEm();
+
+		ArrayList<String> prefValues = new ArrayList<String>();
+
+		try {
+			Query q = em.createQuery("select p from PreferenceUtilisateur p "
+					+ "WHERE p.utilisateur=:u and p.nomPref=:n");
+			q.setParameter("u",u);
+			q.setParameter("n",pref.getNom());
+			List<PreferenceUtilisateur> prefs = q.getResultList();
+			
+			for( PreferenceUtilisateur pu : prefs ) {
+				prefValues.add(pu.getValeurPref());
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return prefValues;
+	}
+	
+	@DbWrite
+	public void addOrChangeUserPreference(UtilisateurDTO util, PreferenceUtilisateurEnum pref, Object value)
+	{
+		
+		EntityManager em = TransactionHelper.getEm();
+		
+
+		Utilisateur user = em.find(Utilisateur.class, util.id);
+		
+		try {
+			// On récupère la préférence à créer ou modifier
+			Query q = em.createQuery("select p from PreferenceUtilisateur p "
+					+ "WHERE p.utilisateur=:u and p.nomPref=:n");
+			q.setParameter("u",user);
+			q.setParameter("n",pref.getNom());
+			
+			List<PreferenceUtilisateur> prefs = q.getResultList();
+			
+			if( prefs.size() == 0 ) {
+				PreferenceUtilisateur p = new PreferenceUtilisateur();
+				p.setNomPref(pref);
+				p.setValeurPref(value.toString());
+				p.setUtilisateur(user);
+				em.persist(p);
+			} else {
+				if( prefs.size() > pref.getMax() ) {
+					
+					System.out.println("Anomalie, trop de pref "+pref.getNom());
+				}
+				PreferenceUtilisateur p = em.find(PreferenceUtilisateur.class, prefs.get(0).getId());
+				p.setValeurPref(value.toString());
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}			 
+
+	@DbWrite
+	public void removeUserPreference(UtilisateurDTO util, PreferenceUtilisateurEnum pref)
+	{
+		
+		EntityManager em = TransactionHelper.getEm();
+		
+		Utilisateur user = em.find(Utilisateur.class, util.id);
+
+		// On récupère la préférence qui doit être supprimée
+		Query q = em.createQuery("select p from PreferenceUtilisateur p WHERE p.utilisateur=:u and p.nomPref=:n");
+		q.setParameter("u",user);
+		q.setParameter("n",pref.getNom());
+		
+		List<PreferenceUtilisateur> prefs = q.getResultList();
+		
+		if( prefs.size() > pref.getMax() ) {
+			System.out.println("Anomalie, trop de pref "+pref.getNom());
+		}
+		if( prefs.size() != 0 ) {
+			PreferenceUtilisateur p = em.find(PreferenceUtilisateur.class,prefs.get(0).getId());
+			em.remove(p);
+		}
+	}	
+	
+	public Producteur getProducteur(EntityManager em, Utilisateur u)
+	{
+		Query q = em.createQuery("select r.producteur from ProducteurUtilisateur r  WHERE r.utilisateur=:u");
+		q.setParameter("u", u);
+		
+		List<Producteur> producteurs = q.getResultList();
+		if( producteurs != null && producteurs.size() > 0)
+			return producteurs.get(0);
+		return null;
+
+	}
 	// PARTIE MISE A JOUR DE L ETAT D'UN UTILISATEUR
 
 	
@@ -154,8 +264,9 @@ public class UtilisateurService
 		EntityManager em = TransactionHelper.getEm();
 		
 		Utilisateur u = em.find(Utilisateur.class, id);
-		u.etatUtilisateur = newValue;
-		u.dateModification = DateUtils.getDate();
+		u.setEtatUtilisateur(newValue);
+		u.setDateModification = DateUtils.getDate();
+
 	}
 	
 	
@@ -179,17 +290,20 @@ public class UtilisateurService
 		String nom = utilisateurDTO.nom.trim();
 		String prenom = utilisateurDTO.prenom.trim();
 		String email = utilisateurDTO.email.trim().toLowerCase();
+		String emailConjoint = null;
+		if( utilisateurDTO.getEmailConjoint() != null )
+			emailConjoint = utilisateurDTO.getEmailConjoint().trim().toLowerCase();
 		
 		Utilisateur u = new Utilisateur();
-		u.nom = nom;
-		u.prenom = prenom;
-		u.email = email;
-		u.dateCreation = DateUtils.getDate();
-		u.numTel1 = utilisateurDTO.numTel1;
-		u.numTel2 = utilisateurDTO.numTel2;
-		u.libAdr1 = utilisateurDTO.libAdr1;
-		u.codePostal = utilisateurDTO.codePostal;
-		u.ville = utilisateurDTO.ville;
+		u.setNom(nom);
+		u.setPrenom(prenom);
+		u.setEmail(email);
+		u.setEmailConjoint(emailConjoint);
+		u.setNumTel1(utilisateurDTO.numTel1);
+		u.setNumTel2(utilisateurDTO.numTel2);
+		u.setLibAdr1(utilisateurDTO.libAdr1);
+		u.setCodePostal(utilisateurDTO.codePostal);
+		u.setVille(utilisateurDTO.ville);
 
 		em.persist(u);
 		
@@ -212,7 +326,10 @@ public class UtilisateurService
 		if (sendMail==true)
 		{
 			ParametresDTO param = new ParametresService().getParametres();
-			String link = param.getUrl()+"?username="+u.email;
+			String link = param.getUrl();
+			if(!link.endsWith("/"))
+				link = link+"/";
+			link=link+"?username="+u.getEmail();
 		
 			StringBuffer buf = new StringBuffer();
 			buf.append("<h2>"+param.nomAmap+"</h2>");
@@ -277,8 +394,7 @@ public class UtilisateurService
 		if (ps.size()>0)
 		{
 			throw new UnableToSuppressException("Cet utilisateur est indiqué comme cotisant sur les périodes de cotisation suivantes :"+CollectionUtils.asStdString(ps, e->e.periodeNom));
-		}
-		
+		}		
 		List<RoleList> rs = new AccessManagementService().getUserRole(u, em);
 		checkRole(rs,RoleList.ADMIN);
 		checkRole(rs,RoleList.TRESORIER);
@@ -311,6 +427,23 @@ public class UtilisateurService
 		return LongUtils.toInt(q.getSingleResult());
 	}
 	
+	private String getPeriodePermanence(Utilisateur u, EntityManager em)
+	{
+		Query q = em.createQuery("select ppu from PeriodePermanenceUtilisateur ppu WHERE ppu.utilisateur=:u");
+		q.setParameter("u", u);
+		List<PeriodePermanenceUtilisateur> res = q.getResultList();
+		// En génère la liste des permanences auquel l'utilisateur a participé
+		if( res != null && res.size() > 0 ) {
+			String periodes = "";
+			for(PeriodePermanenceUtilisateur p : res) {
+				periodes = periodes + p.periodePermanence.nom +";";
+			}
+			if(periodes.endsWith(";"))
+				periodes = periodes.substring(0,periodes.length()-1);
+			return periodes;
+		}
+		return null;
+	}
 	// 
 	@DbRead
 	public int countContrat(Long idUtilisateur)
@@ -319,6 +452,7 @@ public class UtilisateurService
 		Utilisateur u = em.find(Utilisateur.class, idUtilisateur);
 		return countContrat(u,em);
 	}
+		
 	
 	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES UTILISATEURS POUR LE SEARCHER
 	
@@ -376,11 +510,10 @@ public class UtilisateurService
 		EnvoiMailDTO dto = new EnvoiMailDTO();
 		
 		dto.utilisateurs = new ArrayList<>();
-		
 		Query q = em.createQuery("select u from Utilisateur u where u.etatUtilisateur=:etat and u.password is null order by u.nom,u.prenom");
 		q.setParameter("etat", EtatUtilisateur.ACTIF);
 		List<Utilisateur> us = q.getResultList();
-		
+
 		for (Utilisateur u : us)
 		{
 			if (UtilisateurUtil.canSendMailTo(u))
@@ -445,7 +578,7 @@ public class UtilisateurService
 	{
 		EntityManager em = TransactionHelper.getEm();
 		Utilisateur utilisateur = em.find(Utilisateur.class, idUtilisateur);
-		String email=utilisateur.email;
+		String email=utilisateur.getEmail();
 		return email;
 	}
 
@@ -505,8 +638,5 @@ public class UtilisateurService
 		return p.nom+" "+p.prenom;
 	}
 	
-	
-	
-
 
 }

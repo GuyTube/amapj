@@ -108,14 +108,14 @@ public class GestionCotisationService
 		PeriodeCotisationDTO dto = new PeriodeCotisationDTO();
 		
 		dto.id = a.getId();
-		dto.nom = a.nom;
-		dto.montantMini = a.montantMini;
-		dto.montantConseille = a.montantConseille;
-		dto.textPaiement = a.textPaiement;
-		dto.libCheque = a.libCheque;
-		dto.dateDebut = a.dateDebut;
-		dto.dateFin = a.dateFin;
-		dto.idBulletinAdhesion = IdentifiableUtil.getId(a.bulletinAdhesion);
+		dto.nom = a.getNom();
+		dto.montantMini = a.getMontantMini();
+		dto.montantConseille = a.getMontantConseille();
+		dto.textPaiement = a.getTextPaiement();
+		dto.libCheque = a.getLibCheque();
+		dto.dateDebut = a.getDateDebut();
+		dto.dateFin = a.getDateFin();
+		dto.idBulletinAdhesion = IdentifiableUtil.getId(a.getBulletinAdhesion());
 		
 		// Champs calculés
 		dto.nbAdhesion = getNbAdhesion(em,a);
@@ -131,21 +131,21 @@ public class GestionCotisationService
 	{
 		PeriodeCotisationUtilisateurDTO dto = new PeriodeCotisationUtilisateurDTO();
 
-		dto.dateAdhesion = a.dateAdhesion;
-		dto.dateReceptionCheque = a.dateReceptionCheque;
-		dto.etatPaiementAdhesion = a.etatPaiementAdhesion;
+		dto.dateAdhesion = a.getDateAdhesion();
+		dto.dateReceptionCheque = a.getDateReceptionCheque();
+		dto.etatPaiementAdhesion = a.getEtatPaiementAdhesion();
 		dto.id = a.getId();
-		dto.idUtilisateur = a.utilisateur.getId();
-		dto.nomUtilisateur = a.utilisateur.nom;
-		dto.prenomUtilisateur = a.utilisateur.prenom;
-		dto.montantAdhesion = a.montantAdhesion;
-		dto.typePaiementAdhesion = a.typePaiementAdhesion;
+		dto.idUtilisateur = a.getUtilisateur().getId();
+		dto.nomUtilisateur = a.getUtilisateur().nom;
+		dto.prenomUtilisateur = a.getUtilisateur().prenom;
+		dto.montantAdhesion = a.getMontantAdhesion();
+		dto.typePaiementAdhesion = a.getTypePaiementAdhesion();
 
 		// 
-		dto.idPeriodeCotisation = a.periodeCotisation.getId();
-		dto.periodeNom = a.periodeCotisation.nom;
-		dto.periodeDateDebut = a.periodeCotisation.dateDebut;
-		dto.periodeDateFin = a.periodeCotisation.dateFin;
+		dto.idPeriodeCotisation = a.getPeriodeCotisation().getId();
+		dto.periodeNom = a.getPeriodeCotisation().getNom();
+		dto.periodeDateDebut = a.getPeriodeCotisation().getDateDebut();
+		dto.periodeDateFin = a.getPeriodeCotisation().getDateFin();
 		
 		return dto;
 	}
@@ -190,21 +190,21 @@ public class GestionCotisationService
 			a = em.find(PeriodeCotisation.class, dto.id);
 		}
 
-		a.nom = dto.nom;
-		a.montantMini = dto.montantMini;
-		a.montantConseille = dto.montantConseille;
-		a.textPaiement = dto.textPaiement;
-		a.libCheque = dto.libCheque;
-		a.dateDebut = dto.dateDebut;
-		a.dateFin = dto.dateFin;
-		a.bulletinAdhesion = IdentifiableUtil.findIdentifiableFromId(EditionSpecifique.class, dto.idBulletinAdhesion, em);
+		a.setNom(dto.nom);
+		a.setMontantMini(dto.montantMini);
+		a.setMontantConseille(dto.montantConseille);
+		a.setTextPaiement(dto.textPaiement);
+		a.setLibCheque(dto.libCheque);
+		a.setDateDebut(dto.dateDebut);
+		a.setDateFin(dto.dateFin);
+		a.setBulletinAdhesion(IdentifiableUtil.findIdentifiableFromId(EditionSpecifique.class, dto.idBulletinAdhesion, em));
 				
 		if (dto.id==null)
 		{
 			em.persist(a);
 		}
 		
-		return a.id;
+		return a.getId();
 	}
 
 
@@ -359,19 +359,19 @@ public class GestionCotisationService
 		else
 		{
 			pcu = new PeriodeCotisationUtilisateur();
-			pcu.periodeCotisation = em.find(PeriodeCotisation.class, dto.idPeriodeCotisation);
-			pcu.utilisateur = em.find(Utilisateur.class, dto.idUtilisateur);
-			pcu.dateAdhesion = DateUtils.getDate();
+			pcu.setPeriodeCotisation(em.find(PeriodeCotisation.class, dto.idPeriodeCotisation));
+			pcu.setUtilisateur(em.find(Utilisateur.class, dto.idUtilisateur));
+			pcu.setDateAdhesion(DateUtils.getDate());
 		}
 		
-		pcu.etatPaiementAdhesion = dto.etatPaiementAdhesion;
-		pcu.montantAdhesion = dto.montantAdhesion;
-		pcu.typePaiementAdhesion = dto.typePaiementAdhesion;
+		pcu.setEtatPaiementAdhesion(dto.etatPaiementAdhesion);
+		pcu.setMontantAdhesion(dto.montantAdhesion);
+		pcu.setTypePaiementAdhesion(dto.typePaiementAdhesion);
 		
 		// On met à jour la date de réception du chèque si elle n'est pas connu et que l'état est ENCAISSE
-		if (pcu.dateReceptionCheque==null && dto.etatPaiementAdhesion==EtatPaiementAdhesion.ENCAISSE)
+		if (pcu.getDateReceptionCheque()==null && dto.etatPaiementAdhesion==EtatPaiementAdhesion.ENCAISSE)
 		{
-			pcu.dateReceptionCheque = DateUtils.getDate();
+			pcu.setDateReceptionCheque(DateUtils.getDate());
 		}
 		
 		

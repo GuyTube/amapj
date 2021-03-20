@@ -21,6 +21,7 @@
  package fr.amapj.view.engine.enumselector;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.server.FontAwesome;
@@ -187,5 +188,17 @@ public class EnumSearcher
 		
 		return comboBox;
 	}
+
 	
+	static public <T extends Enum<T>> void resetEnum(ComboBox comboBox, List<T> enumList) {
+		comboBox.removeAllItems();
+		for (T en : enumList)
+		{
+			String caption = en.toString();	
+			comboBox.addItem(en);
+			comboBox.setItemCaption(en, caption);
+		}
+
+	}
+ 
 }

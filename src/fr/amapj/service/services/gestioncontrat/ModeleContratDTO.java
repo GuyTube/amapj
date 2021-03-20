@@ -83,6 +83,8 @@ public class ModeleContratDTO
 	
 	public int jokerDelai;
 	
+	public Integer nbMaxSouscription;
+	
 	public Long idPeriodeCotisation;
 	
 	
@@ -332,6 +334,15 @@ public class ModeleContratDTO
 		this.jokerDelai = jokerDelai;
 	}
 
+	
+	public Integer getNbMaxSouscription() {
+		return nbMaxSouscription;
+	}
+
+	public void setNbMaxSouscription(Integer nbMaxSouscription) {
+		this.nbMaxSouscription = nbMaxSouscription;
+	}
+	
 	public Long getIdPeriodeCotisation() 
 	{
 		return idPeriodeCotisation;
@@ -341,9 +352,4 @@ public class ModeleContratDTO
 	{
 		this.idPeriodeCotisation = idPeriodeCotisation;
 	}
-
-	
-	
-	
-	
 }

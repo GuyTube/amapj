@@ -20,6 +20,9 @@
  */
  package fr.amapj.view.engine.popup.cascadingpopup;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
@@ -35,6 +38,9 @@ public class CascadingPopup
 	private PopupListener finalListener;
 	
 	private CascadingData data;
+	
+	private final static Logger logger = LogManager.getLogger();
+	
 	
 	static public interface GetInfo
 	{

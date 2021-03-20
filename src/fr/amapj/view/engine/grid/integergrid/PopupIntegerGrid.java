@@ -23,6 +23,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -57,6 +60,9 @@ import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 abstract public class PopupIntegerGrid extends CorePopup
 {
 
+	private final static Logger logger = LogManager.getLogger();
+
+	
 	private Table table;
 
 	private Label prixTotal;
@@ -505,6 +511,7 @@ abstract public class PopupIntegerGrid extends CorePopup
 		}
 
 		boolean ret = performSauvegarder();
+		logger.info("Retour Sauvegarder : "+ret);
 		if (ret==true)
 		{
 			close();

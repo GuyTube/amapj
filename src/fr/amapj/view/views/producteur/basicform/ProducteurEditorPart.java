@@ -41,6 +41,7 @@ import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
 import fr.amapj.view.engine.popup.formpopup.fieldlink.ClassicFieldLink;
 import fr.amapj.view.engine.popup.formpopup.validator.CollectionNoDuplicates;
 import fr.amapj.view.engine.popup.formpopup.validator.ColumnNotNull;
+import fr.amapj.view.engine.popup.formpopup.validator.EmailConjointValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.NotNullValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.UniqueInDatabaseValidator;
@@ -122,7 +123,9 @@ public class ProducteurEditorPart extends WizardFormPopup
 		TextArea f =  addTextAeraField("Description", "description");
 		f.setMaxLength(20480);
 		f.setHeight(5, Unit.CM);
-
+		
+		IValidator mail = new EmailConjointValidator();
+		addTextField("Adresse mail de contact", "emailContact",mail,notNull);
 	}
 	
 	

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
@@ -126,6 +127,9 @@ public class PeriodePermanenceCreationEditorPart extends WizardFormPopup
 		
 		ComboBox box = addComboEnumField("Régle d'inscription sur une date", "regleInscription", notNull);
 		box.setWidth("600px");
+		
+
+		ComboBox limitBox = addComboEnumField("Limiter strictement le nombre de permanences par utilisateur", "limitNbPermanenceUtil", notNull);
 
 	}
 	

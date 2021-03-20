@@ -45,7 +45,7 @@ public class ModifDateContratEditorPart extends WizardFormPopup
 
 	public enum Step
 	{
-		CHOIX_FREQUENECE, DATE_LIVRAISON;
+		CHOIX_FREQUENCE, DATE_LIVRAISON;
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class ModifDateContratEditorPart extends WizardFormPopup
 	@Override
 	protected void configure()
 	{
-		add(Step.CHOIX_FREQUENECE,()->addFieldChoixFrequence());
+		add(Step.CHOIX_FREQUENCE,()->addFieldChoixFrequence());
 		add(Step.DATE_LIVRAISON,()->addFieldDateLivraison());
 			
 	}

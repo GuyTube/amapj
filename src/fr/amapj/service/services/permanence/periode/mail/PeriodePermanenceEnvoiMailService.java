@@ -100,7 +100,7 @@ public class PeriodePermanenceEnvoiMailService
 		ParametresDTO param = new ParametresService().getParametres();
 		
 		//
-		String email=utilisateur.email;
+		String email=utilisateur.getEmail();
 		
 		String subject = param.nomAmap+" - Planning des permanences";
 		String htmlContent = texte;

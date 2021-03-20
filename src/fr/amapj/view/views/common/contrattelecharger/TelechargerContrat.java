@@ -20,6 +20,9 @@
  */
  package fr.amapj.view.views.common.contrattelecharger;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import fr.amapj.model.models.contrat.modele.GestionPaiement;
 import fr.amapj.service.services.edgenerator.excel.EGBilanCompletCheque;
 import fr.amapj.service.services.edgenerator.excel.EGCollecteCheque;
@@ -28,6 +31,7 @@ import fr.amapj.service.services.edgenerator.excel.feuilledistribution.amapien.E
 import fr.amapj.service.services.edgenerator.excel.feuilledistribution.amapien.EGLiasseFeuilleDistributionAmapien;
 import fr.amapj.service.services.edgenerator.excel.feuilledistribution.amapien.EGFeuilleDistributionAmapien.EGMode;
 import fr.amapj.service.services.edgenerator.excel.feuilledistribution.producteur.EGFeuilleDistributionProducteur;
+import fr.amapj.service.services.edgenerator.excel.feuilledistribution.producteur.EGFeuilleEmargement;
 import fr.amapj.service.services.edgenerator.excel.feuilledistribution.producteur.EGSyntheseContrat;
 import fr.amapj.service.services.edgenerator.pdf.PGEngagement;
 import fr.amapj.service.services.edgenerator.pdf.PGEngagement.PGEngagementMode;
@@ -40,6 +44,7 @@ import fr.amapj.view.engine.popup.corepopup.CorePopup;
 
 public class TelechargerContrat
 {
+	private final static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Permet l'affichage d'un popup avec tous les fichiers à télécharger pour un modele de contrat
@@ -70,6 +75,7 @@ public class TelechargerContrat
 		popup.addGenerator(new EGFeuilleDistributionProducteur(idModeleContrat));
 		popup.addGenerator(new EGLiasseFeuilleDistributionAmapien(idModeleContrat));
 		popup.addGenerator(new EGSyntheseContrat(idModeleContrat));
+		popup.addGenerator(new EGFeuilleEmargement(idModeleContrat));
 		popup.addLabel("");
 		
 		// 3 - Partie dédiée au contrat d'engagement 

@@ -50,6 +50,8 @@ public class UnePeriodePermanenceDTO
 	
 	public int nbInscription;
 	
+	public boolean limitNbPermanenceUtil;
+	
 	public NaturePeriodePermanence nature;
 	
 	// Dans le cas des contrats flottant, contient la premiere date de permanence modifiable 

@@ -232,7 +232,9 @@ public class LoginPart
         @Override
         protected void login(String userName, String password) 
         {
-        	String msg = passwordManager.checkUser(userName, password,sudo); 
+        	//Ajout du LowerCase pour éviter que les personnes qui saisissent leur
+        	// adresse en majuscule aient une erreur
+        	String msg = passwordManager.checkUser(userName.trim().toLowerCase(), password,sudo); 
     		
     		if ( msg == null)
     		{

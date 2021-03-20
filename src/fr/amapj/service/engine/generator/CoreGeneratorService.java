@@ -104,7 +104,7 @@ public class CoreGeneratorService
 	 * Permet de générer un fichier Excel 
 	 */
 	@DbRead
-	public Workbook  getFichierExcel(AbstractExcelGenerator generator)
+	public Workbook getFichierExcel(AbstractExcelGenerator generator)
 	{
 		EntityManager em = TransactionHelper.getEm();
 	

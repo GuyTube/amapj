@@ -76,28 +76,28 @@ public class AmapienContratsService
 		for (Contrat contrat : contrats)
 		{
 			
-				ModeleContrat mc = contrat.modeleContrat;
+				ModeleContrat mc = contrat.getModeleContrat();
 	
 				
 				DateInfo di = new GestionContratService().getDateDebutFin(em, mc);
 	
 				AmapienContratDTO dto = new AmapienContratDTO();
 				
-				dto.nomContrat = contrat.modeleContrat.nom;
-				dto.nomProducteur = contrat.modeleContrat.producteur.nom;
+				dto.nomContrat = contrat.getModeleContrat().getNom();
+				dto.nomProducteur = contrat.getModeleContrat().getProducteur().nom;
 				dto.dateDebut = di.dateDebut;
 				dto.dateFin = di.dateFin;
-				dto.dateCreation = contrat.dateCreation;
-				dto.dateModification = contrat.dateModification;
+				dto.dateCreation = contrat.getDateCreation();
+				dto.dateModification = contrat.getDateModification();
 				dto.montant = gestionContratSigneService.getMontant(em, contrat);
 				
 				dto.idContrat = contrat.getId();
 				dto.idModeleContrat = mc.getId();
 				dto.idUtilisateur = userId;
-				dto.idProducteur = contrat.modeleContrat.producteur.id;
+				dto.idProducteur = contrat.getModeleContrat().getProducteur().id;
 				
-				dto.prenomUtilisateur = contrat.utilisateur.prenom;
-				dto.nomUtilisateur = contrat.utilisateur.nom;
+				dto.prenomUtilisateur = contrat.getUtilisateur().getPrenom();
+				dto.nomUtilisateur = contrat.getUtilisateur().getNom();
 				
 				
 				// Si ce contrat est en historique

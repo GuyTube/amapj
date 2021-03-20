@@ -29,6 +29,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.common.CollectionUtils;
 import fr.amapj.common.DateUtils;
@@ -41,6 +44,7 @@ import fr.amapj.model.models.contrat.modele.EtatModeleContrat;
 import fr.amapj.model.models.contrat.modele.GestionPaiement;
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.contrat.modele.ModeleContratDate;
+import fr.amapj.model.models.contrat.modele.ModeleContratDateComparator;
 import fr.amapj.model.models.contrat.modele.ModeleContratDatePaiement;
 import fr.amapj.model.models.contrat.modele.ModeleContratExclude;
 import fr.amapj.model.models.contrat.modele.ModeleContratProduit;
@@ -58,6 +62,7 @@ import fr.amapj.service.engine.tools.DtoToDb.ListDiff;
 import fr.amapj.service.services.archivage.ArchivageContratService;
 import fr.amapj.service.services.archivage.tools.ArchivableState;
 import fr.amapj.service.services.archivage.tools.ArchivableState.AStatus;
+import fr.amapj.service.services.authentification.PasswordManager;
 import fr.amapj.service.services.gestioncontratsigne.update.GestionContratSigneUpdateService;
 import fr.amapj.service.services.mescontrats.ContratColDTO;
 import fr.amapj.service.services.mescontrats.ContratDTO;
@@ -77,7 +82,8 @@ import fr.amapj.view.views.gestioncontrat.editorpart.FrequenceLivraison;
  */
 public class GestionContratService
 {
-	
+	private final static Logger logger = LogManager.getLogger();
+
 	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES CONTRATS
 
 	/**
@@ -101,13 +107,15 @@ public class GestionContratService
 
 		
 		info.id = mc.getId();
-		info.nom = mc.nom;
-		info.nomProducteur = mc.producteur.nom;
-		info.producteurId = mc.producteur.getId();
-		info.finInscription = mc.dateFinInscription;
-		info.etat = mc.etat;
-		info.periodeCotisationId = IdentifiableUtil.getId(mc.periodeCotisation);
+		info.nom = mc.getNom();
+		info.nomProducteur = mc.getProducteur().nom;
+		info.producteurId = mc.getProducteur().getId();
+		info.finInscription = mc.getDateFinInscription();
+		info.etat = mc.getEtat();
+		info.nbMaxSouscription = mc.nbMaxSouscription == null ? 0 : mc.nbMaxSouscription.intValue();
+		info.periodeCotisationId = IdentifiableUtil.getId(mc.getPeriodeCotisation());
 
+		
 		// Avec une sous requete, on obtient la liste de toutes les dates de
 		// livraison
 		List<ModeleContratDate> dates = getAllDates(em, mc);
@@ -118,8 +126,8 @@ public class GestionContratService
 
 		if (dates.size() >= 1)
 		{
-			info.dateDebut = dates.get(0).dateLiv;
-			info.dateFin = dates.get(dates.size() - 1).dateLiv;
+			info.dateDebut = dates.get(0).getDateLiv();
+			info.dateFin = dates.get(dates.size() - 1).getDateLiv();
 		}
 
 		info.nbProduit = getNbProduit(em, mc);
@@ -259,8 +267,8 @@ public class GestionContratService
 			LigneContratDTO l =new LigneContratDTO();
 			l.prix = new Integer(0);
 			l.produitId = prod.getId();
-			l.produitNom = prod.nom;
-			l.produitConditionnement = prod.conditionnement;
+			l.produitNom = prod.getNom();
+			l.produitConditionnement = prod.getConditionnement();
 			res.add(l);
 		}
 		return res;
@@ -282,14 +290,14 @@ public class GestionContratService
 
 		ModeleContratDTO info = new ModeleContratDTO();
 		info.id = mc.getId();
-		info.nom = mc.nom;
-		info.description = mc.description;
-		info.producteur = mc.producteur.getId();
-		info.dateFinInscription = mc.dateFinInscription;
-		info.gestionPaiement = mc.gestionPaiement;
-		info.textPaiement = mc.textPaiement;
-		info.libCheque = mc.libCheque;
-		info.dateRemiseCheque = mc.dateRemiseCheque;
+		info.nom = mc.getNom();
+		info.description = mc.getDescription();
+		info.producteur = mc.getProducteur().getId();
+		info.dateFinInscription = mc.getDateFinInscription();
+		info.gestionPaiement = mc.getGestionPaiement();
+		info.textPaiement = mc.getTextPaiement();
+		info.libCheque = mc.getLibCheque();
+		info.dateRemiseCheque = mc.getDateRemiseCheque();
 		info.nature = mc.nature;
 		info.cartePrepayeeDelai = mc.cartePrepayeeDelai;
 		info.jokerNbMin = mc.jokerNbMin;
@@ -297,6 +305,7 @@ public class GestionContratService
 		info.jokerAutorise = mc.jokerNbMax!=0 ? ChoixOuiNon.OUI : ChoixOuiNon.NON;
 		info.jokerMode = mc.jokerMode;
 		info.jokerDelai = mc.jokerDelai;
+		info.nbMaxSouscription = mc.nbMaxSouscription == null ? 0 : mc.nbMaxSouscription.intValue();
 		info.idPeriodeCotisation = IdentifiableUtil.getId(mc.periodeCotisation);
 
 		// Avec une sous requete, on obtient la liste de toutes les dates de
@@ -305,14 +314,14 @@ public class GestionContratService
 		for (ModeleContratDate date : dates)
 		{
 			DateModeleContratDTO dto = new DateModeleContratDTO();
-			dto.dateLiv = date.dateLiv;
+			dto.dateLiv = date.getDateLiv();
 			info.dateLivs.add(dto);
 		}
 
 		if (dates.size() >= 1)
 		{
-			info.dateDebut = dates.get(0).dateLiv;
-			info.dateFin = dates.get(dates.size() - 1).dateLiv;
+			info.dateDebut = dates.get(0).getDateLiv();
+			info.dateFin = dates.get(dates.size() - 1).getDateLiv();
 		}
 
 		// Avec une sous requete, on récupere la liste des produits
@@ -321,10 +330,11 @@ public class GestionContratService
 		{
 			LigneContratDTO lig = new LigneContratDTO();
 			lig.idModeleContratProduit = prod.getId();
-			lig.produitId = prod.produit.getId();
-			lig.produitNom = prod.produit.nom;
-			lig.produitConditionnement = prod.produit.conditionnement;
-			lig.prix = prod.prix;
+			lig.produitId = prod.getProduit().getId();
+			lig.produitNom = prod.getProduit().getNom();
+			lig.produitConditionnement = prod.getProduit().getConditionnement();
+			lig.prix = prod.getPrix();
+			lig.nbMaxParLivraison = prod.getNbMaxParLivraison();
 
 			info.produits.add(lig);
 		}
@@ -335,13 +345,13 @@ public class GestionContratService
 		List<ModeleContratDatePaiement> datePaiements = getAllDatesPaiements(em, mc);
 		if (datePaiements.size() >= 1)
 		{
-			info.premierCheque = datePaiements.get(0).datePaiement;
-			info.dernierCheque = datePaiements.get(datePaiements.size()-1).datePaiement;
+			info.premierCheque = datePaiements.get(0).getDatePaiement();
+			info.dernierCheque = datePaiements.get(datePaiements.size()-1).getDatePaiement();
 		}
 		for (ModeleContratDatePaiement date : datePaiements)
 		{
 			DatePaiementModeleContratDTO dto = new DatePaiementModeleContratDTO();
-			dto.datePaiement = date.datePaiement;
+			dto.datePaiement = date.getDatePaiement();
 			info.datePaiements.add(dto);
 		}
 		
@@ -351,11 +361,13 @@ public class GestionContratService
 
 	private FrequenceLivraison guessFrequence(List<ModeleContratDate> dates)
 	{
+		ModeleContratDateComparator c = new ModeleContratDateComparator();
+		dates.sort(c);
 		if ((dates.size() == 0) || dates.size() == 1)
 		{
 			return FrequenceLivraison.UNE_SEULE_LIVRAISON;
 		}
-		int delta = DateUtils.getDeltaDay(dates.get(0).dateLiv, dates.get(1).dateLiv);
+		int delta = Math.abs(DateUtils.getDeltaDay(dates.get(1).getDateLiv(), dates.get(0).getDateLiv()));
 		if (delta == 7)
 		{
 			return FrequenceLivraison.UNE_FOIS_PAR_SEMAINE;
@@ -364,9 +376,20 @@ public class GestionContratService
 			return FrequenceLivraison.QUINZE_JOURS;
 		} else
 		{
-			return FrequenceLivraison.UNE_FOIS_PAR_MOIS;
+			int sumDelta = 0;
+			int nbPeriodes = 0;
+			for( int i = 1 ; i<dates.size(); i++) {
+				int d = DateUtils.getDeltaDay(dates.get(i).getDateLiv(), dates.get(i-1).getDateLiv());
+				sumDelta = sumDelta + d;
+				nbPeriodes ++;
+			}
+			int moyDelta = sumDelta / nbPeriodes;
+			if( moyDelta >=28 && moyDelta <=32) {
+					return FrequenceLivraison.UNE_FOIS_PAR_MOIS;
+			} else {
+				return FrequenceLivraison.AUTRE;
+			}
 		}
-
 	}
 
 	// PARTIE SAUVEGARDE D'UN NOUVEAU CONTRAT
@@ -385,24 +408,24 @@ public class GestionContratService
 
 		// Informations d'entete
 		ModeleContrat mc = new ModeleContrat();
-		mc.producteur = p;
-		mc.nom = modeleContrat.nom;
-		mc.description = modeleContrat.description;
-		mc.dateFinInscription = modeleContrat.dateFinInscription;
+		mc.setProducteur(p);
+		mc.setNom(modeleContrat.nom);
+		mc.setDescription(modeleContrat.description);
+		mc.setDateFinInscription(modeleContrat.dateFinInscription);
 		mc.nature = modeleContrat.nature;
 		mc.cartePrepayeeDelai = modeleContrat.cartePrepayeeDelai;
 		mc.jokerNbMin = modeleContrat.jokerNbMin;
 		mc.jokerNbMax = modeleContrat.jokerNbMax;
 		mc.jokerMode = modeleContrat.jokerMode;
 		mc.jokerDelai = modeleContrat.jokerDelai;
-		mc.periodeCotisation = IdentifiableUtil.findIdentifiableFromId(PeriodeCotisation.class,modeleContrat.idPeriodeCotisation,em);
+		mc.nbMaxSouscription = modeleContrat.nbMaxSouscription;
 		
 		
 		// Informations sur le paiement
-		mc.gestionPaiement = modeleContrat.gestionPaiement;
-		mc.textPaiement = modeleContrat.textPaiement;
-		mc.dateRemiseCheque = modeleContrat.dateRemiseCheque;
-		mc.libCheque = modeleContrat.libCheque;
+		mc.setGestionPaiement(modeleContrat.gestionPaiement);
+		mc.setTextPaiement(modeleContrat.textPaiement);
+		mc.setDateRemiseCheque(modeleContrat.dateRemiseCheque);
+		mc.setLibCheque(modeleContrat.libCheque);
 		
 		em.persist(mc);
 
@@ -416,22 +439,25 @@ public class GestionContratService
 		for (Date date : dates)
 		{
 			ModeleContratDate md = new ModeleContratDate();
-			md.modeleContrat = mc;
-			md.dateLiv = date;
+			md.setModeleContrat(mc);
+			md.setDateLiv(date);
 			em.persist(md);
 		}
 
-		// Création de loutes les lignes pour chacun des produits
+		// Création de toutes les lignes pour chacun des produits
 		List<LigneContratDTO> produits = modeleContrat.getProduits();
 		int index = 0;
 		for (LigneContratDTO lig : produits)
 		{
 			ModeleContratProduit mcp = new ModeleContratProduit();
-			mcp.indx = index;
-			mcp.modeleContrat = mc;
-			mcp.prix = lig.getPrix().intValue();
-			mcp.produit = em.find(Produit.class, lig.produitId);
-
+			mcp.setIndx(index);
+			mcp.setModeleContrat(mc);
+			mcp.setPrix(lig.getPrix().intValue());
+			mcp.setProduit(em.find(Produit.class, lig.produitId));
+			if(lig.getNbMaxParLivraison() != null) {
+				int nb = (lig.getNbMaxParLivraison()==null?0:lig.getNbMaxParLivraison());
+				mcp.setNbMaxParLivraison(nb);
+			}
 			em.persist(mcp);
 
 			index++;
@@ -439,14 +465,14 @@ public class GestionContratService
 		}
 		
 		// Informations de dates de paiement
-		if (modeleContrat.gestionPaiement!=GestionPaiement.NON_GERE)
+		if (modeleContrat.gestionPaiement!=GestionPaiement.NON_GERE && modeleContrat.gestionPaiement!=GestionPaiement.CARTE_PREPAYEE)
 		{
 			List<Date> datePaiements = getAllDatePaiements(modeleContrat.premierCheque, modeleContrat.dernierCheque, modeleContrat.frequence,modeleContrat.dateRemiseCheque);
 			for (Date datePaiement : datePaiements)
 			{
 				ModeleContratDatePaiement md = new ModeleContratDatePaiement();
-				md.modeleContrat = mc;
-				md.datePaiement = datePaiement;
+				md.setModeleContrat(mc);
+				md.setDatePaiement(datePaiement);
 				em.persist(md);
 			}
 		}
@@ -657,7 +683,7 @@ public class GestionContratService
 		}
 		
 		ModeleContrat mc = em.find(ModeleContrat.class, idModeleContrat);
-		mc.etat = newValue;
+		mc.setEtat(newValue);
 	}
 
 	/**
@@ -673,12 +699,14 @@ public class GestionContratService
 		EntityManager em = TransactionHelper.getEm();
 		
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContrat.id);
-		mc.dateFinInscription = modeleContrat.dateFinInscription;
-		mc.nom = modeleContrat.nom;
-		mc.description = modeleContrat.description;
+		mc.setDateFinInscription(modeleContrat.dateFinInscription);
+		mc.setNom(modeleContrat.nom);
+		mc.setDescription(modeleContrat.description);
 		mc.cartePrepayeeDelai = modeleContrat.cartePrepayeeDelai;
 		mc.nature = modeleContrat.nature;
+		mc.nbMaxSouscription = modeleContrat.nbMaxSouscription;
 		mc.periodeCotisation = IdentifiableUtil.findIdentifiableFromId(PeriodeCotisation.class,modeleContrat.idPeriodeCotisation,em);
+
 	}
 
 	/**
@@ -702,7 +730,7 @@ public class GestionContratService
 		List<ModeleContratDate> oldList = getAllDates(em, mc);
 
 		// Calcul de la différence entre les deux listes
-		ListDiff<ModeleContratDate, Date, Date> diff = DtoToDb.diffList(oldList, newList, e->e.dateLiv,e->e);
+		ListDiff<ModeleContratDate, Date, Date> diff = DtoToDb.diffList(oldList, newList, e->e.getDateLiv(),e->e);
 		
 		// On efface les dates en trop
 		GestionContratSigneUpdateService update  = new GestionContratSigneUpdateService();
@@ -743,9 +771,9 @@ public class GestionContratService
 			if (isFullExcludedLine(excluded, i,contratDTO.contratColumns.size()) == true)
 			{
 				ModeleContratExclude exclude = new ModeleContratExclude();
-				exclude.modeleContrat = mc;
-				exclude.date = em.find(ModeleContratDate.class, ligDto.modeleContratDateId);
-				exclude.produit = null;
+				exclude.setModeleContrat(mc);
+				exclude.setDate(em.find(ModeleContratDate.class, ligDto.modeleContratDateId));
+				exclude.setProduit(null);
 				em.persist(exclude);
 			} else
 			{
@@ -756,9 +784,9 @@ public class GestionContratService
 						ContratColDTO colDto = contratDTO.contratColumns.get(j);
 
 						ModeleContratExclude exclude = new ModeleContratExclude();
-						exclude.modeleContrat = mc;
-						exclude.date = em.find(ModeleContratDate.class, ligDto.modeleContratDateId);
-						exclude.produit = em.find(ModeleContratProduit.class, colDto.modeleContratProduitId);
+						exclude.setModeleContrat(mc);
+						exclude.setDate(em.find(ModeleContratDate.class, ligDto.modeleContratDateId));
+						exclude.setProduit(em.find(ModeleContratProduit.class, colDto.modeleContratProduitId));
 						em.persist(exclude);
 					}
 				}
@@ -825,7 +853,7 @@ public class GestionContratService
 		}
 		
 		// Calcul de la différence entre les deux listes
-		ListDiff<ModeleContratProduit, LigneContratDTO, Long> diff = DtoToDb.diffList(dbList, dtoList, e->e.produit.getId(),e->e.produitId);
+		ListDiff<ModeleContratProduit, LigneContratDTO, Long> diff = DtoToDb.diffList(dbList, dtoList, e->e.getProduit().getId(),e->e.produitId);
 		
 		// On efface les produits en trop
 		GestionContratSigneUpdateService update  = new GestionContratSigneUpdateService();
@@ -837,13 +865,13 @@ public class GestionContratService
 		// On crée les nouveaux produits avec le bon index 
 		for (ElementToAdd<LigneContratDTO> toAdd : diff.toAdd)
 		{
-			update.addOneProduit(em,toAdd.dto.produitId,toAdd.dto.prix,toAdd.index,mc);
+			update.addOneProduit(em,toAdd.dto.produitId,toAdd.dto.prix,toAdd.dto.nbMaxParLivraison, toAdd.index,mc);
 		}
 		
 		// On met à jour les produits existants 
 		for (ElementToUpdate<ModeleContratProduit, LigneContratDTO> toUpdate : diff.toUpdate)
 		{
-			update.updateModeleContratProduit(em,toUpdate.db.getId(),toUpdate.dto.prix,toUpdate.index);
+			update.updateModeleContratProduit(em,toUpdate.db.getId(),toUpdate.dto.prix,toUpdate.dto.nbMaxParLivraison, toUpdate.index);
 		}
 	}
 
@@ -855,10 +883,10 @@ public class GestionContratService
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContrat.id);
 		
 		// Sauvegarde des info de paiements
-		mc.gestionPaiement = modeleContrat.gestionPaiement;
-		mc.textPaiement = modeleContrat.textPaiement;
-		mc.dateRemiseCheque = modeleContrat.dateRemiseCheque;
-		mc.libCheque = modeleContrat.libCheque;
+		mc.setGestionPaiement(modeleContrat.gestionPaiement);
+		mc.setTextPaiement(modeleContrat.textPaiement);
+		mc.setDateRemiseCheque(modeleContrat.dateRemiseCheque);
+		mc.setLibCheque(modeleContrat.libCheque);
 
 		// Avec une sous requete, on obtient la liste de toutes les dates de
 		// paiement  actuellement en base et on les efface
@@ -869,14 +897,14 @@ public class GestionContratService
 		}
 
 		// Création de toutes les lignes pour chacune des dates
-		if (modeleContrat.gestionPaiement!=GestionPaiement.NON_GERE)
+		if (modeleContrat.gestionPaiement!=GestionPaiement.NON_GERE && modeleContrat.gestionPaiement!=GestionPaiement.CARTE_PREPAYEE)
 		{
 			List<Date> datePaiements = getAllDatePaiements(modeleContrat.premierCheque, modeleContrat.dernierCheque, modeleContrat.frequence,modeleContrat.dateRemiseCheque);
 			for (Date datePaiement : datePaiements)
 			{
 				ModeleContratDatePaiement md = new ModeleContratDatePaiement();
-				md.modeleContrat = mc;
-				md.datePaiement = datePaiement;
+				md.setModeleContrat(mc);
+				md.setDatePaiement(datePaiement);
 				em.persist(md);
 			}
 		}
@@ -904,7 +932,7 @@ public class GestionContratService
 		// On cherche les dates à supprimer
 		for (ModeleContratDatePaiement dateInBase : dateInBases)
 		{
-			Date ref = DateUtils.suppressTime(dateInBase.datePaiement); 
+			Date ref = DateUtils.suppressTime(dateInBase.getDatePaiement()); 
 					
 			// La date en base n'est pas dans la liste des dates
 			if (dates.contains(ref)==false)
@@ -913,7 +941,7 @@ public class GestionContratService
 				if (r>0)
 				{
 					SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-					String message = "Impossible de supprimer la date de paiement "+df.format(dateInBase.datePaiement)+
+					String message = "Impossible de supprimer la date de paiement "+df.format(dateInBase.getDatePaiement())+
 										" car il y a "+r+" paiements prévus à cette date";
 							
 					throw new OnSaveException(message);
@@ -930,8 +958,8 @@ public class GestionContratService
 			if (contains(dateInBases,date)==false)
 			{
 				ModeleContratDatePaiement md = new ModeleContratDatePaiement();
-				md.modeleContrat = mc;
-				md.datePaiement = date;
+				md.setModeleContrat(mc);
+				md.setDatePaiement(date);
 				em.persist(md);
 			}
 		}
@@ -942,7 +970,7 @@ public class GestionContratService
 	{
 		for (ModeleContratDatePaiement mcdp : dateInBases)
 		{
-			Date ref = DateUtils.suppressTime(mcdp.datePaiement);
+			Date ref = DateUtils.suppressTime(mcdp.getDatePaiement());
 			if (ref.equals(date))
 			{
 				return true;
@@ -1020,7 +1048,31 @@ public class GestionContratService
 		return SQLUtils.toInt(q.getSingleResult());
 	}
 	
-	
+	@DbRead
+	public List<Utilisateur> getUtilisateursProduit(Long modeleContratDateId, List<Long> produitIds)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		List<Produit> produits = new ArrayList<Produit>();
+		for( Long idProduit : produitIds) {
+			Produit p = em.find(Produit.class, idProduit);
+			System.out.println("Produit1 : "+idProduit);
+			System.out.println("Produit2 : "+p);
+			produits.add(p);
+			System.out.println("Produits : "+p.getNom());
+		}
+		ModeleContratDate mcDate = em.find(ModeleContratDate.class, modeleContratDateId);
+		
+		Query q = em.createQuery("select distinct(c.contrat.utilisateur) from ContratCell c WHERE " +
+				"c.modeleContratDate=:mcDate and c.modeleContratProduit.produit in :listeProduits");
+		q.setParameter("mcDate", mcDate);
+		q.setParameter("listeProduits", produits);
+		List<Utilisateur> users = q.getResultList();
+		for(Utilisateur u : users) {
+			System.out.println("User : "+u.getEmail()+"-"+u.getEmailConjoint());
+		}
+		return users;
+	}
+		
 	/**
 	 * Permet d'obtenir le detail d'un contrat pour l'afficher dans la livraison d'un producteur
 	 * 
@@ -1043,9 +1095,9 @@ public class GestionContratService
 		List<ContratCell> cells = q.getResultList();
 		for (ContratCell cell : cells)
 		{
-			int qte =  cell.qte;
-			Utilisateur u = cell.contrat.utilisateur;
-			Produit produit = cell.modeleContratProduit.produit;
+			int qte =  cell.getQte();
+			Utilisateur u = cell.getContrat().getUtilisateur();
+			Produit produit = cell.getModeleContratProduit().getProduit();
 			
 			if (u.getId().equals(user)==false)
 			{
@@ -1054,9 +1106,9 @@ public class GestionContratService
 				{
 					msg +="</ul>";
 				}
-				msg += "<b>"+u.nom+" "+u.prenom+"</b><ul>";
+				msg += "<b>"+u.getNom()+" "+u.getPrenom()+"</b><ul>";
 			}
-			msg += "<li>"+qte+" "+produit.nom+" , "+produit.conditionnement+"</li>";
+			msg += "<li>"+qte+" "+produit.getNom()+" , "+produit.getConditionnement()+"</li>";
 		}
 		
 		if (msg.length()!=0)
@@ -1081,5 +1133,29 @@ public class GestionContratService
 		}
 		
 	}
+	
+	/**
+	 * Retourne la derniere date de livraison d'un contrat
+	 * 
+	 */
+	@DbRead
+	public Date getLastDate(Long idModeleContrat)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		Query q = em.createQuery("select mcd from ModeleContratDate mcd WHERE mcd.modeleContrat.id=:id ORDER BY mcd.dateLiv desc");
+		q.setParameter("id",idModeleContrat);
+		
+		List<ModeleContratDate> dates = q.getResultList();
+		
+		if (dates.size()==0)
+		{
+			throw new AmapjRuntimeException("Le contrat "+idModeleContrat+" a aucune date de livraison !!");
+		}
+		
+		return dates.get(0).getDateLiv();
+		
+	}
+	
 
 }

@@ -101,7 +101,7 @@ public class SearcherService
 		for (Produit produit : us)
 		{
 			// Permet de forcer le chargement du nom du producteur
-			str = str+ produit.producteur.nom;
+			str = str+ produit.getProducteur().nom;
 		}
 		
 		return us;

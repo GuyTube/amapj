@@ -63,13 +63,13 @@ public class EGFeuilleEmargementListe
 	{
 	}
 	
-	public void fillExcelFile(EntityManager em,ExcelGeneratorTool et,FeuilleEmargementJson planningJson, LibInfo libInfo)
+	public void fillExcelFile(EntityManager em,ExcelGeneratorTool et,FeuilleEmargementJson planningJson, LibInfo libInfo, Producteur p)
 	{
 		//
 		SimpleDateFormat df = new SimpleDateFormat("dd MMMMM");
 		
 		// On recherche tout d'abord la liste des livraisons concernées
-		List<ContratCell> cells = getContratCell(em, libInfo, planningJson);
+		List<ContratCell> cells = getContratCell(em, libInfo, p, planningJson);
 		
 		// On réalise une projection 2D de ces livraisons
 		// En colonne, les dates de livraison, en ligne les utilisateurs 
@@ -77,12 +77,12 @@ public class EGFeuilleEmargementListe
 		
 		// 
 		c1.fill(cells);
-		c1.groupByLig(e->e.contrat.utilisateur);
-		c1.groupByCol(e->e.modeleContratDate.dateLiv);
+		c1.groupByLig(e->e.getContrat().getUtilisateur());
+		c1.groupByCol(e->e.getModeleContratDate().getDateLiv());
 		
 		// Tri par nom prenom des lignes
-		c1.sortLig(e->e.nom,true);
-		c1.sortLig(e->e.prenom,true);
+		c1.sortLig(e->e.getNom(),true);
+		c1.sortLig(e->e.getPrenom(),true);
 		
 		// Tri des dates croissantes
 		c1.sortCol(e->e,true);
@@ -214,8 +214,8 @@ public class EGFeuilleEmargementListe
 		
 		Row currentRow = et.addRow();
 		
-		et.setCell(0, utilisateur.nom, et.switchGray(et.grasGaucheWrappeBordure,numLigne));
-		et.setCell(1, utilisateur.prenom, et.switchGray(et.nonGrasGaucheBordure,numLigne));
+		et.setCell(0, utilisateur.getNom(), et.switchGray(et.grasGaucheWrappeBordure,numLigne));
+		et.setCell(1, utilisateur.getPrenom(), et.switchGray(et.nonGrasGaucheBordure,numLigne));
 		
 		int index = 2;
 		List<DateColonne> dateCols = entete.dateCols;
@@ -242,11 +242,11 @@ public class EGFeuilleEmargementListe
 		
 		
 		// Numéro de telephone 1
-		et.setCell(index, utilisateur.numTel1, et.switchGray(et.nonGrasCentreBordure,numLigne));
+		et.setCell(index, utilisateur.getNumTel1(), et.switchGray(et.nonGrasCentreBordure,numLigne));
 		
 		// Numéro de telephone 2
 		index++;
-		et.setCell(index, utilisateur.numTel2, et.switchGray(et.nonGrasCentreBordure,numLigne));
+		et.setCell(index, utilisateur.getNumTel2(), et.switchGray(et.nonGrasCentreBordure,numLigne));
 		
 		// Commentaire
 		index++;
@@ -267,12 +267,12 @@ public class EGFeuilleEmargementListe
 		G1D<ModeleContrat, ContratCell> c1 = new G1D<ModeleContrat, ContratCell>();
 		
 		c1.fill(cells);
-		c1.groupBy(e->e.modeleContratDate.modeleContrat);
+		c1.groupBy(e->e.getModeleContratDate().getModeleContrat());
 		
-		c1.sortLig(e->e.producteur.nom,true);
-		c1.sortLig(e->e.nom,true);
+		c1.sortLig(e->e.getProducteur().nom,true);
+		c1.sortLig(e->e.getNom(),true);
 		
-		c1.sortCell(e->e.modeleContratProduit.indx, true);
+		c1.sortCell(e->e.getModeleContratProduit().getIndx(), true);
 		
 		c1.compute();
 		
@@ -284,13 +284,13 @@ public class EGFeuilleEmargementListe
 		{
 			if (feuilleEmargementJson.getNomDuProducteur()==ChoixOuiNon.OUI)
 			{
-				buf.append(liv.lig.producteur.nom);
+				buf.append(liv.lig.getProducteur().nom);
 				buf.append("\n");
 			}
 			
 			if (feuilleEmargementJson.getNomDuContrat()==ChoixOuiNon.OUI)
 			{
-				buf.append(liv.lig.nom);
+				buf.append(liv.lig.getNom());
 				buf.append("\n");
 			}
 			
@@ -298,8 +298,8 @@ public class EGFeuilleEmargementListe
 			{
 				for (ContratCell cell : liv.values)
 				{
-					Produit p = cell.modeleContratProduit.produit;
-					String content = cell.qte+" "+p.nom+" , "+p.conditionnement;
+					Produit p = cell.getModeleContratProduit().getProduit();
+					String content = cell.getQte()+" "+p.getNom()+" , "+p.getConditionnement();
 					buf.append(" "+BULLET_CHARACTER+" "+content+"\n");
 				}
 			}
@@ -386,8 +386,8 @@ public class EGFeuilleEmargementListe
 		
 		// 
 		c1.fill(cells);
-		c1.groupByLig(e->e.modeleContratDate.modeleContrat.producteur);
-		c1.groupByCol(e->e.modeleContratDate.dateLiv);
+		c1.groupByLig(e->e.getModeleContratDate().getModeleContrat().getProducteur());
+		c1.groupByCol(e->e.getModeleContratDate().getDateLiv());
 		
 		// Tri par nom des lignes (producteur)
 		c1.sortLig(e->e.nom,true);
@@ -476,8 +476,8 @@ public class EGFeuilleEmargementListe
 		
 		// Numéro de telephone 1 + 2 + Commentaire 
 		List<ProducteurUtilisateur> us = new ProducteurService().getProducteurUtilisateur(em, producteur);
-		String tel1 =CollectionUtils.asString(us, "\n", e->e.utilisateur.numTel1,true);
-		String tel2 =CollectionUtils.asString(us, "\n", e->e.utilisateur.numTel2,true);
+		String tel1 =CollectionUtils.asString(us, "\n", e->e.getUtilisateur().getNumTel1(),true);
+		String tel2 =CollectionUtils.asString(us, "\n", e->e.getUtilisateur().getNumTel2(),true);
 		
 		
 		// Numéro de telephone 1
@@ -506,8 +506,8 @@ public class EGFeuilleEmargementListe
 		
 		c1.fill(cells);
 		
-		c1.groupBy(e->e.modeleContratDate.modeleContrat);
-		c1.sortLig(e->e.nom,true);
+		c1.groupBy(e->e.getModeleContratDate().getModeleContrat());
+		c1.sortLig(e->e.getNom(),true);
 				
 		// Pas de tri sur les cellules
 		// Puis calcul du tout
@@ -522,7 +522,7 @@ public class EGFeuilleEmargementListe
 		{
 			ModeleContrat modeleContrat = modeleContrats.get(i);
 			
-			buf.append(modeleContrat.nom);
+			buf.append(modeleContrat.getNom());
 			buf.append("\n");
 			
 			List<ContratCell> pcells = c1.getCell(i);
@@ -543,8 +543,8 @@ public class EGFeuilleEmargementListe
 		
 		c1.fill(pcells);
 		
-		c1.groupBy(e->e.modeleContratProduit.produit);
-		c1.sortLigAdvanced(e->e.modeleContratProduit.indx, true);
+		c1.groupBy(e->e.getModeleContratProduit().getProduit());
+		c1.sortLigAdvanced(e->e.getModeleContratProduit().getIndx(), true);
 				
 		// Pas de tri sur les cellules
 		// Puis calcul du tout
@@ -559,9 +559,9 @@ public class EGFeuilleEmargementListe
 			Produit p = produits.get(i);
 			List<ContratCell> cells = c1.getCell(i);
 			
-			int qte = CollectionUtils.accumulateInt(cells, e->e.qte);
+			int qte = CollectionUtils.accumulateInt(cells, e->e.getQte());
 			
-			String content = qte+" "+p.nom+" , "+p.conditionnement;
+			String content = qte+" "+p.getNom()+" , "+p.getConditionnement();
 			buf.append(" "+BULLET_CHARACTER+" "+content+"\n");
 		}
 		
@@ -574,15 +574,19 @@ public class EGFeuilleEmargementListe
 	 * @param em
 	 * @return
 	 */
-	private List<ContratCell> getContratCell(EntityManager em,LibInfo libInfo, FeuilleEmargementJson planningJson)
+	private List<ContratCell> getContratCell(EntityManager em,LibInfo libInfo, Producteur p, FeuilleEmargementJson planningJson)
 	{
 		// 
-		Query q = em.createQuery("select c from ContratCell c WHERE "
-				+ " c.modeleContratDate.dateLiv >= :d1 AND c.modeleContratDate.dateLiv<:d2  ");
+		String queryStr = "select c from ContratCell c WHERE "
+				+ " c.modeleContratDate.dateLiv >= :d1 AND c.modeleContratDate.dateLiv<:d2 ";
+		if( p!= null )
+				queryStr = queryStr + " and c.modeleContratDate.modeleContrat.producteur = :p";
 				
-		
+		Query q = em.createQuery(queryStr);
 		q.setParameter("d1",libInfo.debut);
 		q.setParameter("d2",libInfo.fin);
+		if( p!= null )
+			q.setParameter("p",p);
 		
 		List<ContratCell> us = q.getResultList();
 		return us;

@@ -43,15 +43,17 @@ import fr.amapj.model.models.permanence.periode.PeriodePermanenceUtilisateur;
 import fr.amapj.model.models.permanence.periode.RegleInscriptionPeriodePermanence;
 import fr.amapj.model.models.permanence.reel.PermanenceCell;
 import fr.amapj.service.services.permanence.detailperiode.DetailPeriodePermanenceService;
+import fr.amapj.service.services.permanence.periode.PeriodePermanenceDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceDateDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceService;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceService.DateInfo;
+import fr.amapj.service.services.permanence.periode.PermanenceCellDTO;
 import fr.amapj.service.services.permanence.periode.SmallPeriodePermanenceDTO;
 
 public class MesPermanencesService
 {
 
-	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES PERMANENCES POUR UN UTILISATEUR 	
+	// PARTIE REQUETAGE POUR AVOIR LA LISTE DES PERMANENCES POUR UN UTILISATEUR 
 
 	/**
 	 * Retourne la liste des permanences sur lesquelles l'utilisateur courant
@@ -223,6 +225,7 @@ public class MesPermanencesService
 		{
 			dto.firstDateModifiable = computeFirstDateModifiable(p,em,nowNoTime);
 		}
+		dto.limitNbPermanenceUtil = p.getLimitNbPermanenceUtilBool();
 		
 		dto.regleInscription = p.regleInscription;
 		
@@ -344,12 +347,12 @@ public class MesPermanencesService
 			}
 		}
 			
-		
+		 
 		// On vérifie ensuite que l'utilisateur n'a pas dépassé son quota d'inscription sur la période
 		q = em.createQuery("select count(c) from PermanenceCell c WHERE c.periodePermanenceUtilisateur=:ppu");
 		q.setParameter("ppu", ppu);
 		int nbInscriptionReel = SQLUtils.toInt(q.getSingleResult());
-		if (nbInscriptionReel>=ppu.nbParticipation)
+		if (ppu.periodePermanence.getLimitNbPermanenceUtilBool() && nbInscriptionReel>=ppu.nbParticipation)
 		{
 			return InscriptionMessage.NOMBRE_SUFFISANT;
 		}
@@ -479,7 +482,7 @@ public class MesPermanencesService
 		Query q = em.createQuery("select count(c) from PermanenceCell c WHERE c.periodePermanenceUtilisateur=:ppu");
 		q.setParameter("ppu", ppu);
 		int nbInscriptionReel = SQLUtils.toInt(q.getSingleResult());
-		if (nbInscriptionReel>=ppu.nbParticipation)
+		if (ppu.periodePermanence.getLimitNbPermanenceUtilBool() && nbInscriptionReel>=ppu.nbParticipation)
 		{
 			return InscriptionMessage.NOMBRE_SUFFISANT;
 		}

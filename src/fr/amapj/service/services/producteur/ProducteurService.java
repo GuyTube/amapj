@@ -42,6 +42,7 @@ import fr.amapj.model.engine.transaction.TransactionHelper;
 import fr.amapj.model.models.contrat.modele.EtatModeleContrat;
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.editionspe.EditionSpecifique;
+import fr.amapj.model.models.fichierbase.CartePrepayee;
 import fr.amapj.model.models.fichierbase.EtatNotification;
 import fr.amapj.model.models.fichierbase.EtatProducteur;
 import fr.amapj.model.models.fichierbase.Producteur;
@@ -55,6 +56,8 @@ import fr.amapj.service.services.archivage.tools.ArchivableState;
 import fr.amapj.service.services.archivage.tools.SuppressionState;
 import fr.amapj.service.services.archivage.tools.SuppressionState.SStatus;
 import fr.amapj.service.services.archivage.tools.ArchivableState.AStatus;
+import fr.amapj.service.services.carteprepayee.CartePrepayeeItemDTO;
+import fr.amapj.service.services.carteprepayee.GestionCartePrepayeeService;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratSummaryDTO;
 import fr.amapj.service.services.parametres.ParametresArchivageDTO;
@@ -124,6 +127,8 @@ public class ProducteurService
 		
 		dto.dateDerniereLivraison = findDerniereDateLivraison(em,p);
 		dto.nbModeleContratActif = countModeleContratActif(em,p);
+
+		dto.emailContact = p.getEmailContact();
 		
 		return dto;
 	}
@@ -181,10 +186,10 @@ public class ProducteurService
 		for (ProducteurUtilisateur pu : pus)
 		{
 			ProdUtilisateurDTO dto = new ProdUtilisateurDTO();
-			dto.idUtilisateur = pu.utilisateur.getId();
-			dto.nom = pu.utilisateur.nom;
-			dto.prenom = pu.utilisateur.prenom;
-			dto.etatNotification = pu.notification==EtatNotification.AVEC_NOTIFICATION_MAIL;
+			dto.idUtilisateur = pu.getUtilisateur().getId();
+			dto.nom = pu.getUtilisateur().getNom();
+			dto.prenom = pu.getUtilisateur().getPrenom();
+			dto.etatNotification = pu.getNotification()==EtatNotification.AVEC_NOTIFICATION_MAIL;
 			
 			res.add(dto);
 		}
@@ -232,6 +237,7 @@ public class ProducteurService
 		
 		p.delaiModifContrat = dto.delaiModifContrat;
 		
+		p.emailContact = dto.emailContact;
 		
 		
 		if (create)
@@ -263,16 +269,16 @@ public class ProducteurService
 		for (ProdUtilisateurDTO util : dto.utilisateurs)
 		{
 			ProducteurUtilisateur pr = new ProducteurUtilisateur();
-			pr.producteur = p;
-			pr.utilisateur = em.find(Utilisateur.class, util.idUtilisateur);
-			pr.indx = indx;
+			pr.setProducteur(p);
+			pr.setUtilisateur(em.find(Utilisateur.class, util.idUtilisateur));
+			pr.setIndx(indx);
 			if (util.etatNotification==true)
 			{
-				pr.notification = EtatNotification.AVEC_NOTIFICATION_MAIL;
+				pr.setNotification(EtatNotification.AVEC_NOTIFICATION_MAIL);
 			}
 			else
 			{
-				pr.notification = EtatNotification.SANS_NOTIFICATION_MAIL;
+				pr.setNotification(EtatNotification.SANS_NOTIFICATION_MAIL);
 			}
 			
 			em.persist(pr);
@@ -326,13 +332,13 @@ public class ProducteurService
 		int r = countModeleContrat(em,p);
 		if (r>0)
 		{
-			throw new UnableToSuppressException("Cet producteur posséde "+r+" modeles de contrats.");
+			throw new UnableToSuppressException("Ce producteur possède "+r+" modèles de contrats.");
 		}
 		
 		r = countProduit(p,em);
 		if (r>0)
 		{
-			throw new UnableToSuppressException("Cet producteur posséde "+r+" produits. Vous devez d'abord les supprimer.");
+			throw new UnableToSuppressException("Ce producteur possède "+r+" produits. Vous devez d'abord les supprimer.");
 		}
 		
 		// Il faut d'abord supprimer les referents et les utilisateurs producteurs 
@@ -377,8 +383,42 @@ public class ProducteurService
 		return DbToDto.transform(q, (ModeleContrat mc)->service.createModeleContratInfo(em, mc));
 	}
 
+	@DbRead
+	public List<ModeleContratSummaryDTO> getModeleContratInfoAll()
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		Query q = em.createQuery("select mc from ModeleContrat mc");
+		//q.setParameter("id",idProducteur);
+		
+		GestionContratService service = new GestionContratService();
+		
+		return DbToDto.transform(q, (ModeleContrat mc)->service.createModeleContratInfo(em, mc));
+	}
 	
-	
+	@DbRead
+	public List<CartePrepayeeItemDTO> getCartePrepayeeList(Long idProducteur, Long idUtilisateur)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		String query = "select cpp from CartePrepayee cpp where  1=1 ";
+		if (idUtilisateur != null ) {
+			query = query + " and cpp.utilisateur.id=:idUtilisateur";
+		}
+		if (idProducteur != null ) {
+			query = query + " and cpp.producteur.id=:idProducteur";
+		}
+		
+		Query q = em.createQuery(query);
+		if( idUtilisateur != null ) {
+			q.setParameter("idUtilisateur",idUtilisateur);
+		}
+		if( idProducteur != null ) {
+			q.setParameter("idProducteur",idProducteur);
+		}
+		GestionCartePrepayeeService service = new GestionCartePrepayeeService();
+		
+		return DbToDto.transform(q, (CartePrepayee cpp)->service.createCartePrepayeeItem(em, cpp));
+	}	
 	// Partie Notification
 	
 	

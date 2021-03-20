@@ -33,6 +33,9 @@ import fr.amapj.view.engine.listpart.StandardListPart;
 import fr.amapj.view.engine.popup.formpopup.FormPopup;
 import fr.amapj.view.engine.tools.DateTimeToStringConverter;
 import fr.amapj.view.views.common.amapientelecharger.TelechargerAmapien;
+import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
+import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
+import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.views.compte.PopupSaisiePassword;
 
 

@@ -81,7 +81,7 @@ public class MesContratsView extends FrontOfficeView implements  PopupListener
 	 */
 	@Override
 	public void enter()
-	{	
+	{
 		refresh();
 	}
 
@@ -171,53 +171,6 @@ public class MesContratsView extends FrontOfficeView implements  PopupListener
 		
 		layout = this;
 		layout.removeAllComponents();
-			
-		// Le titre
-		addLabel(layout,"Les nouveaux contrats disponibles");
-		
-		
-		// la liste des nouveaux contrats 
-		List<ContratDTO> newContrats = mesContratsDTO.getNewContrats();
-		for (ContratDTO c : newContrats)
-		{
-			Panel p = new Panel();
-			p.addStyleName(PANEL_UNCONTRAT);
-			
-			HorizontalLayout hl = new HorizontalLayout();
-			hl.setMargin(true);
-			hl.setSpacing(true);
-			hl.setWidth("100%");
-			
-			VerticalLayout vl = new VerticalLayout();
-			Label lab = new Label(c.nom);
-			lab.addStyleName(LABEL_TITRECONTRAT);
-			vl.addComponent(lab);
-			
-			String str = formatLibelleContrat(c,true);
-			BaseUiTools.addHtmlLabel(vl, str, "libelle-contrat");
-			
-			
-			hl.addComponent(vl);
-			hl.setExpandRatio(vl, 1);
-			
-			VerticalLayout vl2 = new VerticalLayout();
-			vl2.setWidth("115px");
-			vl2.setSpacing(true);	
-			
-			Button b = addButtonInscription("S'inscrire",c);
-			b.setWidth("100%");
-			b.addStyleName(BUTTON_PRINCIPAL);
-			vl2.addComponent(b);
-			
-			hl.addComponent(vl2);
-			hl.setComponentAlignment(vl2, Alignment.MIDDLE_CENTER);
-			
-			p.setContent(hl);
-			
-			layout.addComponent(p);
-			
-		}
-		
 		
 		// Le titre
 		addLabel(layout,"Mes contrats existants");
@@ -236,7 +189,7 @@ public class MesContratsView extends FrontOfficeView implements  PopupListener
 			hl.setWidth("100%");
 			
 			VerticalLayout vl = new VerticalLayout();
-			Label lab = new Label(c.nom);
+			Label lab = new Label(c.nom+ " - " +c.nomProducteur);
 			lab.addStyleName(LABEL_TITRECONTRAT);
 			vl.addComponent(lab);
 						
@@ -328,6 +281,17 @@ public class MesContratsView extends FrontOfficeView implements  PopupListener
 		String str = c.description;
 		str=str+"<br/>";
 		
+		// Ligne 1b - Cas des contrats limités
+		if( c.nbMaxSouscription > 0 ) {
+			int nbRestant = c.nbMaxSouscription - c.nbInscrits;
+			str = str + "<b>Contrat à souscriptions limitées : </b>";
+			if( nbRestant > 0 )
+				str = str + "il reste <b>"+nbRestant+"</b> contrats";
+			else
+				str = str + "tous les contrats ont été souscrits";
+			str = str + "<br/>";
+		}
+		
 		// Ligne 2 - Les dates de livraisons
 		if (c.nbLivraison==1)
 		{
@@ -378,6 +342,17 @@ public class MesContratsView extends FrontOfficeView implements  PopupListener
 		// Ligne 1
 		String str = c.description;
 		str=str+"<br/>";
+		
+		// Ligne 1b - Cas des contrats limités
+		if( c.nbMaxSouscription > 0 ) {
+			int nbRestant = c.nbMaxSouscription - c.nbInscrits;
+			str = str+"<b>Contrat à souscriptions limitées : </b>";
+			if( nbRestant > 0 )
+				str = str + "il reste <b>"+nbRestant+"</b> contrats";
+			else
+				str = str + "tous les contrats ont été souscrits";
+			str = str + "<br/>";
+		}
 		
 		// Ligne 2 - Les dates de livraisons
 		if (nextDateLiv==null)

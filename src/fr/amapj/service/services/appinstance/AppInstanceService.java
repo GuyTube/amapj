@@ -121,11 +121,11 @@ public class AppInstanceService
 		AppInstanceDTO dto = new AppInstanceDTO();
 		
 		dto.id = a.getId();
-		dto.nomInstance = a.nomInstance;
-		dto.dateCreation = a.dateCreation;
-		dto.dbms = a.dbms;
-		dto.dbUserName = a.dbUserName;
-		dto.dbPassword = a.dbPassword;		
+		dto.nomInstance = a.getNomInstance();
+		dto.dateCreation = a.getDateCreation();
+		dto.dbms = a.getDbms();
+		dto.dbUserName = a.getDbUserName();
+		dto.dbPassword = a.getDbPassword();		
 		addInfo(dto, connected);
 		return dto;
 	}
@@ -196,11 +196,11 @@ public class AppInstanceService
 			{
 				AppInstance a = new AppInstance();
 
-				a.nomInstance = appInstanceDTO.nomInstance;
-				a.dateCreation = DateUtils.getDate();
-				a.dbms = appInstanceDTO.dbms;
-				a.dbUserName = appInstanceDTO.dbUserName;
-				a.dbPassword = appInstanceDTO.dbPassword;
+				a.setNomInstance(appInstanceDTO.nomInstance);
+				a.setDateCreation(DateUtils.getDate());
+				a.setDbms(appInstanceDTO.dbms);
+				a.setDbUserName(appInstanceDTO.dbUserName);
+				a.setDbPassword(appInstanceDTO.dbPassword);
 						
 				em.persist(a);
 
@@ -334,7 +334,7 @@ public class AppInstanceService
 		List<SudoUtilisateurDTO> res = new ArrayList<SudoUtilisateurDTO>();
 		ParametresDTO param = new ParametresService().getParametres();
 		
-		List<UtilisateurDTO> utilisateurDTOs =  new UtilisateurService().getAllUtilisateurs(null);
+		List<UtilisateurDTO> utilisateurDTOs =  new UtilisateurService().getAllUtilisateurs(true);
 		for (UtilisateurDTO utilisateur : utilisateurDTOs)
 		{
 			SudoUtilisateurDTO dto = new SudoUtilisateurDTO();
@@ -499,7 +499,7 @@ public class AppInstanceService
 		Query q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleAdmin a) and u.etatUtilisateur = :etat order by u.nom,u.prenom");
 		q.setParameter("etat", EtatUtilisateur.ACTIF);
 		List<Utilisateur> us = q.getResultList();
-		str.append(CollectionUtils.asStringFinalSep(us, ",",t->"\""+dbName+"\" <"+t.email+">"));
+		str.append(CollectionUtils.asStringFinalSep(us, ",",t->"\""+dbName+"\" <"+t.getEmail()+">"));
 		
 		return null;
 	}
@@ -537,13 +537,11 @@ public class AppInstanceService
 		stat.nom = new ParametresService().getParametres().nomAmap;
 		stat.nbAccessLastMonth = statAccess.stream().filter(e->e.nomInstance.equals(dbName)).findFirst().map(e->e.detail[0].nbAccess).orElse(0);
 		
-		TypedQuery<Utilisateur> q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleAdmin a) and u.etatUtilisateur = :etat order by u.nom,u.prenom",Utilisateur.class);
-		q.setParameter("etat", EtatUtilisateur.ACTIF);
-		stat.admins = q.getResultList().stream().map(e->new AdminTresorierDataDTO.ContactDTO(e.nom, e.prenom, e.email)).collect(Collectors.toList());
+		TypedQuery<Utilisateur> q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleAdmin a) order by u.nom,u.prenom",Utilisateur.class);
+		stat.admins = q.getResultList().stream().map(e->new AdminTresorierDataDTO.ContactDTO(e.getNom(), e.getPrenom(), e.getEmail())).collect(Collectors.toList());
 		
-		q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleTresorier a) and u.etatUtilisateur = :etat order by u.nom,u.prenom",Utilisateur.class);
-		q.setParameter("etat", EtatUtilisateur.ACTIF);
-		stat.tresoriers = q.getResultList().stream().map(e->new AdminTresorierDataDTO.ContactDTO(e.nom, e.prenom, e.email)).collect(Collectors.toList());
+		q = em.createQuery("select distinct(u) from Utilisateur u  where u.id in (select a.utilisateur.id from RoleTresorier a) order by u.nom,u.prenom",Utilisateur.class);
+		stat.tresoriers = q.getResultList().stream().map(e->new AdminTresorierDataDTO.ContactDTO(e.getNom(), e.getPrenom(), e.getEmail())).collect(Collectors.toList());
 				
 		data.instances.add(stat);
 		

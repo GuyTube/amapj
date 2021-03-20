@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import fr.amapj.common.AmapjRuntimeException;
 import fr.amapj.common.DateUtils;
 import fr.amapj.common.FormatUtils;
+import fr.amapj.model.models.contrat.modele.JokerMode;
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.contrat.modele.NatureContrat;
 import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
@@ -334,7 +335,7 @@ public class ContratAboManager
 	
 	// BLOC 5 - MESSAGE D'AFFICHAGE
 	
-	public String computeJokerMessage(ContratDTO contratDTO,int used)
+	public String computeJokerMessage(ContratDTO contratDTO,int used, boolean extended)
 	{
 		StringBuilder sb = new StringBuilder();
 		
@@ -362,10 +363,16 @@ public class ContratAboManager
 			}
 		}
 		
+		// Partie 1bis
+		if (contratDTO.jokerMode==JokerMode.LIBRE && extended)
+		{
+			sb.append("<br/><br/>Si vous ne connaissez pas encore vos dates d'absence veuillez cocher la case '<b>Je ne connais pas la date</b>', AmapJ sélectionnera alors automatiquement les dernières dates de livraisons.\nLibre à vous de les modifier jusque "+contratDTO.jokerDelai+" jour(s) avant votre absence réelle.<br/><br/>");
+		}
+		
 		// Partie 2 de la phrase
 		if (used==0)
 		{
-			sb.append("Vous avez utilisé aucun joker.");
+			sb.append("Vous n'avez utilisé aucun joker.");
 		}
 		else if (used==1)
 		{

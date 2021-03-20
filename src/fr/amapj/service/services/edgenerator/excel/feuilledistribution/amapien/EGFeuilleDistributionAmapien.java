@@ -128,8 +128,8 @@ public class EGFeuilleDistributionAmapien  extends AbstractExcelGenerator
 	    String firstLine = "Feuille de distribution amapien de ";
 	    if (mode==EGMode.STD)
 	    {
-	    	Utilisateur u = em.find(Contrat.class, contratId).utilisateur;
-	    	firstLine = firstLine+u.prenom+" "+u.nom;
+	    	Utilisateur u = em.find(Contrat.class, contratId).getUtilisateur();
+	    	firstLine = firstLine+u.getPrenom()+" "+u.getNom();
 	    }
 	    
 	    
@@ -210,7 +210,7 @@ public class EGFeuilleDistributionAmapien  extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		String str = "distri-amapien-"+mc.nom;
+		String str = "distri-amapien-"+mc.getNom();
 		
 		if (mode==EGMode.UN_VIERGE)
 		{
@@ -218,8 +218,8 @@ public class EGFeuilleDistributionAmapien  extends AbstractExcelGenerator
 		}
 		else
 		{
-			Utilisateur u = em.find(Contrat.class, contratId).utilisateur;
-			return str+"-"+u.nom+" "+u.prenom;
+			Utilisateur u = em.find(Contrat.class, contratId).getUtilisateur();
+			return str+"-"+u.getNom()+" "+u.getPrenom();
 		}
 	}
 
@@ -228,7 +228,7 @@ public class EGFeuilleDistributionAmapien  extends AbstractExcelGenerator
 	public String getNameToDisplay(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		String str = "la feuille de distribution amapien "+mc.nom;
+		String str = "la feuille de distribution amapien "+mc.getNom();
 		
 		if (mode==EGMode.UN_VIERGE)
 		{
@@ -236,8 +236,8 @@ public class EGFeuilleDistributionAmapien  extends AbstractExcelGenerator
 		}
 		else
 		{
-			Utilisateur u = em.find(Contrat.class, contratId).utilisateur;
-			return str+" pour "+u.nom+" "+u.prenom;
+			Utilisateur u = em.find(Contrat.class, contratId).getUtilisateur();
+			return str+" pour "+u.getNom()+" "+u.getPrenom();
 		}
 	}
 	

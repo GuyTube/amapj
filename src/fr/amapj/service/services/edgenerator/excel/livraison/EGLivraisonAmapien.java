@@ -225,14 +225,14 @@ public class EGLivraisonAmapien extends AbstractExcelGenerator
 	{
 		// Nom du contrat 
 		StringBuilder buf  = new StringBuilder();
-		buf.append(liv.lig.nom);
+		buf.append(liv.lig.getNom());
 		buf.append("\n");
 			
 		// Liste de produits commandés
 		for (ContratCell cell : liv.values)
 		{
-			Produit p = cell.modeleContratProduit.produit;
-			String content = cell.qte+" x "+p.nom+" , "+p.conditionnement;
+			Produit p = cell.getModeleContratProduit().getProduit();
+			String content = cell.getQte()+" x "+p.getNom()+" , "+p.getConditionnement();
 			buf.append(" "+BULLET_CHARACTER+" "+content+"\n");
 		}
 		

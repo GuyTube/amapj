@@ -44,6 +44,9 @@ public class MenuDescription
 	// Role ayant acces à cette entrée de menu
 	private RoleList role;
 	
+	// Role ne devant pas accéder à cette entrée du menu
+	private List<RoleList> rolesExclus;
+	
 	// Nom du menu (element de la liste MenuList)
 	private MenuList menuName;
 	
@@ -93,6 +96,23 @@ public class MenuDescription
 	public boolean hasRole(List<RoleList> roles)
 	{
 		return roles.contains(role);
+	}
+	
+	public boolean hasRoleExclus(List<RoleList> roles)
+	{
+		// On cherche si l'utilisateur a au moins un rôle qui
+		// n'est pas exclu. Sinon l'accès est refusé
+		boolean exclus = true;
+		if( rolesExclus != null ) {
+			for(RoleList aRole : roles ) {
+				if( !rolesExclus.contains(aRole) ) {
+					exclus = false;
+				}
+			}
+		} else {
+			exclus = false;
+		}
+		return exclus;
 	}
 	
 	
@@ -162,6 +182,11 @@ public class MenuDescription
 	public MenuDescription setCategorie(String categorie)
 	{
 		this.categorie = categorie;
+		return this;
+	}
+	
+	public MenuDescription setRolesExclus(List<RoleList> exclus) {
+		this.rolesExclus = exclus;
 		return this;
 	}
 	

@@ -54,7 +54,7 @@ public class MesPermanencesUtils
 	static public boolean needSubcribeMore(UnePeriodePermanenceDTO periodePermanenceDTO)
 	{
 		int delta = (periodePermanenceDTO.nbSouhaite-periodePermanenceDTO.nbInscription);
-		return delta>0;
+		return (delta>0 || periodePermanenceDTO.limitNbPermanenceUtil == false);
 	}
 	
 	

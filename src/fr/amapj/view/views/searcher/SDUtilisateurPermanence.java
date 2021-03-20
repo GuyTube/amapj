@@ -57,7 +57,7 @@ public class SDUtilisateurPermanence implements SearcherDefinition
 	public String toString(Identifiable identifiable)
 	{
 		Utilisateur u = (Utilisateur) identifiable;
-		return u.nom+" "+u.prenom;
+		return u.getNom()+" "+u.getPrenom();
 	}
 	
 

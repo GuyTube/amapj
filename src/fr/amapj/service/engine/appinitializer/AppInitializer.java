@@ -188,7 +188,6 @@ public class AppInitializer implements ServletContextListener
 			job = newJob(LogDeleteService.class).withIdentity("myJob3", "group3").build();
 			trigger = newTrigger().withIdentity("myTrigger3", "group3").startAt(ref).withSchedule(dailyAtHourAndMinute(4, 0)).build();
 			sched.scheduleJob(job, trigger);
-
 			
 		}
 		catch (SchedulerException e)

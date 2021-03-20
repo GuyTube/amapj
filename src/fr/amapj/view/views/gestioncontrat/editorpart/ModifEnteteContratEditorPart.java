@@ -26,6 +26,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
+import fr.amapj.model.models.contrat.modele.NatureContrat;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
 import fr.amapj.service.services.gestioncontrat.ModeleContratDTO;
 import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
@@ -101,6 +102,8 @@ public class ModifEnteteContratEditorPart extends GestionContratEditorPart
 		//
 		box = addComboEnumField("Nature du contrat", "nature",notNull);
 		box.setEnabled(false);
+		
+		addIntegerField("Nombre de contrats max.", "nbMaxSouscription");
 		
 		//
 		HorizontalLayout hl = (HorizontalLayout) box.getParent();

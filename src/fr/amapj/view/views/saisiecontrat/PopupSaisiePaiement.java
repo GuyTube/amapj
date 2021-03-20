@@ -356,6 +356,7 @@ public class PopupSaisiePaiement extends PopupCurrencyVector
 		{
 			new MesContratsService().saveNewContrat(data.contratDTO,data.userId);
 		}
+		data.validate();
 	}
 	
 }

@@ -50,6 +50,70 @@ import fr.amapj.model.models.fichierbase.Producteur;
 public class ModeleContrat implements Identifiable
 {
 
+	public NatureContrat getNature() {
+		return nature;
+	}
+
+	public void setNature(NatureContrat nature) {
+		this.nature = nature;
+	}
+
+	public int getCartePrepayeeDelai() {
+		return cartePrepayeeDelai;
+	}
+
+	public void setCartePrepayeeDelai(int cartePrepayeeDelai) {
+		this.cartePrepayeeDelai = cartePrepayeeDelai;
+	}
+
+	public ExtendedParam getMiseEnFormeGraphique() {
+		return miseEnFormeGraphique;
+	}
+
+	public void setMiseEnFormeGraphique(ExtendedParam miseEnFormeGraphique) {
+		this.miseEnFormeGraphique = miseEnFormeGraphique;
+	}
+
+	public int getJokerNbMin() {
+		return jokerNbMin;
+	}
+
+	public void setJokerNbMin(int jokerNbMin) {
+		this.jokerNbMin = jokerNbMin;
+	}
+
+	public int getJokerNbMax() {
+		return jokerNbMax;
+	}
+
+	public void setJokerNbMax(int jokerNbMax) {
+		this.jokerNbMax = jokerNbMax;
+	}
+
+	public JokerMode getJokerMode() {
+		return jokerMode;
+	}
+
+	public void setJokerMode(JokerMode jokerMode) {
+		this.jokerMode = jokerMode;
+	}
+
+	public int getJokerDelai() {
+		return jokerDelai;
+	}
+
+	public void setJokerDelai(int jokerDelai) {
+		this.jokerDelai = jokerDelai;
+	}
+
+	public PeriodeCotisation getPeriodeCotisation() {
+		return periodeCotisation;
+	}
+
+	public void setPeriodeCotisation(PeriodeCotisation periodeCotisation) {
+		this.periodeCotisation = periodeCotisation;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public Long id;
@@ -77,6 +141,8 @@ public class ModeleContrat implements Identifiable
 	@Temporal(TemporalType.DATE)
 	public Date dateFinInscription;
 	
+	// Nombre max de contrats que les adhérents peuvent souscrire
+	public Integer nbMaxSouscription;
 	
 	// Paiement
 	
@@ -137,7 +203,103 @@ public class ModeleContrat implements Identifiable
 		this.id = id;
 	}
 
-	
+	public String getNom()
+	{
+		return nom;
+	}
+
+	public void setNom(String nom)
+	{
+		this.nom = nom;
+	}
+
+	public Producteur getProducteur()
+	{
+		return producteur;
+	}
+
+	public void setProducteur(Producteur producteur)
+	{
+		this.producteur = producteur;
+	}
+
+	public EtatModeleContrat getEtat()
+	{
+		return etat;
+	}
+
+	public void setEtat(EtatModeleContrat etat)
+	{
+		this.etat = etat;
+	}
+
+	public Date getDateFinInscription()
+	{
+		return dateFinInscription;
+	}
+
+	public void setDateFinInscription(Date dateFinInscription)
+	{
+		this.dateFinInscription = dateFinInscription;
+	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
+	public String getLibCheque()
+	{
+		return libCheque;
+	}
+
+	public void setLibCheque(String libCheque)
+	{
+		this.libCheque = libCheque;
+	}
+
+	public Date getDateRemiseCheque()
+	{
+		return dateRemiseCheque;
+	}
+
+	public void setDateRemiseCheque(Date dateRemiseCheque)
+	{
+		this.dateRemiseCheque = dateRemiseCheque;
+	}
+
+	public GestionPaiement getGestionPaiement()
+	{
+		return gestionPaiement;
+	}
+
+	public void setGestionPaiement(GestionPaiement gestionPaiement)
+	{
+		this.gestionPaiement = gestionPaiement;
+	}
+
+	public String getTextPaiement()
+	{
+		return textPaiement;
+	}
+
+	public void setTextPaiement(String textPaiement)
+	{
+		this.textPaiement = textPaiement;
+	}
+
+	public Integer getNbMaxSouscription() {
+		return nbMaxSouscription;
+	}
+
+	public void setNbMaxSouscription(Integer nbMaxSouscription) {
+		this.nbMaxSouscription = nbMaxSouscription;
+	}
 	
 	
 	

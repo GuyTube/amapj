@@ -32,11 +32,11 @@ import fr.amapj.common.LongUtils;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.DbWrite;
 import fr.amapj.model.engine.transaction.TransactionHelper;
-import fr.amapj.model.models.contrat.modele.EtatModeleContrat;
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
 import fr.amapj.model.models.contrat.reel.Contrat;
 import fr.amapj.model.models.contrat.reel.EtatPaiement;
 import fr.amapj.model.models.contrat.reel.Paiement;
+import fr.amapj.model.models.fichierbase.CartePrepayee;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
 import fr.amapj.service.services.mescontrats.DatePaiementDTO;
@@ -77,6 +77,44 @@ public class MesPaiementsService
 
 	}
 
+	@DbRead
+	public MesPaiementsCPPDTO getMesPaiementsCPP(Long userId)
+	{
+		EntityManager em = TransactionHelper.getEm();
+		
+		MesPaiementsCPPDTO res = new MesPaiementsCPPDTO();
+		Utilisateur user = em.find(Utilisateur.class, userId);
+
+		res.paiementAFournir = getPaiementCPPAFournir(em, user);
+
+		return res;
+
+	}
+	
+	private List<PaiementCPPAFournirDTO> getPaiementCPPAFournir(EntityManager em, Utilisateur user)
+	{
+		List<PaiementCPPAFournirDTO> res = new ArrayList<>();
+
+		// On récupère d'abord la liste des contrats de l'utilisateur avec des
+		// paiements à l'état A_FOURNIR
+		Query q = em.createQuery("select cpp from CartePrepayee cpp "
+				+ "WHERE cpp.utilisateur=:u and cpp.datePaiement=NULL");
+		q.setParameter("u", user);
+
+		List<CartePrepayee> cpps = q.getResultList();
+
+		for (CartePrepayee cpp : cpps)
+		{
+			PaiementCPPAFournirDTO dto = new PaiementCPPAFournirDTO();
+			dto.libCheque = cpp.producteur.nom;
+			dto.numPublicCartePP = cpp.getPublicId();
+			dto.montant = cpp.getMontant();
+			res.add(dto);
+		}
+		return res;
+	}
+	
+	
 	private List<PaiementAFournirDTO> getPaiementAFournir(EntityManager em, Utilisateur user)
 	{
 		List<PaiementAFournirDTO> res = new ArrayList<>();
@@ -95,9 +133,9 @@ public class MesPaiementsService
 		for (Contrat contrat : cs)
 		{
 			PaiementAFournirDTO dto = new PaiementAFournirDTO();
-			dto.dateRemise = contrat.modeleContrat.dateRemiseCheque;
-			dto.libCheque = contrat.modeleContrat.libCheque;
-			dto.nomContrat = contrat.modeleContrat.nom;
+			dto.dateRemise = contrat.getModeleContrat().getDateRemiseCheque();
+			dto.libCheque = contrat.getModeleContrat().getLibCheque();
+			dto.nomContrat = contrat.getModeleContrat().getNom();
 			dto.paiements = getPaiementAFournir(em, contrat);
 			res.add(dto);
 		}
@@ -119,7 +157,7 @@ public class MesPaiementsService
 
 		for (Paiement paiement : ps)
 		{
-			String datePaiement = df.format(paiement.modeleContratDatePaiement.datePaiement);
+			String datePaiement = df.format(paiement.getModeleContratDatePaiement().getDatePaiement());
 			if (lastMatch(res, paiement) == true)
 			{
 				DetailPaiementAFournirDTO last = res.get(res.size() - 1);
@@ -131,7 +169,7 @@ public class MesPaiementsService
 				DetailPaiementAFournirDTO dto = new DetailPaiementAFournirDTO();
 				dto.nbCheque = 1;
 				dto.moisPaiement = datePaiement;
-				dto.montant = paiement.montant;
+				dto.montant = paiement.getMontant();
 				res.add(dto);
 			}
 		}
@@ -145,7 +183,7 @@ public class MesPaiementsService
 			return false;
 		}
 		DetailPaiementAFournirDTO last = res.get(res.size() - 1);
-		if (last.montant == paiement.montant)
+		if (last.montant == paiement.getMontant())
 		{
 			return true;
 		}
@@ -174,7 +212,7 @@ public class MesPaiementsService
 		for (Paiement paiement : ps)
 		{
 			DetailPaiementFourniDTO detail = createDetail(paiement);
-			String datePaiement = df.format(paiement.modeleContratDatePaiement.datePaiement);
+			String datePaiement = df.format(paiement.getModeleContratDatePaiement().getDatePaiement());
 			if (lastMatch(res, datePaiement) == true)
 			{
 				PaiementFourniDTO last = res.get(res.size() - 1);
@@ -213,10 +251,10 @@ public class MesPaiementsService
 	private DetailPaiementFourniDTO createDetail(Paiement paiement)
 	{
 		DetailPaiementFourniDTO dto = new DetailPaiementFourniDTO();
-		dto.libCheque = paiement.contrat.modeleContrat.libCheque;
-		dto.nomContrat = paiement.contrat.modeleContrat.nom;
-		dto.montant = paiement.montant;
-		dto.etatPaiement = paiement.etat;
+		dto.libCheque = paiement.getContrat().getModeleContrat().getLibCheque();
+		dto.nomContrat = paiement.getContrat().getModeleContrat().getNom();
+		dto.montant = paiement.getMontant();
+		dto.etatPaiement = paiement.getEtat();
 		return dto;
 	}
 	
@@ -238,11 +276,11 @@ public class MesPaiementsService
 			PaiementHistoriqueDTO dto = new PaiementHistoriqueDTO();
 			
 			dto.id = paiement.getId();
-			dto.nomProducteur = paiement.contrat.modeleContrat.producteur.nom;
-			dto.nomContrat = paiement.contrat.modeleContrat.nom;
-			dto.montant = paiement.montant;
-			dto.datePrevu = paiement.modeleContratDatePaiement.datePaiement;
-			dto.dateReelle = paiement.remise.dateRemise;
+			dto.nomProducteur = paiement.getContrat().getModeleContrat().getProducteur().nom;
+			dto.nomContrat = paiement.getContrat().getModeleContrat().getNom();
+			dto.montant = paiement.getMontant();
+			dto.datePrevu = paiement.getModeleContratDatePaiement().getDatePaiement();
+			dto.dateReelle = paiement.getRemise().getDateRemise();
 			
 			res.add(dto);
 		}
@@ -276,11 +314,11 @@ public class MesPaiementsService
 		{
 			DatePaiementDTO dto = new DatePaiementDTO();
 			dto.idPaiement = paiement.getId();
-			dto.datePaiement = paiement.modeleContratDatePaiement.datePaiement;
-			dto.montant = paiement.montant;
-			dto.etatPaiement = paiement.etat;
-			dto.commentaire1 = paiement.commentaire1;
-			dto.commentaire2 = paiement.commentaire2;
+			dto.datePaiement = paiement.getModeleContratDatePaiement().getDatePaiement();
+			dto.montant = paiement.getMontant();
+			dto.etatPaiement = paiement.getEtat();
+			dto.commentaire1 = paiement.getCommentaire1();
+			dto.commentaire2 = paiement.getCommentaire2();
 			
 			res.add(dto);
 		}
@@ -302,9 +340,9 @@ public class MesPaiementsService
 		for (DatePaiementDTO dto : paiementDto)
 		{
 			Paiement p = em.find(Paiement.class, dto.idPaiement);
-			p.etat = dto.etatPaiement;
-			p.commentaire1 = dto.commentaire1;
-			p.commentaire2 = dto.commentaire2;
+			p.setEtat(dto.etatPaiement);
+			p.setCommentaire1(dto.commentaire1);
+			p.setCommentaire2(dto.commentaire2);
 						
 		}	
 	}
@@ -355,17 +393,17 @@ public class MesPaiementsService
 		
 		if ( (mntDonneAmap>mntCommande) && (paiements.size()>0) )
 		{
-			Utilisateur u = contrat.utilisateur;
+			Utilisateur u = contrat.getUtilisateur();
 			SimpleDateFormat df = new SimpleDateFormat("MMMMM yyyy");
 			
-			buf.append("L'adhérent "+u.nom+" "+u.prenom+" a un trop payé de "
+			buf.append("L'adhérent "+u.getNom()+" "+u.getPrenom()+" a un trop payé de "
 						+new CurrencyTextFieldConverter().convertToString(mntDonneAmap-mntCommande)+" €<br/>");
 			
 			buf.append("Vous avez en votre possession ces chèques, que vous pouvez rendre ou faire refaire:<br/>");
 			for (Paiement paiement : paiements)
 			{
-				buf.append(" - "+df.format(paiement.modeleContratDatePaiement.datePaiement)+" - "
-							+new CurrencyTextFieldConverter().convertToString(paiement.montant)+"€ <br/>");
+				buf.append(" - "+df.format(paiement.getModeleContratDatePaiement().getDatePaiement())+" - "
+							+new CurrencyTextFieldConverter().convertToString(paiement.getMontant())+"€ <br/>");
 			}
 			buf.append("<br/>");
 		}
@@ -394,7 +432,7 @@ public class MesPaiementsService
 				
 		int mnt1 = LongUtils.toInt(q.getSingleResult());
 		
-		int avoir = contrat.montantAvoir;
+		int avoir = contrat.getMontantAvoir();
 		return mnt1+avoir;
 	}
 

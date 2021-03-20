@@ -29,10 +29,17 @@ import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.common.DebugUtil;
 import fr.amapj.common.FormatUtils;
+import fr.amapj.model.models.acces.RoleList;
+import fr.amapj.model.models.param.ChoixOuiNon;
+import fr.amapj.model.models.param.paramecran.PEPermanences;
+import fr.amapj.service.services.parametres.ParamEcranDTO;
+import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceDateDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceService;
 import fr.amapj.service.services.permanence.periode.PermanenceCellDTO;
+import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.view.engine.menu.MenuList;
 import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.corepopup.CorePopup.PopupType;
@@ -169,7 +176,13 @@ abstract public class AbstractPeriodePermanenceGrillePart extends CorePopup impl
 			}
 			else if (pc.idUtilisateur!=null)
 			{
-				line.col2 = pc.nom+" "+pc.prenom;
+				ParametresService ps = new ParametresService();
+				PEPermanences ped = (PEPermanences) ps.loadParamEcran(MenuList.MES_PERMANENCES);
+				List<RoleList> roles = SessionManager.getSessionParameters().userRole;
+				if( ChoixOuiNon.NON.equals(ped.afficheNomPermanents) && ! roles.contains(RoleList.PRODUCTEUR) )
+					line.col2 = "Réservé";
+				else 
+					line.col2 = pc.nom+" "+pc.prenom;
 				line.styleCol2 = "place-occupee";
 			}
 			else

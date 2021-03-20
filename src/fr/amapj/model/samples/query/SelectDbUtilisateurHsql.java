@@ -59,7 +59,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
+			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
 		}
 	}
 	
@@ -76,7 +76,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
+			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
 		}
 	}
 	
@@ -97,7 +97,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
+			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
 		}
 
 	}
@@ -174,7 +174,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
+			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
 		}
 		
 		for (int i = 0; i < 10; i++)
@@ -197,7 +197,7 @@ public class SelectDbUtilisateurHsql
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
+			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
 		}
 		
 		

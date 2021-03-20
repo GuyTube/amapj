@@ -26,6 +26,7 @@ import java.util.List;
 
 import fr.amapj.common.CollectionUtils;
 import fr.amapj.common.LongUtils;
+import fr.amapj.model.models.param.ChoixOuiNon;
 import fr.amapj.model.models.permanence.periode.EtatPeriodePermanence;
 import fr.amapj.model.models.permanence.periode.NaturePeriodePermanence;
 import fr.amapj.model.models.permanence.periode.RegleInscriptionPeriodePermanence;
@@ -85,6 +86,8 @@ public class PeriodePermanenceDTO implements TableItem
 		
 	public RegleInscriptionPeriodePermanence regleInscription;
 	
+	public ChoixOuiNon limitNbPermanenceUtil;
+
 	
 	// Permet de retrouver les informations d'un utilisateur
 	public PeriodePermanenceUtilisateurDTO findPeriodePermanenceUtilisateurDTO(Long idUtilisateur)
@@ -333,6 +336,14 @@ public class PeriodePermanenceDTO implements TableItem
 	public void setRegleInscription(RegleInscriptionPeriodePermanence regleInscription)
 	{
 		this.regleInscription = regleInscription;
+	}
+
+	public ChoixOuiNon getLimitNbPermanenceUtil() {
+		return limitNbPermanenceUtil;
+	}
+
+	public void setLimitNbPermanenceUtil(ChoixOuiNon limitNbPermanenceUtil) {
+		this.limitNbPermanenceUtil = limitNbPermanenceUtil;
 	}
 	
 	

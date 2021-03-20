@@ -21,14 +21,27 @@
  package fr.amapj.view.views.saisiecontrat;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import fr.amapj.common.AmapjRuntimeException;
+import fr.amapj.model.models.contrat.modele.ModeleContratProduit;
+import fr.amapj.model.models.contrat.reel.Contrat;
+import fr.amapj.model.models.contrat.reel.ContratCell;
 import fr.amapj.service.services.mescontrats.ContratColDTO;
 import fr.amapj.service.services.mescontrats.ContratDTO;
 import fr.amapj.service.services.mescontrats.ContratLigDTO;
 import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.GridSizeCalculator;
 import fr.amapj.view.engine.grid.integergrid.PopupIntegerGrid;
+import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.tools.BaseUiTools;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
@@ -40,6 +53,8 @@ import fr.amapj.view.views.saisiecontrat.SaisieContrat.SaisieContratData;
  */
 public class PopupSaisieQteCartePrepayee extends PopupIntegerGrid
 {	
+	private final static Logger logger = LogManager.getLogger();
+
 	SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 	
 	private ContratDTO contratDTO;

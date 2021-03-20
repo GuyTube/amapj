@@ -57,7 +57,7 @@ public class SelectDbUtilisateur
 		List<Utilisateur> us = em.createQuery(cq).getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
+			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
 		}
 
 	}
@@ -81,7 +81,7 @@ public class SelectDbUtilisateur
 		List<Utilisateur> us = em.createQuery(cq).getResultList();
 		for (Utilisateur u : us)
 		{
-			System.out.println("Utilisateur: Nom ="+u.nom+" Prenom ="+u.prenom);
+			System.out.println("Utilisateur: Nom ="+u.getNom()+" Prenom ="+u.getPrenom());
 		}
 
 	}

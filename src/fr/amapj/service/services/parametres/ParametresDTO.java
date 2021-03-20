@@ -32,10 +32,14 @@ import fr.amapj.model.models.param.SmtpType;
  */
 public class ParametresDTO 
 {
-	
+
 	public String nomAmap;
 	
 	public String villeAmap;
+	
+	public String lieuLivraison;
+	
+	public String heureLivraison;
 	
 	public SmtpType smtpType;
 	
@@ -48,7 +52,6 @@ public class ParametresDTO
 	public String sendingMailFooter;
 	
 	public String mailCopyTo;
-	
 	
 	public String url;
 	
@@ -288,7 +291,21 @@ public class ParametresDTO
 	{
 		this.sendingMailFooter = sendingMailFooter;
 	}
+	
+	public String getLieuLivraison() {
+		return lieuLivraison;
+	}
 
-	
-	
+	public void setLieuLivraison(String lieuLivraison) {
+		this.lieuLivraison = lieuLivraison;
+	}
+
+	public String getHeureLivraison() {
+		return heureLivraison;
+	}
+
+	public void setHeureLivraison(String heureLivraison) {
+		this.heureLivraison = heureLivraison;
+	}
+
 }

@@ -175,32 +175,10 @@ public class GestionContratEditorPart extends WizardFormPopup
 		}
 		//
 		addComboEnumField("Fréquence des livraisons", "frequence",notNull);
+		addIntegerField("Nombre de contrats max.", "nbMaxSouscription");
+		
 	}
 	
-	protected void drawAccess() 
-	{
-		setStepTitle("les conditions d'accès à ce contrat");
-		
-		ParametresDTO param = new ParametresService().getParametres();
-		if (param.etatGestionCotisation==EtatModule.INACTIF)
-		{
-			addLabel("Ce contrat sera accessible par tous les amapiens. Vous pouvez cliquer sur Etape suivante",ContentMode.TEXT);
-			return;
-		}
-		
-		PEGestionContratsVierges peEcran = (PEGestionContratsVierges) new ParametresService().loadParamEcran(MenuList.GESTION_CONTRAT);
-		IValidator[] validators = new IValidator[0];
-		if (peEcran.periodeCotisationObligatoire==ChoixOuiNon.OUI)
-		{
-			validators = new IValidator[1];
-			validators[0] = new NotNullValidator();
-		}
-		
-		//
-		addSearcher("Pour pouvoir souscrire à ce contrat, l'amapien doit être inscrit sur la période d'adhésion :", "idPeriodeCotisation", SearcherList.PERIODE_COTISATION, null, validators);
-	}
-
-
 	private String checkInfoGenerales()
 	{
 		if ((modeleContrat.nature==NatureContrat.CARTE_PREPAYEE) && (modeleContrat.frequence==FrequenceLivraison.UNE_SEULE_LIVRAISON))
@@ -427,6 +405,7 @@ public class GestionContratEditorPart extends WizardFormPopup
 		
 		addColumnSearcher("produitId", "Nom du produit",FieldType.SEARCHER, null,SearcherList.PRODUIT,prod,new ColumnNotNull<LigneContratDTO>(e->e.produitId));
 		addColumn("prix", "Prix du produit", FieldType.CURRENCY, null,new ColumnNotNull<LigneContratDTO>(e->e.prix));	
+		addColumn("nbMaxParLivraison", "Stock maximum", FieldType.INTEGER, null);	
 		
 	}
 
@@ -442,17 +421,21 @@ public class GestionContratEditorPart extends WizardFormPopup
 			// Titre
 			setStepTitle("Contrat Carte prépayée - gestion du paiement");
 						
-			addLabel("Votre contrat est de type Carte prépayée, il n'y a pas de gestion des paiements possible pour le moment. Vous pouvez juste définir un message avec les indications sur le paiement sur la page suivante.", ContentMode.HTML);
-			
-			modeleContrat.gestionPaiement = GestionPaiement.NON_GERE;
+//			addLabel("Votre contrat est de type Carte prépayée, il n'y a pas de gestion des paiements possible pour le moment. Vous pouvez juste définir un message avec les indications sur le paiement sur la page suivante.", ContentMode.HTML);
+			IValidator notNull = new NotNullValidator();
+
+			addComboEnumField("Gestion des paiements", "gestionPaiement",modeleContrat.nature.getPaiementNonAutorise(),notNull);
+//			modeleContrat.gestionPaiement = GestionPaiement.NON_GERE;
 		}
 		else
 		{		
 			setStepTitle("genéralités sur le paiement");
 			
 			IValidator notNull = new NotNullValidator();
-			
-			addComboEnumField("Gestion des paiements", "gestionPaiement",notNull);
+			//TODO PMO : vérifier ce libellé
+			addComboEnumField("Fréquence des livraisons", "frequence",notNull);
+			//dans la V029 : addComboEnumField("Gestion des paiements", "gestionPaiement",notNull);
+
 		}
 	}
 	

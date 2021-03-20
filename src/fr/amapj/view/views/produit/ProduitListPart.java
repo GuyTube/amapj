@@ -29,8 +29,9 @@ import fr.amapj.service.services.produit.ProduitService;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
-import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
+import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
 import fr.amapj.view.views.producteur.ProducteurSelectorPart;
 
 

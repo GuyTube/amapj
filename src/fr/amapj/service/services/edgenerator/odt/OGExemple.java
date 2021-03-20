@@ -61,7 +61,7 @@ public class OGExemple extends AbstractOdtGenerator
 	public void fillWordFile(EntityManager em,OdtGeneratorTool et)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		EditionSpecifique editionSpecifique = mc.producteur.engagement;
+		EditionSpecifique editionSpecifique = mc.getProducteur().engagement;
 		EngagementJson engagement = (EngagementJson)  new EditionSpeService().load(editionSpecifique.id);
 		String htmlContent = engagement.getText();
 		
@@ -93,12 +93,12 @@ public class OGExemple extends AbstractOdtGenerator
 	{
 		VelocityContext ctx = new VelocityContext();
 		
-		Producteur producteur = c.modeleContrat.producteur;
+		Producteur producteur = c.getModeleContrat().getProducteur();
 		
 		VCBuilder.addAmap(ctx);
 		VCBuilder.addDateInfo(ctx);
 		VCBuilder.addAmapien(ctx, utilisateur);
-		VCBuilder.addContrat(ctx, c.modeleContrat,c, em);
+		VCBuilder.addContrat(ctx, c.getModeleContrat(),c, em);
 		VCBuilder.addProducteur(ctx, producteur);
 		List<ProdUtilisateurDTO> refs=new ProducteurService().getReferents(em, producteur);
 		if (refs.size()>=1)
@@ -115,7 +115,7 @@ public class OGExemple extends AbstractOdtGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class,modeleContratId);
-		return "engagements-"+mc.nom;
+		return "engagements-"+mc.getNom();
 	}
 
 	@Override

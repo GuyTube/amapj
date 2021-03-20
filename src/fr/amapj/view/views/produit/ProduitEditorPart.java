@@ -72,7 +72,7 @@ public class ProduitEditorPart extends FormPopup
 	protected void addFields()
 	{
 		IValidator len_1_255 = new StringLengthValidator(1, 255);
-		IValidator len_1_500 = new StringLengthValidator(1, 255);
+		IValidator len_1_500 = new StringLengthValidator(1, 500);
 		
 		// Champ 1
 		addTextField("Nom", "nom",len_1_255);

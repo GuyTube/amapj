@@ -83,9 +83,9 @@ public class EGBilanCompletCheque extends AbstractExcelGenerator
 		et.addRow("Bilan des chèques",et.grasGaucheNonWrappe);
 		et.addRow("",et.grasGaucheNonWrappe);
 		
-		et.addRow("Nom du contrat : "+mc.nom,et.grasGaucheNonWrappe);
-		et.addRow("Nom du producteur : "+mc.producteur.nom,et.grasGaucheNonWrappe);
-		et.addRow("Ordre des chèques : "+mc.libCheque,et.grasGaucheNonWrappe);
+		et.addRow("Nom du contrat : "+mc.getNom(),et.grasGaucheNonWrappe);
+		et.addRow("Nom du producteur : "+mc.getProducteur().nom,et.grasGaucheNonWrappe);
+		et.addRow("Ordre des chèques : "+mc.getLibCheque(),et.grasGaucheNonWrappe);
 		
 
 		
@@ -221,8 +221,8 @@ public class EGBilanCompletCheque extends AbstractExcelGenerator
 		
 		
 		et.addRow();
-		et.setCell(0,utilisateur.nom,et.grasGaucheNonWrappeBordure);
-		et.setCell(1,utilisateur.prenom,et.nonGrasGaucheBordure);
+		et.setCell(0,utilisateur.getNom(),et.grasGaucheNonWrappeBordure);
+		et.setCell(1,utilisateur.getPrenom(),et.nonGrasGaucheBordure);
 		
 		
 		et.setCellPrix(2,montantDu,et.prixCentreBordure);
@@ -294,7 +294,7 @@ public class EGBilanCompletCheque extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		return "bilan-cheque-"+mc.nom;
+		return "bilan-cheque-"+mc.getNom();
 	}
 
 

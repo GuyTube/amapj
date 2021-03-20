@@ -98,9 +98,9 @@ public class EGPaiementProducteur extends AbstractExcelGenerator
 		et.addRow("Bilan des paiements",et.grasGaucheNonWrappe);
 		et.addRow("",et.grasGaucheNonWrappe);
 		
-		et.addRow("Nom du contrat : "+mc.nom,et.grasGaucheNonWrappe);
-		et.addRow("Nom du producteur : "+mc.producteur.nom,et.grasGaucheNonWrappe);
-		et.addRow("Ordre des chèques : "+mc.libCheque,et.grasGaucheNonWrappe);
+		et.addRow("Nom du contrat : "+mc.getNom(),et.grasGaucheNonWrappe);
+		et.addRow("Nom du producteur : "+mc.getProducteur().nom,et.grasGaucheNonWrappe);
+		et.addRow("Ordre des chèques : "+mc.getLibCheque(),et.grasGaucheNonWrappe);
 		
 
 		// Une ligne vide
@@ -211,7 +211,7 @@ public class EGPaiementProducteur extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class,modeleContratId);
-		return "bilan-paiement-"+mc.nom;
+		return "bilan-paiement-"+mc.getNom();
 	}
 
 	@Override

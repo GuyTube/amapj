@@ -40,7 +40,7 @@ public class DevToolsService
 		
 		Utilisateur u = em.find(Utilisateur.class, id);
 		
-		return u.nom+" "+u.prenom;
+		return u.getNom()+" "+u.getPrenom();
 	}
 	
 }

@@ -47,6 +47,8 @@ public class ProducteurDTO implements TableItem
 	
 	public String description;
 	
+	public String emailContact;
+	
 	public Date dateCreation;
 	
 	public Date dateModification;
@@ -180,6 +182,16 @@ public class ProducteurDTO implements TableItem
 	public void setDescription(String description)
 	{
 		this.description = description;
+	}
+
+	public String getEmailContact()
+	{
+		return this.emailContact;
+	}
+
+	public void setEmailContact(String emailContact)
+	{
+		this.emailContact = emailContact;
 	}
 
 	public Long getIdEtiquette()

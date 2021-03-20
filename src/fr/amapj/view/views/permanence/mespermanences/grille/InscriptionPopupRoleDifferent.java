@@ -32,15 +32,21 @@ import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.common.CollectionUtils;
 import fr.amapj.common.FormatUtils;
+import fr.amapj.model.models.acces.RoleList;
+import fr.amapj.model.models.param.ChoixOuiNon;
+import fr.amapj.model.models.param.paramecran.PEPermanences;
 import fr.amapj.model.models.permanence.periode.RegleInscriptionPeriodePermanence;
+import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.permanence.mespermanences.MesPermanencesService;
 import fr.amapj.service.services.permanence.mespermanences.MesPermanencesService.InscriptionMessage;
 import fr.amapj.service.services.permanence.mespermanences.UnePeriodePermanenceDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceDateDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceService;
 import fr.amapj.service.services.permanence.periode.PermanenceCellDTO;
+import fr.amapj.service.services.session.SessionManager;
 import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.GridSizeCalculator;
+import fr.amapj.view.engine.menu.MenuList;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
 import fr.amapj.view.engine.tools.BaseUiTools;
@@ -204,7 +210,13 @@ public class InscriptionPopupRoleDifferent extends  CorePopup
 			
 			if (cell.idUtilisateur!=null)
 			{
-				line.utilisateurs.add(cell.nom+" "+cell.prenom);
+				ParametresService ps = new ParametresService();
+				PEPermanences ped = (PEPermanences) ps.loadParamEcran(MenuList.MES_PERMANENCES);
+				List<RoleList> uroles = SessionManager.getSessionParameters().userRole;
+				if( ChoixOuiNon.NON.equals(ped.afficheNomPermanents) && ! uroles.contains(RoleList.PRODUCTEUR) )
+					line.utilisateurs.add("Réservé");
+				else 
+					line.utilisateurs.add(cell.nom+" "+cell.prenom);
 			}
 			else
 			{
@@ -264,7 +276,6 @@ public class InscriptionPopupRoleDifferent extends  CorePopup
 
 	protected void createButtonBar()
 	{
-		addButtonBlank();
 		addButton("OK", e->close());
 	}
 	

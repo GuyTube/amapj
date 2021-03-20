@@ -20,6 +20,7 @@
  */
  package fr.amapj.view.views.common.contratselector;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.vaadin.ui.Alignment;
@@ -29,6 +30,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 
 import fr.amapj.model.models.contrat.modele.ModeleContrat;
+import fr.amapj.model.models.contrat.modele.NatureContrat;
 import fr.amapj.model.models.fichierbase.Producteur;
 import fr.amapj.service.services.access.AccessManagementService;
 import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
@@ -55,6 +57,8 @@ public class ContratSelectorPart
 	private PopupListener listener;
 	
 	private boolean onlyOneProducteur;
+	
+	private List<NatureContrat> excludedNatures;
 
 
 	/**
@@ -184,8 +188,10 @@ public class ContratSelectorPart
 			List<ModeleContrat> mcs = new GestionContratSigneService().getModeleContratCreationOrActif(idProducteur);
 			for (ModeleContrat mc : mcs)
 			{
-				contratBox.addItem(mc.getId());
-				contratBox.setItemCaption(mc.getId(), mc.nom);	
+				if( excludedNatures == null || !excludedNatures.contains(mc.nature)) {
+					contratBox.addItem(mc.getId());
+					contratBox.setItemCaption(mc.getId(), mc.getNom());	
+				}
 			}
 			
 			// Si il y a un seul contrat : on le selectionne tout de suite
@@ -207,5 +213,15 @@ public class ContratSelectorPart
 	{
 		return idModeleContrat;
 	}
+
+	public List<NatureContrat> getExcludedNatures() {
+		return excludedNatures;
+	}
+
+	public void setExcludedNatures(List<NatureContrat> excludedNatures) {
+		this.excludedNatures = excludedNatures;
+	}
+	
+	
 
 }

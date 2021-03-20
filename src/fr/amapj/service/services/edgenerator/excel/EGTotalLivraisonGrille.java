@@ -100,7 +100,7 @@ public class EGTotalLivraisonGrille
 		et.addRow();
 		
 		// Colonne 0  : la date
-		et.setCell(0,df2.format(date.dateLiv),et.grasCentreBordure);
+		et.setCell(0,df2.format(date.getDateLiv()),et.grasCentreBordure);
 		
 		// Colonne 1 - Vide
 		et.setCell(1,"",et.grasGaucheNonWrappeBordure);
@@ -108,7 +108,7 @@ public class EGTotalLivraisonGrille
 		// Colonne 2 - cumul pour cette date
 		et.setCellSumProdInRow(2, 3, nbProd, 7, et.prixCentreBordure);
 		
-		String sheetName = df1.format(date.dateLiv);
+		String sheetName = df1.format(date.getDateLiv());
 		
 		// Affectation des quantités
 		int index =nbColGauche;

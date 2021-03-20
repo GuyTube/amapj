@@ -104,7 +104,7 @@ public class LogDeleteService implements Job
 		for (LogAccess logAccess : ps)
 		{
 			deleteLogFile(logAccess);
-			logAccess.logFileName = null;
+			logAccess.setLogFileName(null);
 			nbFile++;
 		}
 		
@@ -115,7 +115,7 @@ public class LogDeleteService implements Job
 	{
 		try
 		{
-			Path path = Paths.get(AmapJLogManager.getFullFileName(logAccess.logFileName));
+			Path path = Paths.get(AmapJLogManager.getFullFileName(logAccess.getLogFileName()));
 			Files.delete(path);
 		} 
 		catch (IOException e)
@@ -197,9 +197,9 @@ public class LogDeleteService implements Job
 		
 		for (LogAccess logAccess : ps)
 		{
-			logAccess.dateOut = ref;
+			logAccess.setDateOut(ref);
 			// On poistionne une valeur arbitraire à 1 minute
-			logAccess.activityTime = 60;
+			logAccess.setActivityTime(60);
 		}
 		
 	}

@@ -20,21 +20,31 @@
  */
  package fr.amapj.model.models.contrat.modele;
 
+import java.util.List;
+
 import fr.amapj.model.engine.metadata.MetaDataEnum;
 
 
 public enum NatureContrat
 {
 	// 
-	ABONNEMENT,
+	ABONNEMENT(new GestionPaiement[]{GestionPaiement.CARTE_PREPAYEE}),
 	
 	//  
-	LIBRE,
+	LIBRE(new GestionPaiement[]{GestionPaiement.CARTE_PREPAYEE}),
 
 	
-	CARTE_PREPAYEE;
+	CARTE_PREPAYEE(new GestionPaiement[]{GestionPaiement.GESTION_STANDARD});
 	
+	GestionPaiement[] paiementNonAutorise;
 	
+	private NatureContrat(GestionPaiement[] paiements) {
+		paiementNonAutorise = paiements;
+	}
+	
+	public GestionPaiement[] getPaiementNonAutorise() {
+		return paiementNonAutorise;
+	}
 	
 	static public class MetaData extends MetaDataEnum
 	{

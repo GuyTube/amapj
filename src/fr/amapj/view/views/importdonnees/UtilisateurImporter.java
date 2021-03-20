@@ -26,6 +26,7 @@ import java.util.List;
 import fr.amapj.common.StringUtils;
 import fr.amapj.service.services.utilisateur.UtilisateurDTO;
 import fr.amapj.service.services.utilisateur.UtilisateurService;
+import fr.amapj.view.engine.popup.formpopup.validator.EmailConjointValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.EmailValidator;
 import fr.amapj.view.views.importdonnees.tools.AbstractImporter;
 
@@ -36,7 +37,7 @@ public class UtilisateurImporter extends AbstractImporter<UtilisateurDTO>
 	@Override
 	public int getNumCol()
 	{
-		return 8;
+		return 9;
 	}
 
 	@Override
@@ -56,12 +57,17 @@ public class UtilisateurImporter extends AbstractImporter<UtilisateurDTO>
 
 		if (isEmpty(dto.email) )
 		{
-			return "L'adresse e mail n'est pas renseignée. Elle est obligatoire. Si la personne n'a pas d'email, merci de mettre son nom ou prénom suivi d'un #. Exemple : geraldine#";
+			return "L'adresse email n'est pas renseignée ("+dto.nom+" "+dto.prenom+"). Elle est obligatoire. Si la personne n'a pas d'email, merci de mettre son nom ou prénom suivi d'un #. Exemple : geraldine#";
 		}
 		
 		if (EmailValidator.isValidEmail(dto.email)==false)
 		{
-			return "L'adresse e mail n'est pas valide. Si la personne n'a pas d'email, merci de mettre son nom ou prénom suivi d'un #. Exemple : geraldine#";
+			return "L'adresse email n'est pas valide ("+dto.nom+" "+dto.prenom+"). Si la personne n'a pas d'email, merci de mettre son nom ou prénom suivi d'un #. Exemple : geraldine#";
+		}
+		
+		if (EmailConjointValidator.isValidEmail(dto.emailConjoint, true)==false)
+		{
+			return "L'adresse email du conjoint n'est pas valide ("+dto.nom+" "+dto.prenom+"). Veuillez saisir une adresse valide ou laisser ce champ vide.";
 		}
 		
 		return null;
@@ -81,6 +87,7 @@ public class UtilisateurImporter extends AbstractImporter<UtilisateurDTO>
 		dto.libAdr1 = strs[5];
 		dto.codePostal = strs[6];
 		dto.ville = strs[7];
+		dto.emailConjoint = trimEmail(strs[8]);
 		
 		return dto;
 	}
@@ -128,8 +135,6 @@ public class UtilisateurImporter extends AbstractImporter<UtilisateurDTO>
 	}
 	
 
-	
-	
 	
 	public static void main(String[] args) throws IOException
 	{		

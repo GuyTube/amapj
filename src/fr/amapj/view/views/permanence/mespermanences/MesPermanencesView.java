@@ -233,13 +233,16 @@ public class MesPermanencesView extends FrontOfficeView implements PopupListener
 	private String getLibMesPermanences()
 	{
 		StringBuffer buf = new StringBuffer();
-		buf.append("Vous devez faire les permanences suivantes :<ul>");
-		for (PeriodePermanenceDateDTO permanence : mesContratsDTO.mesPermanencesFutures)
-		{
-			buf.append("<li>"+df1.format(permanence.datePerm)+"</li>");	
+		if(mesContratsDTO.mesPermanencesFutures.size()>0) {
+			buf.append("Vous devez faire les permanences suivantes :<ul>");
+			for (PeriodePermanenceDateDTO permanence : mesContratsDTO.mesPermanencesFutures)
+			{
+				buf.append("<li>"+df1.format(permanence.datePerm)+"</li>");	
+			}
+			buf.append("</ul>");
+		} else {
+			buf.append("Vous n'êtes inscrit.e à aucune permanence.");
 		}
-		buf.append("</ul>");
-		
 		return buf.toString();
 	}
 

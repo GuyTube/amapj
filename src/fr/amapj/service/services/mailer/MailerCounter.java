@@ -82,7 +82,7 @@ public class MailerCounter
 		logger.info("Cache size "+instance.cache.size());
 		
 		
-		if (mailCount.nbMail<param.sendingMailNbMax)
+		if (mailCount.nbMail<param.getSendingMailNbMax())
 		{
 			synchronized (mailCount)
 			{

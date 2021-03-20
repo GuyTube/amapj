@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.amapj.service.services.edgenerator.excel.feuilledistribution.producteur.EGFeuilleDistributionProducteur;
+import fr.amapj.service.services.edgenerator.excel.feuilledistribution.producteur.EGFeuilleEmargement;
 import fr.amapj.service.services.edgenerator.excel.feuilledistribution.producteur.EGSyntheseContrat;
 import fr.amapj.service.services.edgenerator.excel.producteur.EGPaiementProducteur;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
@@ -145,6 +146,7 @@ public class ProducteurContratListPart extends StandardListPart<ModeleContratSum
 		popup.addGenerator(new EGFeuilleDistributionProducteur(mcDto.id));
 		popup.addGenerator(new EGPaiementProducteur(mcDto.id));
 		popup.addGenerator(new EGSyntheseContrat(mcDto.id));
+		popup.addGenerator(new EGFeuilleEmargement(mcDto.id));
 				
 		CorePopup.open(popup,this);
 	}

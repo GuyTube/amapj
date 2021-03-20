@@ -22,6 +22,7 @@
 
 import java.util.Date;
 
+import fr.amapj.model.models.param.ChoixOuiNon;
 import fr.amapj.model.models.permanence.periode.EtatPeriodePermanence;
 import fr.amapj.view.engine.tools.TableItem;
 
@@ -44,6 +45,8 @@ public class SmallPeriodePermanenceDTO implements TableItem
 	public int nbDatePerm;
 	
 	public int pourcentageInscription;
+	
+	public ChoixOuiNon limitNbPermanenceUtil;
 
 	public Long getId()
 	{
@@ -113,6 +116,14 @@ public class SmallPeriodePermanenceDTO implements TableItem
 	public void setPourcentageInscription(int pourcentageInscription)
 	{
 		this.pourcentageInscription = pourcentageInscription;
+	}
+
+	public ChoixOuiNon getLimitNbPermanenceUtil() {
+		return limitNbPermanenceUtil;
+	}
+
+	public void setLimitNbPermanenceUtil(ChoixOuiNon limitNbPermanenceUtil) {
+		this.limitNbPermanenceUtil = limitNbPermanenceUtil;
 	}
 	
 	

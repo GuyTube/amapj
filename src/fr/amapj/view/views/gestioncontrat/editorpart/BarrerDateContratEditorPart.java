@@ -95,11 +95,30 @@ public class BarrerDateContratEditorPart extends PopupBooleanGrid
 		GridHeaderLine line2  =new GridHeaderLine();
 		line2.styleName = "prix";
 		line2.cells.add("prix unitaire");
-				
+		boolean hasLimit = false;
 		for (ContratColDTO col : contratDTO.contratColumns)
 		{
 			line2.cells.add(new CurrencyTextFieldConverter().convertToString(col.prix));
+			if( col.stockMax != null && col.stockMax != 0 ) {
+				hasLimit = true;
+			}
 		}
+
+		GridHeaderLine lineLimit = null;
+		if( hasLimit ) {
+			lineLimit = new GridHeaderLine();
+			lineLimit.styleName = "prix";
+			lineLimit.cells.add("Stock restant");
+			for (ContratColDTO col : contratDTO.contratColumns)
+			{
+				String val = "";
+				if( col.stockMax != null && col.stockMax != 0 ) {
+					val = col.stockMax.toString();
+				}
+				
+			}
+		}
+			
 
 		// Construction du header 3
 		GridHeaderLine line3  =new GridHeaderLine();
@@ -114,6 +133,9 @@ public class BarrerDateContratEditorPart extends PopupBooleanGrid
 		
 		param.headerLines.add(line1);
 		param.headerLines.add(line2);
+		if( hasLimit ) {
+			param.headerLines.add(lineLimit);
+		}
 		param.headerLines.add(line3);
 		
 		

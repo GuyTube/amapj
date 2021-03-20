@@ -48,10 +48,12 @@ import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.model.models.permanence.periode.EtatPeriodePermanence;
 import fr.amapj.model.models.permanence.periode.PeriodePermanence;
 import fr.amapj.model.models.permanence.periode.PeriodePermanenceDate;
+import fr.amapj.service.services.access.AccessManagementService;
 import fr.amapj.service.services.edgenerator.excel.emargement.EGFeuilleEmargement;
 import fr.amapj.service.services.editionspe.EditionSpeService;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceDateDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceService;
+import fr.amapj.service.services.utilisateur.UtilisateurService;
 
 /**
  * Permet la gestion des modeles de contrat
@@ -101,7 +103,13 @@ public class MesLivraisonsService
 		}
 		
 		// On récupère ensuite le planning mensuel si il y en a un
-		res.planningMensuel = computePlanningMensuel(em,dateDebut,dateFin,roles);
+		Producteur p = null;
+		AccessManagementService ams = new AccessManagementService();
+		if( ams.isProducteur(em, user) ) {
+			UtilisateurService us = new UtilisateurService();
+			p = us.getProducteur(em, user);
+		}
+		res.planningMensuel = computePlanningMensuel(em,dateDebut,dateFin,roles,p);
 		
 		return res;
 
@@ -146,26 +154,26 @@ public class MesLivraisonsService
 	
 	private void addCell(ContratCell cell, MesLivraisonsDTO res)
 	{
-		JourLivraisonsDTO jour = findJour(cell.modeleContratDate.dateLiv,res);
-		ProducteurLivraisonsDTO producteurs = findProducteurLivraison(cell.modeleContratDate,cell.modeleContratDate.modeleContrat,jour);
+		JourLivraisonsDTO jour = findJour(cell.getModeleContratDate().getDateLiv(),res);
+		ProducteurLivraisonsDTO producteurs = findProducteurLivraison(cell.getModeleContratDate(),cell.getModeleContratDate().getModeleContrat(),jour);
 		
 		QteProdDTO qteProdDTO = findQteProdDTO(producteurs.produits,cell);
-		qteProdDTO.qte = qteProdDTO.qte+cell.qte;
+		qteProdDTO.qte = qteProdDTO.qte+cell.getQte();
 	}
 
 	private QteProdDTO findQteProdDTO(List<QteProdDTO> produits, ContratCell cell)
 	{
 		for (QteProdDTO qteProdDTO : produits)
 		{
-			if (qteProdDTO.idProduit.equals(cell.modeleContratProduit.produit.getId()))
+			if (qteProdDTO.idProduit.equals(cell.getModeleContratProduit().getProduit().getId()))
 			{
 				return qteProdDTO;
 			}
 		}
 		QteProdDTO qteProdDTO = new QteProdDTO();
-		qteProdDTO.conditionnementProduit = cell.modeleContratProduit.produit.conditionnement;
-		qteProdDTO.nomProduit = cell.modeleContratProduit.produit.nom;
-		qteProdDTO.idProduit = cell.modeleContratProduit.produit.getId();
+		qteProdDTO.conditionnementProduit = cell.getModeleContratProduit().getProduit().getConditionnement();
+		qteProdDTO.nomProduit = cell.getModeleContratProduit().getProduit().getNom();
+		qteProdDTO.idProduit = cell.getModeleContratProduit().getProduit().getId();
 		
 		produits.add(qteProdDTO);
 		
@@ -203,8 +211,8 @@ public class MesLivraisonsService
 			}
 		}
 		ProducteurLivraisonsDTO producteur = new ProducteurLivraisonsDTO();
-		producteur.producteur = modeleContrat.producteur.nom;
-		producteur.modeleContrat = modeleContrat.nom;
+		producteur.producteur = modeleContrat.getProducteur().nom;
+		producteur.modeleContrat = modeleContrat.getNom();
 		producteur.idModeleContrat = modeleContrat.getId();
 		producteur.idModeleContratDate = modeleContratDate.getId();
 		jour.producteurs.add(producteur);
@@ -231,7 +239,7 @@ public class MesLivraisonsService
 	}
 	
 	
-	private List<EGFeuilleEmargement> computePlanningMensuel(EntityManager em, Date dateDebut, Date dateFin,List<RoleList> roles)
+	private List<EGFeuilleEmargement> computePlanningMensuel(EntityManager em, Date dateDebut, Date dateFin,List<RoleList> roles, Producteur p)
 	{
 		List<EGFeuilleEmargement> res = new ArrayList<EGFeuilleEmargement>(); 
 		
@@ -267,7 +275,7 @@ public class MesLivraisonsService
 				{
 					for (Date month : months)
 					{
-						EGFeuilleEmargement planningMensuel = new EGFeuilleEmargement(editionSpecifique.getId(), month, suffix);
+						EGFeuilleEmargement planningMensuel = new EGFeuilleEmargement(editionSpecifique.getId(), month, suffix, p);
 						res.add(planningMensuel);
 					}
 				}
@@ -275,7 +283,7 @@ public class MesLivraisonsService
 				{
 					for (Date week : weeks)
 					{
-						EGFeuilleEmargement planningMensuel = new EGFeuilleEmargement(editionSpecifique.getId(), week, suffix);
+						EGFeuilleEmargement planningMensuel = new EGFeuilleEmargement(editionSpecifique.getId(), week, suffix, p);
 						res.add(planningMensuel);
 					}
 				}
@@ -294,7 +302,12 @@ public class MesLivraisonsService
 	 */
 	private boolean canAccess(List<RoleList> roles, EditionSpecifique editionSpecifique)
 	{
+		// Cas des notification adhérents par mails, on suppose que la personne notifiée peut accéder à cette information
+		if (roles == null )
+			return true;
+		
 		FeuilleEmargementJson planningJson = (FeuilleEmargementJson) new EditionSpeService().load(editionSpecifique.id);
+
 		return roles.contains(planningJson.getAccessibleBy());
 	}
 
@@ -413,7 +426,10 @@ public class MesLivraisonsService
 		{
 			addCell(cell,res);
 		}
-		
+		List<RoleList> roles = new ArrayList<RoleList>();
+		roles.add(RoleList.PRODUCTEUR);
+		res.planningMensuel = computePlanningMensuel(em,dateDebut,dateFin,roles,producteur);
+
 		return res;
 
 	}

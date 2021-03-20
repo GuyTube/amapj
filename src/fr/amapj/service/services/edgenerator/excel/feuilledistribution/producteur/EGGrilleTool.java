@@ -22,12 +22,15 @@
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.poi.ss.usermodel.CellStyle;
 
@@ -77,7 +80,7 @@ public class EGGrilleTool
 	    List<String> titres = new ArrayList<>();
 	    for (ModeleContratDate date : dates)
 		{
-			titres.add(df2.format(date.dateLiv));
+			titres.add(df2.format(date.getDateLiv()));
 		}
 	    
 
@@ -106,8 +109,8 @@ public class EGGrilleTool
 		
 		// Ligne 1 à 5
 		et.addRow(firstLine,et.grasGaucheNonWrappe);
-		et.addRow(mc.nom,et.grasGaucheNonWrappe);
-		et.addRow(mc.description,et.grasGaucheNonWrappe);
+		et.addRow(mc.getNom(),et.grasGaucheNonWrappe);
+		et.addRow(mc.getDescription(),et.grasGaucheNonWrappe);
 		et.addRow("Extrait le "+df1.format(DateUtils.getDate()),et.grasGaucheNonWrappe);
 		et.addRow("",et.grasGaucheNonWrappe);
 
@@ -135,7 +138,7 @@ public class EGGrilleTool
 			for (ModeleContratProduit prod : prods)
 			{
 				int index = nbColGauche+i;
-				et.setCell(index,prod.produit.nom,et.switchColor(et.grasCentreBordure,k));
+				et.setCell(index,prod.getProduit().getNom(),et.switchColor(et.grasCentreBordure,k));
 				i++;
 			}
 		}
@@ -148,7 +151,7 @@ public class EGGrilleTool
 			for (ModeleContratProduit prod : prods)
 			{
 				int index = nbColGauche+i;
-				et.setCellPrix(index,prod.prix,et.switchColor(et.prixCentreBordure,k));
+				et.setCellPrix(index,prod.getPrix(),et.switchColor(et.prixCentreBordure,k));
 				i++;
 			}
 		}
@@ -165,7 +168,7 @@ public class EGGrilleTool
 			for (ModeleContratProduit prod : prods)
 			{
 				int index = nbColGauche+i;
-				et.setCell(index,prod.produit.conditionnement,et.switchColor(et.grasCentreBordure,k));
+				et.setCell(index,prod.getProduit().getConditionnement(),et.switchColor(et.grasCentreBordure,k));
 				i++;
 			}
 		}
@@ -212,8 +215,8 @@ public class EGGrilleTool
 		et.addRow();
 		
 		// Colonne 0 et 1 : le nom et prenom 
-		et.setCell(0,utilisateur.nom,et.grasGaucheNonWrappeBordure);
-		et.setCell(1,utilisateur.prenom,et.nonGrasGaucheBordure);
+		et.setCell(0,utilisateur.getNom(),et.grasGaucheNonWrappeBordure);
+		et.setCell(1,utilisateur.getPrenom(),et.nonGrasGaucheBordure);
 		
 		// Colonne 3 - cumul pour cet utilisateur 
 		et.setCellSumProdInRow(2, 3, nbColDateProd, 7, et.prixCentreBordure);
@@ -260,23 +263,27 @@ public class EGGrilleTool
 	private ContratDTO findContrat(EntityManager em,Utilisateur utilisateur,ModeleContrat mc)
 	{
 		
-		TypedQuery<Contrat> query = em.createQuery("select c from Contrat c where c.modeleContrat=:mc and c.utilisateur=:u",Contrat.class);
-		query.setParameter("mc", mc);
-		query.setParameter("u", utilisateur);
-				
-		List<Contrat> contrats = query.getResultList();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+
+		CriteriaQuery<Contrat> cq = cb.createQuery(Contrat.class);
+		Root<Contrat> root = cq.from(Contrat.class);
+
+		// On ajoute la condition where
+		cq.where(cb.and(cb.equal(root.get(Contrat.P.UTILISATEUR.prop()), utilisateur),cb.equal(root.get(Contrat.P.MODELECONTRAT.prop()), mc)));
+		
+		List<Contrat> contrats = em.createQuery(cq).getResultList();
 		if (contrats.size()==0)
 		{
 			throw new RuntimeException("Erreur inattendue");
 		}
 		if (contrats.size()>1)
 		{
-			throw new RuntimeException("L'utilisateur "+utilisateur.nom+" posséde plusieurs contrats !!");
+			throw new RuntimeException("L'utilisateur "+utilisateur.getNom()+" posséde plusieurs contrats !!");
 		}
 		
 		Contrat contrat = contrats.get(0);
 		
-		return new MesContratsService().loadContrat(contrat.modeleContrat.getId(), contrat.getId());
+		return new MesContratsService().loadContrat(contrat.getModeleContrat().getId(), contrat.getId());
 		
 	}
 	

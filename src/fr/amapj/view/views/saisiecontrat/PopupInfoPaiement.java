@@ -27,6 +27,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.service.services.mescontrats.InfoPaiementDTO;
 import fr.amapj.service.services.mescontrats.MesContratsService;
+import fr.amapj.view.engine.popup.cascadingpopup.CInfo;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
@@ -62,7 +63,7 @@ public class PopupInfoPaiement extends CorePopup
 		if (readOnly==false)
 		{
 			String str = "<br/><br/>Veuillez maintenant cliquer sur Sauvegarder pour valider votre contrat, " +
-				"ou sur Annuler si vous ne souhaitez pas conserver ce contrat<br/><br/>";
+				"ou sur Retour si vous souhaitez retourner à l'écran de saisie du contrat<br/><br/>";
 		
 			contentLayout.addComponent(new Label(str,ContentMode.HTML));
 		}
@@ -106,6 +107,7 @@ public class PopupInfoPaiement extends CorePopup
 				return;
 			}
 		}
+		data.validate();
 		
 		close();
 	}

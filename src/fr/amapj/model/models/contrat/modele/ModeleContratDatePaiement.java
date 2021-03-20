@@ -32,6 +32,7 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import fr.amapj.model.engine.Identifiable;
+import fr.amapj.model.engine.Mdm;
 
 /**
  * Date de paiement pour un modele de contrat
@@ -43,16 +44,32 @@ public class ModeleContratDatePaiement implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Long id;
+	private Long id;
 
 	@NotNull
 	@ManyToOne
-	public ModeleContrat modeleContrat;
+	private ModeleContrat modeleContrat;
 	
 	@NotNull
 	@Temporal(TemporalType.DATE)
-	public Date datePaiement;
+	private Date datePaiement;
 	
+	public enum P implements Mdm
+	{
+		ID("id") ,  MODELECONTRAT("modeleContrat") , DATEPAIEMENT("datePaiement") ;
+		
+		private String propertyId;   
+		   
+	    P(String propertyId) 
+	    {
+	        this.propertyId = propertyId;
+	    }
+	    public String prop() 
+	    { 
+	    	return propertyId; 
+	    }
+		
+	} ;
 
 	public Long getId()
 	{
@@ -62,6 +79,26 @@ public class ModeleContratDatePaiement implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+	public ModeleContrat getModeleContrat()
+	{
+		return modeleContrat;
+	}
+
+	public void setModeleContrat(ModeleContrat modeleContrat)
+	{
+		this.modeleContrat = modeleContrat;
+	}
+
+	public Date getDatePaiement()
+	{
+		return datePaiement;
+	}
+
+	public void setDatePaiement(Date datePaiement)
+	{
+		this.datePaiement = datePaiement;
 	}
 
 	

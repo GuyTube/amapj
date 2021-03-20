@@ -108,7 +108,7 @@ public class EGBilanCompletAmapien extends AbstractExcelGenerator
 		
 		addLine(et,"Nom",u.nom);
 		addLine(et,"Prénom",u.prenom);
-		addLine(et,"E mail",u.email);
+		addLine(et,"E mail",u.getEmail());
 		addLine(et,"Téléphone 1",u.numTel1);
 		addLine(et,"Téléphone 2",u.numTel2);
 		addLine(et,"Adresse",u.libAdr1);
@@ -118,7 +118,7 @@ public class EGBilanCompletAmapien extends AbstractExcelGenerator
 		
 		et.addRow();
 		
-		addLine(et,"Date de création : ",u.dateCreation);
+		addLine(et,"Date de création : ",u.getDateCreation());
 		addLine(et,"Nombre de contrats de cet utilisateur : ",""+cs.size());
 		
 		et.addRow();
@@ -239,13 +239,13 @@ public class EGBilanCompletAmapien extends AbstractExcelGenerator
 		{
 			Contrat contrat = cs.get(i);
 			ContratSigneDTO dto = new GestionContratSigneService().createContratSigneInfo(em, contrat);
-			ModeleContratSummaryDTO mcDto = new GestionContratService().createModeleContratInfo(em, contrat.modeleContrat);
+			ModeleContratSummaryDTO mcDto = new GestionContratService().createModeleContratInfo(em, contrat.getModeleContrat());
 			
 			et.addRow();
 			et.setCell(0, "C"+(i+1), et.nonGrasCentreBordure);
-			et.setCellDateTime(1, contrat.dateCreation, et.nonGrasCentreBordure);
-			et.setCell(2, contrat.modeleContrat.nom, et.nonGrasGaucheBordure);
-			et.setCell(3, contrat.modeleContrat.producteur.nom, et.nonGrasGaucheBordure);
+			et.setCellDateTime(1, contrat.getDateCreation(), et.nonGrasCentreBordure);
+			et.setCell(2, contrat.getModeleContrat().nom, et.nonGrasGaucheBordure);
+			et.setCell(3, contrat.getModeleContrat().producteur.nom, et.nonGrasGaucheBordure);
 			et.setCellPrix(4, dto.mntCommande, et.prixCentreBordure);
 			et.setCellDate(5, mcDto.dateDebut, et.nonGrasCentreBordure);
 			et.setCellDate(6, mcDto.dateFin, et.nonGrasCentreBordure);
@@ -298,7 +298,7 @@ public class EGBilanCompletAmapien extends AbstractExcelGenerator
 		{
 			Contrat contrat = cs.get(i);
 			String nomPage = "C"+(i+1);
-			new EGFeuilleDistributionAmapien(EGMode.STD, contrat.modeleContrat.id, contrat.id).addOnePage(em, et, nomPage);
+			new EGFeuilleDistributionAmapien(EGMode.STD, contrat.getModeleContrat().id, contrat.getId()).addOnePage(em, et, nomPage);
 		}
 		
 	}

@@ -56,6 +56,8 @@ public class ModeleContratSummaryDTO implements TableItem
 	
 	// Nombre d'adherents ayant souscrit à ce contrat
 	public int nbInscrits;
+	
+	public int nbMaxSouscription;
 
 	public Long getId()
 	{
@@ -155,6 +157,22 @@ public class ModeleContratSummaryDTO implements TableItem
 	public void setNbInscrits(int nbInscrits)
 	{
 		this.nbInscrits = nbInscrits;
+	}
+
+	public Long getProducteurId() {
+		return producteurId;
+	}
+
+	public void setProducteurId(Long producteurId) {
+		this.producteurId = producteurId;
+	}
+
+	public int getNbMaxSouscriptio() {
+		return nbMaxSouscription;
+	}
+
+	public void setNbMaxSouscriptions(int nbMaxSouscription) {
+		this.nbMaxSouscription = nbMaxSouscription;
 	}
 	
 	

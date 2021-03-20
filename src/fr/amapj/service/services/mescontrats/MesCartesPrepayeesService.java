@@ -104,9 +104,9 @@ public class MesCartesPrepayeesService
 		Date ref = DateUtils.addDays(now, -1);
 		for (ModeleContratDate lig : datLivs)
 		{
-			if (ref.before(lig.dateLiv))
+			if (ref.before(lig.getDateLiv()))
 			{
-				return lig.dateLiv;
+				return lig.getDateLiv();
 			}
 		}
 		return null;
@@ -121,7 +121,7 @@ public class MesCartesPrepayeesService
 		{
 			if (cartePrepayeeLigModifiable(lig,now,cartePrepayeeDelai))
 			{
-				return lig.dateLiv;
+				return lig.getDateLiv();
 			}
 		}
 		return null;
@@ -132,7 +132,7 @@ public class MesCartesPrepayeesService
 	
 	public boolean cartePrepayeeLigModifiable(ModeleContratDate lig,Date now, int cartePrepayeeDelai)
 	{
-		Date d = DateUtils.addDays(lig.dateLiv, -cartePrepayeeDelai);
+		Date d = DateUtils.addDays(lig.getDateLiv(), -cartePrepayeeDelai);
 		return  d.after(now);
 	}
 	

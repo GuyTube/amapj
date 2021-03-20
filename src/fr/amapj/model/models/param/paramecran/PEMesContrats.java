@@ -27,16 +27,19 @@ import fr.amapj.model.models.param.paramecran.common.AbstractParamEcran;
  */
 public class PEMesContrats  extends AbstractParamEcran
 {
-	// Indique si l'amapein peut imprimer ses contrats (classique au format Excel) 
+	// Indique si l'amapien peut imprimer ses contrats (classique au format Excel) 
 	public ImpressionContrat canPrintContrat = ImpressionContrat.TOUJOURS;
 
-	// Indique si l'amapein peut imprimer ses contrats d'engagement 
+	// Indique si l'amapien peut imprimer ses contrats d'engagement 
 	public ImpressionContrat canPrintContratEngagement = ImpressionContrat.TOUJOURS;
 	
 	// Indique le mode de présentation des impressions 
 	public PresentationImpressionContrat presentationImpressionContrat = PresentationImpressionContrat.ENGAGEMENT_FIRST;
 	
 	
+	// Indique si l'amapien peut imprimer son bulletin d'adhesion 
+	public ImpressionContrat canPrintAdhesion = ImpressionContrat.TOUJOURS;
+
 	public ImpressionContrat getCanPrintContrat()
 	{
 		return canPrintContrat;
@@ -66,4 +69,17 @@ public class PEMesContrats  extends AbstractParamEcran
 	{
 		this.presentationImpressionContrat = presentationImpressionContrat;
 	}
+
+	public ImpressionContrat getCanPrintAdhesion()
+	{
+		return canPrintAdhesion;
+	}
+
+	public void setCanPrintAdhesion(ImpressionContrat canPrintAdhesion)
+	{
+		this.canPrintAdhesion = canPrintAdhesion;
+	}
+
+	
+	
 }

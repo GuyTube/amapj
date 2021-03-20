@@ -42,6 +42,8 @@ public class UtilisateurDTO implements TableItem
 	
 	public String email;
 	
+	public String emailConjoint;
+	
 	public EtatUtilisateur etatUtilisateur;
 	
 	public Date dateCreation;
@@ -96,6 +98,16 @@ public class UtilisateurDTO implements TableItem
 	public void setEmail(String email)
 	{
 		this.email = email;
+	}
+
+	public String getEmailConjoint()
+	{
+		return emailConjoint;
+	}
+
+	public void setEmailConjoint(String emailConjoint)
+	{
+		this.emailConjoint = emailConjoint;
 	}
 
 	public EtatUtilisateur getEtatUtilisateur()
@@ -167,7 +179,7 @@ public class UtilisateurDTO implements TableItem
 	{
 		this.roles = roles;
 	}
-
+	
 	public Date getDateCreation() 
 	{
 		return dateCreation;

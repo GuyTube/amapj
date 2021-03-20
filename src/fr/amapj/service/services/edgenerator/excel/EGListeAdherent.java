@@ -102,7 +102,7 @@ public class EGListeAdherent extends AbstractExcelGenerator
 		}
 		else
 		{
-			utilisateurs = new UtilisateurService().getAllUtilisateurs(null);
+			utilisateurs = new UtilisateurService().getAllUtilisateurs(true);
 		}
 		
 		
@@ -191,6 +191,10 @@ public class EGListeAdherent extends AbstractExcelGenerator
 			et.setCell(6, u.getCodePostal(), et.nonGrasGaucheBordure);
 			et.setCell(7, u.getVille(), et.nonGrasGaucheBordure);
 		}
+		if (peListeAdherentDTO.canAccessEmail) {
+			et.setCell(8, u.getEmailConjoint(), et.nonGrasGaucheBordure);
+		}
+		
 		if (type!=Type.EXAMPLE)
 		{
 			et.setCell(8, u.getRoles(), et.nonGrasGaucheBordure);

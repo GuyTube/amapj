@@ -20,20 +20,24 @@
  */
  package fr.amapj.view.views.receptioncheque;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table.Align;
 
+import fr.amapj.model.models.contrat.modele.NatureContrat;
 import fr.amapj.service.services.gestioncontratsigne.ContratSigneDTO;
 import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
+import fr.amapj.service.services.mescontrats.ContratDTO;
+import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.view.engine.listpart.ButtonType;
 import fr.amapj.view.engine.listpart.StandardListPart;
 import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 import fr.amapj.view.views.common.contratselector.ContratSelectorPart;
 import fr.amapj.view.views.common.contrattelecharger.TelechargerContrat;
-import fr.amapj.view.views.receptioncheque.ReceptionChequeEditorPart.Mode;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat;
 import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
 
@@ -82,7 +86,8 @@ public class ReceptionChequeListPart extends StandardListPart<ContratSigneDTO>
 		HorizontalLayout toolbar1 = contratSelectorPart.getChoixContratComponent();
 		
 		addComponent(toolbar1);
-		
+		NatureContrat[] cpp = {NatureContrat.CARTE_PREPAYEE};
+		contratSelectorPart.setExcludedNatures(Arrays.asList(cpp));
 		contratSelectorPart.fillAutomaticValues();
 	}
 	

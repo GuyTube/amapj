@@ -51,7 +51,7 @@ public class SDProduitAll implements SearcherDefinition
 	public String toString(Identifiable identifiable)
 	{
 		Produit u = (Produit) identifiable;
-		return u.producteur.nom+" / "+u.nom+","+u.conditionnement;
+		return u.getProducteur().nom+" / "+u.getNom()+","+u.getConditionnement();
 	}
 	
 

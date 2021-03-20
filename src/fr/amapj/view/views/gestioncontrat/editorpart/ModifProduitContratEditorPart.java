@@ -77,7 +77,7 @@ public class ModifProduitContratEditorPart extends FormPopup
 		
 		addColumnSearcher("produitId", "Nom du produit",FieldType.SEARCHER, null,SearcherList.PRODUIT,prod,new ColumnNotNull<LigneContratDTO>(e->e.produitId));
 		addColumn("prix", "Prix du produit", FieldType.CURRENCY, null,new ColumnNotNull<LigneContratDTO>(e->e.prix));	
-	
+		addColumn("nbMaxParLivraison","Stock maximum", FieldType.INTEGER, null);
 	}
 	
 	

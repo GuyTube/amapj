@@ -96,7 +96,7 @@ public class PasswordManager
 			return "Adresse e-mail ou mot de passe incorrect";
 		}
 		
-		if (u.etatUtilisateur==EtatUtilisateur.INACTIF)
+		if (u.getEtatUtilisateur()==EtatUtilisateur.INACTIF)
 		{
 			return "Votre compte a été désactivé car vous n'êtes plus membre de l'AMAP.";
 		}
@@ -120,19 +120,27 @@ public class PasswordManager
 		// Si password ok :		
 		
 		// On mémorise l'accès dans la base de données du master
-		LogAccessDTO logAccessDTO = new LogViewService().saveAccess(u.nom,u.prenom,u.getId(),ip,browser,dbName,TypLog.USER,(sudo!=null));
-						
+		LogAccessDTO logAccessDTO = new LogViewService().saveAccess(u.getNom(),u.getPrenom(),u.getId(),ip,browser,dbName,TypLog.USER,(sudo!=null));
+
+		Producteur producteur = findProducteur(u.getId(), em);
+
 		// On sauveagrde les paramètres de session
 		SessionParameters p = new SessionParameters();
 		p.userId = u.getId();
 		p.userRole = new AccessManagementService().getUserRole(u,em);
-		p.userNom = u.nom;
-		p.userPrenom = u.prenom;
+		p.userNom = u.getNom();
+		p.userPrenom = u.getPrenom();
 		p.userEmail = email;
+		p.emailConjoint = u.getEmailConjoint();
 		p.dateConnexion = logAccessDTO.dateIn;
 		p.logId = logAccessDTO.id;
 		p.isSudo = (sudo!=null);
 		p.logFileName = logAccessDTO.logFileName;
+		if( producteur != null ) {
+			p.producteurId = producteur.getId();
+		} else { 
+			p.producteurId = null;
+		}
 		SessionManager.setSessionParameters(p);
 		
 		
@@ -173,8 +181,8 @@ public class PasswordManager
 
 	private String checkCredentialByPassword(Utilisateur u, String password)
 	{
-		byte[] encryptedPassword = toByteArray(u.password);
-		byte[] salt = toByteArray(u.salt);
+		byte[] encryptedPassword = toByteArray(u.getPassword());
+		byte[] salt = toByteArray(u.getSalt());
 
 		
 		// Verification du password
@@ -236,18 +244,18 @@ public class PasswordManager
 			return false;
 		}
 		
-		if (r.salt==null)
+		if (r.getSalt()==null)
 		{
-			r.salt = fromByteArray(passwordEncryptionService.generateSalt());
+			r.setSalt(fromByteArray(passwordEncryptionService.generateSalt()));
 		}
 		
-		byte[] salt = toByteArray(r.salt);
+		byte[] salt = toByteArray(r.getSalt());
 		byte[] encryptedPass = passwordEncryptionService.getEncryptedPassword(clearPassword, salt);
-		r.password = fromByteArray(encryptedPass);
+		r.setPassword(fromByteArray(encryptedPass));
 		
 		// A chaque changement du mot de passe on supprime la ré initilisation par mail
-		r.resetPasswordDate = null;
-		r.resetPasswordSalt = null;
+		r.setResetPasswordDate(null);
+		r.setResetPasswordSalt(null);
 		
 		return true;
 	
@@ -289,7 +297,7 @@ public class PasswordManager
 			return "Votre adresse e mail est inconnue";
 		}
 		
-		if (u.etatUtilisateur==EtatUtilisateur.INACTIF)
+		if (u.getEtatUtilisateur()==EtatUtilisateur.INACTIF)
 		{
 			return "Votre compte a été désactivé car vous n'êtes plus membre de l'AMAP.";
 		}
@@ -302,13 +310,13 @@ public class PasswordManager
 		}
 		
 		
-		u.resetPasswordDate = DateUtils.getDate();
+		u.setResetPasswordDate(DateUtils.getDate());
 		// Génère une clé pour le reset du password , de 20 caractères en minuscules
-		u.resetPasswordSalt = RandomUtils.generatePasswordMin(20);
+		u.setResetPasswordSalt(RandomUtils.generatePasswordMin(20));
 
 		ParametresDTO parametresDTO = new ParametresService().getParametres(); 
 		
-		String link = parametresDTO.getUrl()+"?resetPassword="+u.resetPasswordSalt;
+		String link = parametresDTO.getUrl()+"?resetPassword="+u.getResetPasswordSalt();
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("<h2>"+parametresDTO.nomAmap+"</h2>");
@@ -364,7 +372,7 @@ public class PasswordManager
 
 		Utilisateur u =  us.get(0);
 		
-		if (u.etatUtilisateur==EtatUtilisateur.INACTIF)
+		if (u.getEtatUtilisateur()==EtatUtilisateur.INACTIF)
 		{
 			return null;
 		}

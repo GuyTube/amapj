@@ -40,6 +40,8 @@ public class ConnectedUserDTO implements TableItem
 	
 	public String email;
 	
+	public String emailConjoint;
+
 	public Date date;
 	
 	public String ip;
@@ -76,6 +78,16 @@ public class ConnectedUserDTO implements TableItem
 	public void setEmail(String email)
 	{
 		this.email = email;
+	}
+
+	public String getEmailConjoint()
+	{
+		return emailConjoint;
+	}
+
+	public void setEmailConjoint(String emailConjoint)
+	{
+		this.emailConjoint = emailConjoint;
 	}
 
 	public Date getDate()

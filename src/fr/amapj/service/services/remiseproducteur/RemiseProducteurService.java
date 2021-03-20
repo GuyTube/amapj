@@ -99,12 +99,12 @@ public class RemiseProducteurService
 	{
 		RemiseDTO info = new RemiseDTO();
 
-		info.idModeleContrat = remise.datePaiement.modeleContrat.getId();
-		info.dateCreation = remise.dateCreation;
-		info.dateReelleRemise = remise.dateRemise;
-		info.dateTheoRemise = remise.datePaiement.datePaiement;
+		info.idModeleContrat = remise.getDatePaiement().getModeleContrat().getId();
+		info.dateCreation = remise.getDateCreation();
+		info.dateReelleRemise = remise.getDateRemise();
+		info.dateTheoRemise = remise.getDatePaiement().getDatePaiement();
 		info.id = remise.getId();
-		info.mnt = remise.montant;
+		info.mnt = remise.getMontant();
 		info.moisRemise = df.format(info.dateTheoRemise);
 		info.nbCheque = getNbCheque(em, remise);
 
@@ -147,7 +147,7 @@ public class RemiseProducteurService
 	{
 		RemiseDTO info = new RemiseDTO();
 		info.idModeleContratDatePaiement = datePaiement.getId();
-		info.dateTheoRemise = datePaiement.datePaiement;
+		info.dateTheoRemise = datePaiement.getDatePaiement();
 		info.idModeleContrat = idModeleContrat;
 		info.moisRemise = df.format(info.dateTheoRemise);
 
@@ -157,19 +157,18 @@ public class RemiseProducteurService
 
 		for (Paiement paiement : paiements)
 		{
-			info.mnt = info.mnt + paiement.montant;
+			info.mnt = info.mnt + paiement.getMontant();
 
 			PaiementRemiseDTO dto = new PaiementRemiseDTO();
 			dto.idPaiement = paiement.getId();
-			dto.montant = paiement.montant;
-			dto.nomUtilisateur = paiement.contrat.utilisateur.nom;
-			dto.prenomUtilisateur = paiement.contrat.utilisateur.prenom;
-			dto.etatPaiement = paiement.etat;
-			dto.commentaire1 = paiement.commentaire1;
-			dto.commentaire2 = paiement.commentaire2;
-			dto.commentaire3 = paiement.commentaire3;
-			dto.commentaire4 = paiement.commentaire4;
-
+			dto.montant = paiement.getMontant();
+			dto.nomUtilisateur = paiement.getContrat().getUtilisateur().getNom();
+			dto.prenomUtilisateur = paiement.getContrat().getUtilisateur().getPrenom();
+			dto.etatPaiement = paiement.getEtat();
+			dto.commentaire1 = paiement.getCommentaire1();
+			dto.commentaire2 = paiement.getCommentaire2();
+			dto.commentaire3 = paiement.getCommentaire3();
+			dto.commentaire4 = paiement.getCommentaire4();
 			info.paiements.add(dto);
 		}
 
@@ -265,17 +264,17 @@ public class RemiseProducteurService
 		EntityManager em = TransactionHelper.getEm();
 
 		RemiseProducteur remiseProducteur = new RemiseProducteur();
-		remiseProducteur.dateCreation = DateUtils.getDate();
-		remiseProducteur.datePaiement = em.find(ModeleContratDatePaiement.class, remiseDTO.idModeleContratDatePaiement);
-		remiseProducteur.dateRemise = remiseDTO.dateReelleRemise;
-		remiseProducteur.montant = remiseDTO.mnt;
+		remiseProducteur.setDateCreation(DateUtils.getDate());
+		remiseProducteur.setDatePaiement(em.find(ModeleContratDatePaiement.class, remiseDTO.idModeleContratDatePaiement));
+		remiseProducteur.setDateRemise(remiseDTO.dateReelleRemise);
+		remiseProducteur.setMontant(remiseDTO.mnt);
 		em.persist(remiseProducteur);
 
 		for (PaiementRemiseDTO paiement : remiseDTO.paiements)
 		{
 			Paiement p = em.find(Paiement.class, paiement.idPaiement);
-			p.etat = EtatPaiement.PRODUCTEUR;
-			p.remise = remiseProducteur;
+			p.setEtat(EtatPaiement.PRODUCTEUR);
+			p.setRemise(remiseProducteur);
 		}
 	}
 
@@ -290,8 +289,8 @@ public class RemiseProducteurService
 		List<Paiement> paiements = getPaiement(em, remiseProducteur);
 		for (Paiement p : paiements)
 		{
-			p.etat = EtatPaiement.AMAP;
-			p.remise = null;
+			p.setEtat(EtatPaiement.AMAP);
+			p.setRemise(null);
 		}
 		em.remove(remiseProducteur);
 
@@ -327,21 +326,19 @@ public class RemiseProducteurService
 		{
 			PaiementRemiseDTO dto = new PaiementRemiseDTO();
 			dto.idPaiement = paiement.getId();
-			dto.etatPaiement = paiement.etat;
-			dto.montant = paiement.montant;
-			dto.nomUtilisateur = paiement.contrat.utilisateur.nom;
-			dto.prenomUtilisateur = paiement.contrat.utilisateur.prenom;
-			dto.commentaire1 = paiement.commentaire1;
-			dto.commentaire2 = paiement.commentaire2;
-			dto.commentaire3 = paiement.commentaire3;
-			dto.commentaire4 = paiement.commentaire4;
+			dto.etatPaiement = paiement.getEtat();
+			dto.montant = paiement.getMontant();
+			dto.nomUtilisateur = paiement.getContrat().getUtilisateur().getNom();
+			dto.prenomUtilisateur = paiement.getContrat().getUtilisateur().getPrenom();
+			dto.commentaire1 = paiement.getCommentaire1();
+			dto.commentaire2 = paiement.getCommentaire2();
 			
 			res.paiements.add(dto);
 
-			if (paiement.etat != EtatPaiement.PRODUCTEUR)
+			if (paiement.getEtat() != EtatPaiement.PRODUCTEUR)
 			{
-				throw new RuntimeException("Erreur pour " + paiement.contrat.utilisateur.nom
-						+ paiement.contrat.utilisateur.prenom + " le cheque n'a pas le bon état");
+				throw new RuntimeException("Erreur pour " + paiement.getContrat().getUtilisateur().getNom()
+						+ paiement.getContrat().getUtilisateur().getPrenom() + " le cheque n'a pas le bon état");
 			}
 
 		}

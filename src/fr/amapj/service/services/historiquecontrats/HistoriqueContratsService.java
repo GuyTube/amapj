@@ -75,7 +75,7 @@ public class HistoriqueContratsService
 		{
 			// Si ce contrat est en historique
 			
-			ModeleContrat mc = contrat.modeleContrat;
+			ModeleContrat mc = contrat.getModeleContrat();
 			CartePrepayeeDTO cartePrepayeeDTO = mesCartesPrepayeesService.computeCartePrepayee(mc,em,now);
 			boolean isModifiable = statusService.isModifiable(mc,em,cartePrepayeeDTO,now);
 			if (statusService.isHistorique(contrat,em,now,isModifiable)==true)
@@ -87,12 +87,12 @@ public class HistoriqueContratsService
 	
 				HistoriqueContratDTO dto = new HistoriqueContratDTO();
 				
-				dto.nomContrat = contrat.modeleContrat.nom;
-				dto.nomProducteur = contrat.modeleContrat.producteur.nom;
+				dto.nomContrat = contrat.getModeleContrat().getNom();
+				dto.nomProducteur = contrat.getModeleContrat().getProducteur().nom;
 				dto.dateDebut = summaryDTO.dateDebut;
 				dto.dateFin = summaryDTO.dateFin;
-				dto.dateCreation = contrat.dateCreation;
-				dto.dateModification = contrat.dateModification;
+				dto.dateCreation = contrat.getDateCreation();
+				dto.dateModification = contrat.getDateModification();
 				dto.montant = gestionContratSigneService.getMontant(em, contrat);
 				
 				dto.idContrat = contrat.getId();

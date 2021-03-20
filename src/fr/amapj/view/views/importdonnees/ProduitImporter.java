@@ -119,7 +119,7 @@ public class ProduitImporter extends AbstractImporter<ImportProduitProducteurDTO
 				&& dto1.produit.equalsIgnoreCase(dto2.produit) 
 				&& (StringUtils.equalsIgnoreCase(dto1.conditionnement, dto2.conditionnement)) )
 		{
-			return "Deux produits chez le même producteur ont le même nom et condtionnement alors que ceci est interdit.";
+			return "Deux produits chez le même producteur ont le même nom et conditionnement alors que ceci est interdit.";
 		}
 		
 		return null;

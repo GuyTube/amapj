@@ -80,7 +80,7 @@ public class PEReceptionChequeEditorPart extends WizardFormPopup
 	private void addFieldCommentaire()
 	{
 		// Titre
-		setStepTitle("Autoriser la saisie de commentaires lors de la réception des chèques (exemple : saisir le nom de la banque, saisir le numéro des chèques, le nom sur le chèque, ...)");
+		setStepTitle("Autoriser la saisie de commentaires lors de la réception des chèques (exemple : saisir le nom de la banque, saisir le numéro des chèques)");
 		
 		// Liste des validators
 		IValidator len_1_100 = new StringLengthValidator(1, 255);

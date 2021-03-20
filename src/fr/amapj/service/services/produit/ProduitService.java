@@ -82,9 +82,9 @@ public class ProduitService
 		ProduitDTO dto = new ProduitDTO();
 		
 		dto.id = p.getId();
-		dto.nom = p.nom;
-		dto.conditionnement = p.conditionnement;
-		dto.producteurId = p.producteur.getId();
+		dto.nom = p.getNom();
+		dto.conditionnement = p.getConditionnement();
+		dto.producteurId = p.getProducteur().getId();
 		
 		return dto;
 		
@@ -114,9 +114,9 @@ public class ProduitService
 			p = em.find(Produit.class, dto.id);
 		}
 		
-		p.nom = dto.nom;
-		p.conditionnement = dto.conditionnement;
-		p.producteur = em.find(Producteur.class, dto.producteurId);
+		p.setNom(dto.nom);
+		p.setConditionnement(dto.conditionnement);
+		p.setProducteur(em.find(Producteur.class, dto.producteurId));
 		
 		if (create)
 		{
@@ -153,7 +153,7 @@ public class ProduitService
 
 		if (mcs.size()>0)
 		{
-			String str = CollectionUtils.asStdString(mcs, t -> t.nom);
+			String str = CollectionUtils.asStdString(mcs, t -> t.getNom());
 			throw new UnableToSuppressException("Cet produit est présent dans "+mcs.size()+" contrats : "+str);
 		}
 	}
@@ -172,7 +172,7 @@ public class ProduitService
 		}
 		
 		Produit p = em.find(Produit.class, idProduit);
-		return p.nom+","+p.conditionnement;
+		return p.getNom()+","+p.getConditionnement();
 		
 	}
 	

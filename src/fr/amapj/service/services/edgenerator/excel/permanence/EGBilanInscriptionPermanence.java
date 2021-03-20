@@ -120,9 +120,9 @@ public class EGBilanInscriptionPermanence extends AbstractExcelGenerator
 		{
 			et.addRow();
 			
-			et.setCell(0, u.utilisateur.nom, et.grasGaucheNonWrappeBordure);
-			et.setCell(1, u.utilisateur.prenom, et.nonGrasGaucheBordure);
-			et.setCell(2, u.utilisateur.email, et.nonGrasGaucheBordure);
+			et.setCell(0, u.utilisateur.getNom(), et.grasGaucheNonWrappeBordure);
+			et.setCell(1, u.utilisateur.getPrenom(), et.nonGrasGaucheBordure);
+			et.setCell(2, u.utilisateur.getEmail(), et.nonGrasGaucheBordure);
 			et.setCellQte(3, u.nbParticipationSouhaite,et.grasCentreBordure);
 			et.setCellQte(4, u.nbParticipationRelle,et.grasCentreBordure);
 			et.setCellQte(5, u.nbParticipationSouhaite-u.nbParticipationRelle,et.grasCentreBordure);

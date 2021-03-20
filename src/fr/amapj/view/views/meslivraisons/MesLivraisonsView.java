@@ -30,6 +30,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.common.FormatUtils;
+import fr.amapj.model.models.param.ChoixOuiNon;
 import fr.amapj.model.models.param.paramecran.PEMesLivraisons;
 import fr.amapj.service.services.edgenerator.excel.emargement.EGFeuilleEmargement;
 import fr.amapj.service.services.meslivraisons.JourLivraisonsDTO;
@@ -124,15 +125,20 @@ public class MesLivraisonsView extends FrontOfficeView implements PopupListener
 		
 		// Pour la semaine, ajout des planning mensuels de distribution
 		planning.removeAllComponents();
-		for (EGFeuilleEmargement planningMensuel : res.planningMensuel)
-		{
-			planning.addComponent(LinkCreator.createLink(planningMensuel));
+		PEMesLivraisons peMesLivraisons = (PEMesLivraisons) new ParametresService().loadParamEcran(MenuList.MES_LIVRAISONS);
+		if( ChoixOuiNon.OUI.equals(peMesLivraisons.getAfficheFeuilleEmargement())) {
+			for (EGFeuilleEmargement planningMensuel : res.planningMensuel)
+			{
+				planning.addComponent(LinkCreator.createLink(planningMensuel));
+			}
+			if (res.planningMensuel.size()>0)
+			{
+				BaseUiTools.addEmptyLine(planning);
+			}
+		} else {
+			System.out.println("NON AUTORISE");
+
 		}
-		if (res.planningMensuel.size()>0)
-		{
-			BaseUiTools.addEmptyLine(planning);
-		}
-		
 		
 		// Pour chaque jour, ajout des informations permanence et produits livrés
 		livraison.removeAllComponents();

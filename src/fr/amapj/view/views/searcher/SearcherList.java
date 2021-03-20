@@ -64,6 +64,7 @@ public class SearcherList
 	
 	static public SearcherDefinition PERIODE_PERMANENCE_ROLE = new SDPeriodePermanenceRole();
 	
-	
+	static public SearcherDefinition MODELEEMAIL = new SDModeleEmail();
+
 		
 }

@@ -85,7 +85,7 @@ public class EGUtilisateurContrat extends AbstractExcelGenerator
 		SimpleDateFormat df1 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		
 		// Ligne de titre
-		et.addRow("Liste des souscripteurs du contrat "+mc.nom,et.grasGaucheNonWrappe);
+		et.addRow("Liste des souscripteurs du contrat "+mc.getNom(),et.grasGaucheNonWrappe);
 		et.addRow("Extrait le "+df1.format(DateUtils.getDate()),et.grasGaucheNonWrappe);
 			
 		// Ligne vide
@@ -112,14 +112,14 @@ public class EGUtilisateurContrat extends AbstractExcelGenerator
 	{
 		et.addRow();
 			
-		et.setCell(0, u.nom, et.grasGaucheNonWrappeBordure);
-		et.setCell(1, u.prenom, et.nonGrasGaucheBordure);
-		et.setCell(2, u.email, et.nonGrasGaucheBordure);
-		et.setCell(3, u.numTel1, et.nonGrasGaucheBordure);
-		et.setCell(4, u.numTel2, et.nonGrasGaucheBordure);
-		et.setCell(5, u.libAdr1, et.nonGrasGaucheBordure);
-		et.setCell(6, u.codePostal, et.nonGrasGaucheBordure);
-		et.setCell(7, u.ville, et.nonGrasGaucheBordure);
+		et.setCell(0, u.getNom(), et.grasGaucheNonWrappeBordure);
+		et.setCell(1, u.getPrenom(), et.nonGrasGaucheBordure);
+		et.setCell(2, u.getEmail(), et.nonGrasGaucheBordure);
+		et.setCell(3, u.getNumTel1(), et.nonGrasGaucheBordure);
+		et.setCell(4, u.getNumTel2(), et.nonGrasGaucheBordure);
+		et.setCell(5, u.getLibAdr1(), et.nonGrasGaucheBordure);
+		et.setCell(6, u.getCodePostal(), et.nonGrasGaucheBordure);
+		et.setCell(7, u.getVille(), et.nonGrasGaucheBordure);
 		
 	}
 	
@@ -129,7 +129,7 @@ public class EGUtilisateurContrat extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class,idModeleContrat);
-		return "liste-souscripteurs-"+mc.nom;
+		return "liste-souscripteurs-"+mc.getNom();
 	}
 	
 

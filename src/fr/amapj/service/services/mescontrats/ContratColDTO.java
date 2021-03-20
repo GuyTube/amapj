@@ -36,6 +36,8 @@ public class ContratColDTO
 	
 	public Long modeleContratProduitId;
 	
+	public Integer stockMax;
+		
 	public int j;
 		
 }

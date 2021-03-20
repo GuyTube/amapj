@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -243,8 +244,16 @@ public class DateUtils
 
 	public static int getDeltaDay(Date d1, Date d2)
 	{
+		// TODO Pouvoir configurer la zone
+		LocalDate date1 = d1.toInstant().atZone(ZoneId.of("Europe/Paris")).toLocalDate();
+		LocalDate date2 = d2.toInstant().atZone(ZoneId.of("Europe/Paris")).toLocalDate();
+		long delta = ChronoUnit.DAYS.between(date2, date1);
+		if( delta > Integer.MAX_VALUE ) {
+			throw new RuntimeException("getDeltaDay RESULT IS GREATER THAN "+Integer.MAX_VALUE+". NOT ALLOWED");
+		}
+		return (int) delta;
 		// TODO ce n'est pas bon aux changements d'heure ete hiver
-		return (int) ((d2.getTime()-d1.getTime())/(1000L*3600L*24L));
+		//return (int) ((d2.getTime()-d1.getTime())/(1000L*3600L*24L));
 	}
 
 	

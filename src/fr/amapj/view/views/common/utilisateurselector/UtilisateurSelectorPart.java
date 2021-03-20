@@ -97,7 +97,7 @@ public class UtilisateurSelectorPart
 		toolbar1.addComponent(utilisateurBox);
 		toolbar1.addComponent(reinitButton);
 		toolbar1.setExpandRatio(reinitButton, 1);
-		toolbar1.setComponentAlignment(reinitButton, Alignment.TOP_RIGHT);
+		toolbar1.setComponentAlignment(reinitButton, Alignment.TOP_LEFT);
 		
 	}
 

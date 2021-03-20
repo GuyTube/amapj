@@ -46,7 +46,7 @@ public class SDPeriodeCotisation implements SearcherDefinition
 	public String toString(Identifiable identifiable)
 	{
 		PeriodeCotisation u = (PeriodeCotisation) identifiable;
-		return u.nom;
+		return u.getNom();
 	}
 	
 

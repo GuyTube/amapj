@@ -35,8 +35,6 @@ import fr.amapj.model.models.param.paramecran.PEMesContrats;
 import fr.amapj.service.services.edgenerator.pdf.PGBulletinAdhesion;
 import fr.amapj.service.services.gestioncotisation.GestionCotisationService;
 import fr.amapj.service.services.gestioncotisation.PeriodeCotisationDTO;
-import fr.amapj.service.services.mescontrats.AdhesionDTO;
-import fr.amapj.service.services.mescontrats.AdhesionDTO.AffichageOnly;
 import fr.amapj.service.services.mescontrats.MesContratsDTO;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
@@ -44,6 +42,7 @@ import fr.amapj.view.engine.menu.MenuList;
 import fr.amapj.view.engine.popup.suppressionpopup.PopupSuppressionListener;
 import fr.amapj.view.engine.popup.suppressionpopup.SuppressionPopup;
 import fr.amapj.view.engine.popup.suppressionpopup.UnableToSuppressException;
+import fr.amapj.view.engine.template.FrontOfficeView;
 import fr.amapj.view.engine.tools.BaseUiTools;
 import fr.amapj.view.engine.widgets.CurrencyTextFieldConverter;
 
@@ -56,16 +55,17 @@ public class MesContratsViewAdhesionPart implements PopupSuppressionListener
 {
 	
 	SimpleDateFormat df = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
-	private MesContratsView view;
+	private ContratsASouscrire view;
 
 	/**
 	 * 
 	 */
-	public MesContratsViewAdhesionPart(MesContratsView view)
+
+
+	public MesContratsViewAdhesionPart(ContratsASouscrire view)
 	{
 		this.view = view;
 	}
-
 	
 	private Button addButtonAdhesionAdherer(String str)
 	{

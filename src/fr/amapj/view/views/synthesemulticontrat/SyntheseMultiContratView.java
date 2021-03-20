@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
+import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -46,12 +47,11 @@ import fr.amapj.service.engine.generator.CoreGenerator;
 import fr.amapj.service.services.edgenerator.excel.cheque.EGSyntheseCheque;
 import fr.amapj.service.services.edgenerator.excel.cheque.EGSyntheseCheque.Mode;
 import fr.amapj.service.services.edgenerator.excel.livraison.EGLivraisonAmapien;
-import fr.amapj.service.services.edgenerator.excel.stats.EGStatAnnuelleProducteur;
-import fr.amapj.service.services.edgenerator.excel.stats.EGStatPeriodeContratAdherent;
 import fr.amapj.service.services.edgenerator.pdf.PGLivraisonAmapien;
 import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.menu.MenuList;
+import fr.amapj.view.engine.popup.PopupListener;
 import fr.amapj.view.engine.template.BackOfficeLongView;
 
 

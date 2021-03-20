@@ -101,8 +101,8 @@ public class EGBilanAdhesion extends AbstractExcelGenerator
 		Utilisateur u = em.find(Utilisateur.class, pu.idUtilisateur);
 		
 		et.addRow();
-		et.setCell(0,u.nom,et.grasGaucheNonWrappeBordure);
-		et.setCell(1,u.prenom,et.nonGrasGaucheBordure);
+		et.setCell(0,u.getNom(),et.grasGaucheNonWrappeBordure);
+		et.setCell(1,u.getPrenom(),et.nonGrasGaucheBordure);
 		et.setCellPrix(2,pu.montantAdhesion,et.prixCentreBordure);
 		et.setCell(3,pu.etatPaiementAdhesion.toString(),et.nonGrasCentreBordure);
 		et.setCell(4,pu.typePaiementAdhesion.toString(),et.nonGrasCentreBordure);
@@ -140,14 +140,14 @@ public class EGBilanAdhesion extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		PeriodeCotisation pc = em.find(PeriodeCotisation.class, periodeCotisationId);
-		return "bilan-adhésion-"+pc.nom;
+		return "bilan-adhésion-"+pc.getNom();
 	}
 
 	@Override
 	public String getNameToDisplay(EntityManager em)
 	{
 		PeriodeCotisation pc = em.find(PeriodeCotisation.class, periodeCotisationId);
-		return "le bilan des adhésions pour "+pc.nom;
+		return "le bilan des adhésions pour "+pc.getNom();
 	}
 	
 	@Override

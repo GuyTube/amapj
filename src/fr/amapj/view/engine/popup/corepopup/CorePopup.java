@@ -124,6 +124,7 @@ abstract public class CorePopup
 			mainLayout.addComponent(contentLayout);
 			
 			//
+			//popupButtonBarLayout.setWidth(null);
 			mainLayout.addComponent(popupButtonBarLayout);
 			mainLayout.setComponentAlignment(popupButtonBarLayout, Alignment.MIDDLE_RIGHT);
 			
@@ -151,6 +152,7 @@ abstract public class CorePopup
 			
 			
 			//
+			//popupButtonBarLayout.setWidth(null);
 			mainLayout.addComponent(popupButtonBarLayout);
 			mainLayout.setComponentAlignment(popupButtonBarLayout, Alignment.MIDDLE_RIGHT);
 			
@@ -366,6 +368,7 @@ abstract public class CorePopup
 					}
 					catch(Throwable t)
 					{
+						t.printStackTrace();
 						ErrorPopup.open(t);
 					}
 				}

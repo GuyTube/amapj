@@ -52,7 +52,7 @@ public class SDProduit implements SearcherDefinition
 	public String toString(Identifiable identifiable)
 	{
 		Produit u = (Produit) identifiable;
-		return u.nom+","+u.conditionnement;
+		return u.getNom()+","+u.getConditionnement();
 	}
 	
 

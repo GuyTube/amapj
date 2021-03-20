@@ -38,6 +38,8 @@ public class LigneContratDTO
 	
 	public Integer prix;
 	
+	public Integer nbMaxParLivraison;
+	
 	public Long getProduitId()
 	{
 		return produitId;
@@ -58,6 +60,16 @@ public class LigneContratDTO
 		this.prix = prix;
 	}
 
+	public Integer getNbMaxParLivraison()
+	{
+		return nbMaxParLivraison;
+	}
+
+	public void setNbMaxParLivraison(Integer nbMaxParLivraison)
+	{
+		this.nbMaxParLivraison = nbMaxParLivraison;
+	}
+	
 	public String getProduitNom()
 	{
 		return produitNom;

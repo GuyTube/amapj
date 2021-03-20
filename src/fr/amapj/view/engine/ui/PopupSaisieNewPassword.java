@@ -69,7 +69,7 @@ public class PopupSaisieNewPassword extends FormPopup
 		
 		
 		Date datLimit = DateUtils.addDays(fr.amapj.common.DateUtils.getDate(), -1);
-		if (u.resetPasswordDate.before(datLimit))
+		if (u.getResetPasswordDate().before(datLimit))
 		{
 			addLabel("Votre demande est trop ancienne", ContentMode.TEXT);
 			return ;

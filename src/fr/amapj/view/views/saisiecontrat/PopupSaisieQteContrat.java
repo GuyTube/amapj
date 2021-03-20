@@ -22,9 +22,11 @@
 
 import java.text.SimpleDateFormat;
 
+import fr.amapj.service.services.gestioncontratsigne.GestionContratSigneService;
 import fr.amapj.service.services.mescontrats.ContratColDTO;
 import fr.amapj.service.services.mescontrats.ContratDTO;
 import fr.amapj.service.services.mescontrats.ContratLigDTO;
+import fr.amapj.service.services.mescontrats.MesContratsService;
 import fr.amapj.view.engine.grid.GridHeaderLine;
 import fr.amapj.view.engine.grid.GridSizeCalculator;
 import fr.amapj.view.engine.grid.integergrid.PopupIntegerGrid;
@@ -106,12 +108,32 @@ public class PopupSaisieQteContrat extends PopupIntegerGrid
 		GridHeaderLine line2  =new GridHeaderLine();
 		line2.styleName = "prix";
 		line2.cells.add("prix unitaire");
-				
+		
+		boolean hasLimit = false;
 		for (ContratColDTO col : contratDTO.contratColumns)
 		{
 			line2.cells.add(new CurrencyTextFieldConverter().convertToString(col.prix));
+			if( col.stockMax != null && col.stockMax != 0 ) {
+				hasLimit = true;
+			}
 		}
-
+		MesContratsService mcs = new MesContratsService();
+		GridHeaderLine lineLimit = null;
+		if( hasLimit ) {
+			lineLimit = new GridHeaderLine();
+			lineLimit.styleName = "prix";
+			lineLimit.cells.add("Stock restant");
+			for (ContratColDTO col : contratDTO.contratColumns)
+			{
+				String val = "-";
+				if( col.stockMax != null && col.stockMax != 0 ) {
+					long qteCom = mcs.getMaxStockCommande(contratDTO.modeleContratId,col.modeleContratProduitId);
+					val = (col.stockMax-qteCom)+"/"+col.stockMax.toString();;
+				}
+				lineLimit.cells.add(val);
+			}
+		}
+		
 		// Construction du header 3
 		GridHeaderLine line3  =new GridHeaderLine();
 		line3.styleName = "tete";
@@ -125,6 +147,9 @@ public class PopupSaisieQteContrat extends PopupIntegerGrid
 		
 		param.headerLines.add(line1);
 		param.headerLines.add(line2);
+		if(hasLimit) {
+			param.headerLines.add(lineLimit);
+		}
 		param.headerLines.add(line3);
 		
 		

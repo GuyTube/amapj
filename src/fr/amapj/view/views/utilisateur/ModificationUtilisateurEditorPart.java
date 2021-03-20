@@ -78,6 +78,9 @@ public class ModificationUtilisateurEditorPart extends FormPopup
 		// Champ 8
 		addTextField("Ville", "ville");
 
+		// Champ 9
+		addTextField("E mail du conjoint", "emailConjoint");
+
 	}
 
 	

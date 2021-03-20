@@ -23,19 +23,25 @@
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 
 import fr.amapj.common.CollectionUtils;
 import fr.amapj.common.DateUtils;
 import fr.amapj.common.FormatUtils;
 import fr.amapj.service.services.mescontrats.ContratDTO;
 import fr.amapj.service.services.mescontrats.ContratLigDTO;
+import fr.amapj.view.engine.popup.corepopup.CorePopup;
+import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
+import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
 import fr.amapj.view.engine.popup.okcancelpopup.OKCancelPopup;
 import fr.amapj.view.views.saisiecontrat.ContratAboManager.ContratAbo;
 
@@ -50,13 +56,15 @@ public class PopupSaisieJoker extends OKCancelPopup
 	
 	private List<ComboBox> combos;
 	
+	private List<CheckBox> cboxes;
+	
 	private List<ContratLigDTO> nonModifiableJokers;
 	
 	
 	private ContratDTO contratDTO;
 	
 	private Label titre;
-
+	
 	// Indique si on peut modifier les jokers ou si on est en mode read only 
 	private boolean readOnly;
 
@@ -71,6 +79,7 @@ public class PopupSaisieJoker extends OKCancelPopup
 		CollectionUtils.sort(abo.dateJokers, e->e.date);
 		
 		combos = new ArrayList<>();
+		cboxes = new ArrayList<>();
 		nonModifiableJokers = new ArrayList<>();
 		
 		popupTitle = "Gestion des jokers de mon contrat "+contratDTO.nom;
@@ -92,7 +101,7 @@ public class PopupSaisieJoker extends OKCancelPopup
 		titre = new Label(msg,ContentMode.HTML);
 		contentLayout.addComponent(titre);
 		
-		GridLayout gl = new GridLayout(3,contratDTO.jokerNbMax);
+		GridLayout gl = new GridLayout(4,contratDTO.jokerNbMax);
 		gl.setMargin(true);
 		gl.setSpacing(true);
 		
@@ -114,6 +123,20 @@ public class PopupSaisieJoker extends OKCancelPopup
 				box.setWidth("220px");
 				gl.addComponent(box, 1, i);
 				combos.add(box);
+				CheckBox checkboxNonConnu;
+				checkboxNonConnu = new CheckBox();
+				checkboxNonConnu.setCaption("Je ne connais pas la date");
+				checkboxNonConnu.addValueChangeListener(event -> {
+					if( checkboxNonConnu.getValue() == true ) {
+						box.select(box.getNullSelectionItemId());
+						box.setReadOnly(true);
+					} else {
+						box.setReadOnly(false);
+					}
+					updateTitre();
+				});
+				cboxes.add(checkboxNonConnu);
+				gl.addComponent(checkboxNonConnu, 3,i);
 			}
 			else
 			{
@@ -124,19 +147,21 @@ public class PopupSaisieJoker extends OKCancelPopup
 					nonModifiableJokers.add(dateJoker);
 				}
 			}
-			
+
+
 			String l3msg = isModifiable ? "" :" (Non modifiable)";
 			Label l3 = new Label(l3msg);
 			gl.addComponent(l3, 2, i);
 				
 		}
 		contentLayout.addComponent(gl);
+
 		
 	}
 
 	private String getTitre(int nbJokers)
 	{
-		return new ContratAboManager().computeJokerMessage(contratDTO, nbJokers);
+		return new ContratAboManager().computeJokerMessage(contratDTO, nbJokers,true);
 	}
 
 
@@ -187,6 +212,7 @@ public class PopupSaisieJoker extends OKCancelPopup
 	private void updateTitre()
 	{
 		int nbJokers = (int) combos.stream().filter(e->e.getValue()!=null).count();
+		nbJokers = nbJokers + (int) cboxes.stream().filter(e->e.getValue()==true).count();
 		titre.setValue(getTitre(nbJokers));
 	}
 
@@ -201,19 +227,49 @@ public class PopupSaisieJoker extends OKCancelPopup
 		
 		abo.dateJokers.clear();
 		abo.dateJokers.addAll(nonModifiableJokers);
+		
+		int idx = 0;
 		for (ComboBox comboBox : combos)
 		{
 			ContratLigDTO lig = (ContratLigDTO) comboBox.getValue();
+			CheckBox cb = cboxes.get(idx);
 			if (lig!=null)
 			{
 				abo.dateJokers.add(lig);
+			} else if(cb.getValue() == true ) {
+				abo.dateJokers.add(getLastIdWithShift(comboBox.getItemIds(), idx));
 			}
+			
+			idx++;
 		}
+
+		for( CheckBox cb : cboxes) {
+			
+		}
+		int nbJokers = abo.dateJokers.size();
 		CollectionUtils.removeDuplicate(abo.dateJokers);
+		if( nbJokers != abo.dateJokers.size()) {
+			MessagePopup popup = new MessagePopup("Erreur de saisie",ColorStyle.RED,"Veuillez supprimer les doublons");
+			CorePopup.open(popup);
+			return false;
+		}
+		
 		CollectionUtils.sort(abo.dateJokers,e->e.date);
 		
 		return true;
 	}
 
+	private ContratLigDTO getLastIdWithShift(Collection<?> col, int shift) {
+		
+		int i = 0;
+		int nbItemCol = col.size();
+		for( Object c : col) {
+			if(i == nbItemCol - 1 - shift) {
+				return (ContratLigDTO) c;
+			}
+			i++;
+		}
+		return null;
+	}
 	
 }

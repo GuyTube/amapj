@@ -299,7 +299,7 @@ public class SmallInscriptionPermanence extends OKCancelPopup implements PopupLi
 	private void handleInscription(PeriodePermanenceDateDTO detail)
 	{
 		//
-		if (periodePermanenceDTO.nbInscription>=periodePermanenceDTO.nbSouhaite)
+		if (periodePermanenceDTO.limitNbPermanenceUtil && periodePermanenceDTO.nbInscription>=periodePermanenceDTO.nbSouhaite)
 		{
 			MessagePopup popup = new MessagePopup("Impossible de s'inscrire",ColorStyle.GREEN,"Vous êtes déjà inscrit sur suffisamment de dates.");
 			MessagePopup.open(popup);

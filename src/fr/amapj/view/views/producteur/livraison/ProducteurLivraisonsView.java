@@ -22,6 +22,9 @@
 
 import java.text.SimpleDateFormat;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
@@ -29,8 +32,10 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.VerticalLayout;
 
 import fr.amapj.model.models.param.paramecran.PELivraisonProducteur;
+import fr.amapj.service.services.edgenerator.excel.emargement.EGFeuilleEmargement;
 import fr.amapj.service.services.edgenerator.excel.feuilledistribution.producteur.EGFeuilleDistributionProducteur;
 import fr.amapj.service.services.gestioncontrat.GestionContratService;
+import fr.amapj.service.services.mailer.PopupSelectProduitsEmail;
 import fr.amapj.service.services.meslivraisons.JourLivraisonsDTO;
 import fr.amapj.service.services.meslivraisons.MesLivraisonsDTO;
 import fr.amapj.service.services.meslivraisons.MesLivraisonsService;
@@ -40,10 +45,12 @@ import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.view.engine.excelgenerator.LinkCreator;
 import fr.amapj.view.engine.menu.MenuList;
 import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.popup.formpopup.FormPopup;
 import fr.amapj.view.engine.template.FrontOfficeView;
 import fr.amapj.view.engine.tools.BaseUiTools;
 import fr.amapj.view.views.common.gapviewer.AbstractGapViewer;
 import fr.amapj.view.views.common.gapviewer.GapViewerUtil;
+import fr.amapj.view.views.parametres.PopupConfigModeleEmail;
 import fr.amapj.view.views.producteur.ProducteurSelectorPart;
 
 
@@ -53,6 +60,8 @@ import fr.amapj.view.views.producteur.ProducteurSelectorPart;
  */
 public class ProducteurLivraisonsView extends FrontOfficeView implements PopupListener
 {
+
+	private final static Logger logger = LogManager.getLogger();
 
 	SimpleDateFormat df1 = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
 	
@@ -144,11 +153,23 @@ public class ProducteurLivraisonsView extends FrontOfficeView implements PopupLi
 				b.addClickListener(e->buttonClick(detail,b,producteurLiv.idModeleContratDate));
 				b.setData(new Boolean(false));
 				
+				Button bMail = new Button("Envoyer un email spécifique");
+				bMail.addClickListener(e->buttonMailClick(producteurLiv));
+				bMail.addStyleName("icon-align-right");
+				bMail.addStyleName("large");	
+				vl.addComponent(bMail);
 				
 				//
 				Link extractFile = LinkCreator.createLink(new EGFeuilleDistributionProducteur(producteurLiv.idModeleContrat,producteurLiv.idModeleContratDate));
 				vl.addComponent(extractFile);
-				
+
+				/*for (EGFeuilleEmargement planningMensuel : res.planningMensuel)
+				{
+					if( planningMensuel.ge)
+					vl.addComponent(LinkCreator.createLink(planningMensuel));
+				}*/
+				// TODO PMO : Voir si le principe du compteur est vraiment une bonne idée
+				//vl.addComponent(LinkCreator.createLink(res.planningMensuel.get(cpt)));
 			}
 		}		
 	}
@@ -179,6 +200,11 @@ public class ProducteurLivraisonsView extends FrontOfficeView implements PopupLi
 		}	
 	}
 	
+	public void buttonMailClick(ProducteurLivraisonsDTO prodLiv)
+	{
+		FormPopup.open(new PopupSelectProduitsEmail(prodLiv),this);
+
+	}	
 	
 	
 }

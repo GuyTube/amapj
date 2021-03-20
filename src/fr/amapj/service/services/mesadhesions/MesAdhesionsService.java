@@ -97,7 +97,7 @@ public class MesAdhesionsService
 			// Si cet adhesion utilisateur n'a pas été proposé dans les periodes de cotisation 
 			if (periodeCotisation==null)
 			{
-				periodeCotisation = em.find(PeriodeCotisation.class, pcu.periodeCotisation.id);
+				periodeCotisation = em.find(PeriodeCotisation.class, pcu.getPeriodeCotisation().getId());
 				AdhesionDTO dto = createAdhesionDTO(em,periodeCotisation,pcu,userId);
 				mesAdhesionDTO.archives.add(dto);
 			}
@@ -115,12 +115,12 @@ public class MesAdhesionsService
 
 	private PeriodeCotisationUtilisateur findMatching(PeriodeCotisation p,List<PeriodeCotisationUtilisateur> pcus) 
 	{
-		return pcus.stream().filter(e->e.periodeCotisation.id.equals(p.id)).collect(CollectorUtils.oneOrZero());
+		return pcus.stream().filter(e->e.getPeriodeCotisation().getId().equals(p.getId())).collect(CollectorUtils.oneOrZero());
 	}
 	
 	private PeriodeCotisation findMatching(PeriodeCotisationUtilisateur pcu, List<PeriodeCotisation> ps) 
 	{
-		return ps.stream().filter(e->e.id.equals(pcu.periodeCotisation.id)).collect(CollectorUtils.oneOrZero());
+		return ps.stream().filter(e->e.getId().equals(pcu.getPeriodeCotisation().getId())).collect(CollectorUtils.oneOrZero());
 	}
 
 	private AdhesionDTO createAdhesionDTO(EntityManager em, PeriodeCotisation p, PeriodeCotisationUtilisateur pcu,Long idUtilisateur) 
@@ -132,23 +132,23 @@ public class MesAdhesionsService
 		dto.isModifiable= computeIsModifiable(pcu);
 		dto.isSupprimable = computeIsSupprimable(pcu,em); 
 		dto.idUtilisateur =  idUtilisateur;
-		dto.idPeriode = p.id;
-		dto.nomPeriode = p.nom;
-		dto.montantMini = p.montantMini;
-		dto.montantConseille = p.montantConseille;
-		dto.dateDebut = p.dateDebut;
-		dto.dateFin = p.dateFin;
-		dto.libCheque = p.libCheque;
-		dto.textPaiement = p.textPaiement;
+		dto.idPeriode = p.getId();
+		dto.nomPeriode = p.getNom();
+		dto.montantMini = p.getMontantMini();
+		dto.montantConseille = p.getMontantConseille();
+		dto.dateDebut = p.getDateDebut();
+		dto.dateFin = p.getDateFin();
+		dto.libCheque = p.getLibCheque();
+		dto.textPaiement = p.getTextPaiement();
 		
 		if (pcu!=null)
 		{
-			dto.idPeriodeUtilisateur = pcu.id;
-			dto.montantAdhesion = pcu.montantAdhesion;
+			dto.idPeriodeUtilisateur = pcu.getId();
+			dto.montantAdhesion = pcu.getMontantAdhesion();
 		}
 		
 		//
-		dto.idBulletin = IdentifiableUtil.getId(p.bulletinAdhesion);
+		dto.idBulletin = IdentifiableUtil.getId(p.getBulletinAdhesion());
 		
 		return dto;
 	}
@@ -163,7 +163,7 @@ public class MesAdhesionsService
 		{
 			return false;
 		}
-		if (pcu.etatPaiementAdhesion==EtatPaiementAdhesion.ENCAISSE)
+		if (pcu.getEtatPaiementAdhesion()==EtatPaiementAdhesion.ENCAISSE)
 		{
 			return false;
 		}
@@ -181,14 +181,14 @@ public class MesAdhesionsService
 		{
 			return false;
 		}
-		if (pcu.etatPaiementAdhesion==EtatPaiementAdhesion.ENCAISSE)
+		if (pcu.getEtatPaiementAdhesion()==EtatPaiementAdhesion.ENCAISSE)
 		{
 			return false;
 		}
 		
 		TypedQuery<Contrat> q = em.createQuery("select count(c) from Contrat c WHERE c.modeleContrat.periodeCotisation=:p and c.utilisateur=:u",Contrat.class);
-		q.setParameter("p", pcu.periodeCotisation);
-		q.setParameter("u", pcu.utilisateur);
+		q.setParameter("p", pcu.getPeriodeCotisation());
+		q.setParameter("u", pcu.getUtilisateur());
 		int nb = SQLUtils.count(q);
 		if (nb>0)
 		{
@@ -212,12 +212,12 @@ public class MesAdhesionsService
 		else
 		{
 			pcu = new PeriodeCotisationUtilisateur();
-			pcu.periodeCotisation = em.find(PeriodeCotisation.class, dto.idPeriode);
-			pcu.utilisateur = em.find(Utilisateur.class, dto.idUtilisateur);
+			pcu.setPeriodeCotisation( em.find(PeriodeCotisation.class, dto.idPeriode));
+			pcu.setUtilisateur( em.find(Utilisateur.class, dto.idUtilisateur));
 		}
 		
-		pcu.dateAdhesion = DateUtils.getDate();
-		pcu.montantAdhesion = montant;
+		pcu.setDateAdhesion(DateUtils.getDate());
+		pcu.setMontantAdhesion(montant);
 		
 		if (dto.idPeriodeUtilisateur==null)
 		{

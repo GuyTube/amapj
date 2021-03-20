@@ -85,7 +85,7 @@ public class EGSyntheseContrat  extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		ModeleContrat mc = em.find(ModeleContrat.class, modeleContratId);
-		return "synthese-"+mc.nom;
+		return "synthese-"+mc.getNom();
 	}
 
 

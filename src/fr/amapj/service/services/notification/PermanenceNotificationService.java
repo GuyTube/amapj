@@ -32,19 +32,24 @@ import org.apache.logging.log4j.Logger;
 
 import fr.amapj.common.CollectionUtils;
 import fr.amapj.common.DateUtils;
+import fr.amapj.common.Dictionary;
+import fr.amapj.common.DictionaryEnum;
 import fr.amapj.model.engine.tools.TestTools;
 import fr.amapj.model.engine.transaction.Call;
 import fr.amapj.model.engine.transaction.DbRead;
 import fr.amapj.model.engine.transaction.NewTransaction;
 import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.fichierbase.ModeleEmail;
 import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.model.models.param.ChoixOuiNon;
+import fr.amapj.model.models.param.ModeleEmailEnum;
 import fr.amapj.model.models.permanence.periode.EtatPeriodePermanence;
 import fr.amapj.model.models.permanence.reel.PermanenceCell;
 import fr.amapj.service.services.mailer.MailerMessage;
 import fr.amapj.service.services.mailer.MailerService;
 import fr.amapj.service.services.parametres.ParametresDTO;
 import fr.amapj.service.services.parametres.ParametresService;
+import fr.amapj.service.services.permanence.detailperiode.DetailPeriodePermanenceService;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceDateDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceService;
 import fr.amapj.service.services.utilisateur.util.UtilisateurUtil;
@@ -111,9 +116,6 @@ public class PermanenceNotificationService
 		}
 	}
 	
-	
-	
-	
 	/**
 	 * 
 	 * @param u
@@ -126,13 +128,34 @@ public class PermanenceNotificationService
 		MailerMessage message  = new MailerMessage();
 		
 		Utilisateur utilisateur = pc.periodePermanenceUtilisateur.utilisateur;
-		
-		String titre = replaceWithContext(param.titreMailRappelPermanence, pc, em,utilisateur,param);
-		String content = replaceWithContext(param.contenuMailRappelPermanence, pc, em,utilisateur,param);
+
+		ModeleEmail emailPermanence = MailerService.getModeleEmail(ModeleEmailEnum.NOTIFICATION_PERMANENCE);
+		String titreTemplate = emailPermanence.getTitre();
+		//param.titreMailRappelPermanence;
+		String contenuTemplate = emailPermanence.getContenu();
+		//param.contenuMailRappelPermanence;
+		if (titreTemplate==null || titreTemplate.trim().length()==0)
+		{
+			titreTemplate = "Permanence AMAP";
+		}
+		if(contenuTemplate==null || contenuTemplate.trim().length()==0) {
+			contenuTemplate = "Permanence AMAP";
+		}
+
+		// Calcul du contexte
+		SimpleDateFormat df = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
+
+		PeriodePermanenceDateDTO permanenceDTO = new PeriodePermanenceService().loadOneDatePermanence(pc.periodePermanenceDate.id);
+		Dictionary dictionary = new Dictionary(utilisateur);
+		dictionary.addWord(DictionaryEnum.DATE_PERMANENCE, df.format(pc.periodePermanenceDate.datePerm));
+		dictionary.addWord(DictionaryEnum.PERSONNES, permanenceDTO.getNomInscrit());
+
+		String titre = dictionary.substitue(titreTemplate);
+		String content = dictionary.substitue(contenuTemplate);
 		
 		message.setTitle(titre);
 		message.setContent(content);
-		message.setEmail(utilisateur.email);
+		message.setEmail(utilisateur.getEmail());
 		sendMessageAndMemorize(message,pc.getId());
 		
 	}
@@ -181,7 +204,7 @@ public class PermanenceNotificationService
 		pc.dateNotification = DateUtils.getDate();
 	}
 
-
+/*
 	private String replaceWithContext(String in,PermanenceCell dpu,EntityManager em,Utilisateur u,ParametresDTO param)
 	{
 		// Si le champ a été laissé vide, on positione une valeur par défaut 
@@ -189,29 +212,17 @@ public class PermanenceNotificationService
 		{
 			in = "Permanence AMAP";
 		}
-		
+
 		// Calcul du contexte
 		SimpleDateFormat df = new SimpleDateFormat("EEEEE dd MMMMM yyyy");
-		
+
 		PeriodePermanenceDateDTO permanenceDTO = new PeriodePermanenceService().loadOneDatePermanence(dpu.periodePermanenceDate.id);
-		String link = param.getUrl()+"?username="+u.email;
-		
-		in = in.replaceAll("#NOM_AMAP#", param.nomAmap);
-		in = in.replaceAll("#VILLE_AMAP#", param.villeAmap);
-		in = in.replaceAll("#LINK#", link);
-		
-		in = in.replaceAll("#DATE_PERMANENCE#", df.format(dpu.periodePermanenceDate.datePerm));
-		in = in.replaceAll("#PERSONNES#", permanenceDTO.getNomInscrit());
-		
-		in = in.replaceAll("#PERSONNES_AVEC_ROLES#", permanenceDTO.getNomInscritWithRoles());
-		
-		in = in.replaceAll("#ROLES#", permanenceDTO.getRolesAsString(u.id));
-		
-		
-		
-		return in;
-		
-	}
+		Dictionary dictionary = new Dictionary(u);
+		dictionary.addWord(DictionaryEnum.DATE_PERMANENCE, df.format(dpu.periodePermanenceDate.datePerm));
+		dictionary.addWord(DictionaryEnum.PERSONNES, permanenceDTO.getNomInscrit());
+
+		return dictionary.substitue(in);
+	}*/
 	
 	public static void main(String[] args)
 	{

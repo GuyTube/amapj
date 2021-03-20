@@ -38,6 +38,7 @@ import fr.amapj.service.services.utilisateur.UtilisateurService;
 import fr.amapj.service.services.utilisateur.UtilisateurService.UtilisateurInfo;
 import fr.amapj.service.services.utilisateur.util.UtilisateurUtil;
 import fr.amapj.view.engine.popup.formpopup.WizardFormPopup;
+import fr.amapj.view.engine.popup.formpopup.validator.EmailConjointValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.EmailValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.IValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.NotNullValidator;
@@ -99,6 +100,7 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 		IValidator uniq = new UniqueInDatabaseValidator(Utilisateur.class,"email",utilisateurDTO.id);
 		IValidator notNull = new NotNullValidator();
 		IValidator email = new EmailValidator();
+		IValidator emailConjoint = new EmailConjointValidator();
 		
 		
 		// Titre
@@ -128,6 +130,8 @@ public class CreationUtilisateurEditorPart extends WizardFormPopup
 		// Champ 8
 		addTextField("Ville", "ville");
 
+		// Champ 9
+		addTextField("E mail du conjoint (notifications)", "emailConjoint",emailConjoint);
 	}
 	
 	private String checkSaisie()

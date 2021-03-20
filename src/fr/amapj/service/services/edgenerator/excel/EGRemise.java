@@ -58,7 +58,7 @@ public class EGRemise extends AbstractExcelGenerator
 	public void fillExcelFile(EntityManager em,ExcelGeneratorTool et)
 	{
 		RemiseProducteur remise = em.find(RemiseProducteur.class, remiseId);
-		ModeleContrat mc = remise.datePaiement.modeleContrat;
+		ModeleContrat mc = remise.getDatePaiement().getModeleContrat();
 		RemiseDTO dto = new RemiseProducteurService().loadRemise(remiseId);
 		
 		PEReceptionCheque peConf = (PEReceptionCheque) new ParametresService().loadParamEcran(MenuList.RECEPTION_CHEQUES);
@@ -158,7 +158,7 @@ public class EGRemise extends AbstractExcelGenerator
 	public String getFileName(EntityManager em)
 	{
 		RemiseProducteur remise = em.find(RemiseProducteur.class, remiseId);
-		ModeleContrat mc = remise.datePaiement.modeleContrat;
+		ModeleContrat mc = remise.getDatePaiement().getModeleContrat();
 		return "remise-"+mc.nom;
 	}
 

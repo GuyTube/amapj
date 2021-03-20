@@ -94,6 +94,14 @@ public class ListeProducteurReferentView extends FrontOfficeView
 				vl1.addComponent(l);
 			}
 			
+			str = detailProducteurDTO.emailContact;
+			if (str!=null)
+			{
+				l =new Label(str, ContentMode.HTML);
+				l.addStyleName(LABEL_LIGNE);
+				vl1.addComponent(l);
+			}
+
 			str = formatUtilisateur(detailProducteurDTO.utilisateurs);
 			l =new Label(str, ContentMode.HTML);
 			l.addStyleName(LABEL_LIGNE);

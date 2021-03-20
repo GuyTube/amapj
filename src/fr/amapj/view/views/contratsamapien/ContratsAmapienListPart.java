@@ -90,7 +90,7 @@ public class ContratsAmapienListPart extends StandardListPart<AmapienContratDTO>
 		addButton("Visualiser", ButtonType.EDIT_MODE, ()->handleVisualiser());
 		addButton("Modifier quantités", ButtonType.EDIT_MODE, ()->handleModifier());
 		addButton("Réceptionner chèques",ButtonType.EDIT_MODE,()->handleReceptionCheque());
-		addButton("Modifier chéques", ButtonType.EDIT_MODE, ()->handleModifierCheque());
+		addButton("Modifier chèques", ButtonType.EDIT_MODE, ()->handleModifierCheque());
 		addButton("Supprimer contrat", ButtonType.EDIT_MODE, ()->handleSupprimer());
 		addButton("Télécharger ...", ButtonType.ALWAYS, ()->handleTelecharger());
 

@@ -45,7 +45,7 @@ public enum FrequenceLivraison
 			
 			add(UNE_SEULE_LIVRAISON,"Une seule livraison","Ce contrat comprend une seule livraison");
 			add(UNE_FOIS_PAR_SEMAINE,"Une fois par semaine","Ce contrat comprend une livraison toutes les semaines (tous les jeudis par exemple)"); 
-			add(QUINZE_JOURS,"Une fois tous les quinze jours"); 
+			add(QUINZE_JOURS,"Une fois tous les quinze jours","Ce contrat comprend une livraison toutes les deux semaines"); 
 			add(UNE_FOIS_PAR_MOIS,"Une fois par mois","Ce contrat comprend une livraison tous les mois, par exemple tous les premiers jeudis du mois"); 
 			add(AUTRE,"Autre...","Dans ce mode, vous choississez vous même toutes les dates de livraison une par une");
 			

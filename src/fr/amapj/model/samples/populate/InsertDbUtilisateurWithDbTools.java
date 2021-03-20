@@ -41,17 +41,17 @@ public class InsertDbUtilisateurWithDbTools
 		
 
 		Utilisateur u = new Utilisateur();
-		u.nom = "nom_c";
-		u.prenom = "prenom_c";
-		u.email = "c";
+		u.setNom("nom_c");
+		u.setPrenom("prenom_c");
+		u.setEmail("c");
 		
 		
 		em.persist(u);
 		
 		u = new Utilisateur();
-		u.nom = "nom_d";
-		u.prenom = "prenom_d";
-		u.email = "d";
+		u.setNom("nom_d");
+		u.setPrenom("prenom_d");
+		u.setEmail("d");
 		
 		em.persist(u);
 		

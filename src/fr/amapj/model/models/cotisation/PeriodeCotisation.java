@@ -48,28 +48,37 @@ public class PeriodeCotisation implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Long id;
+	private Long id;
 
 	@NotNull
 	@Size(min = 1, max = 100)
 	@Column(length = 100)
-	public String nom;
+	private String nom;
 	
 	@NotNull
 	// Montant mini 
-	public int montantMini;
+	private int montantMini;
 	
 	@NotNull
 	// Montant conseillé
-	public int montantConseille;
+	private int montantConseille;
 	
 	@NotNull
 	@Temporal(TemporalType.DATE)
-	public Date dateDebut;
+	private Date dateDebutInscription;
 	
 	@NotNull
 	@Temporal(TemporalType.DATE)
-	public Date dateFin;
+	private Date dateFinInscription;
+	
+	
+	@NotNull
+	@Temporal(TemporalType.DATE)
+	private Date dateDebut;
+	
+	@NotNull
+	@Temporal(TemporalType.DATE)
+	private Date dateFin;
 	
 	
 	// Paiement
@@ -77,20 +86,23 @@ public class PeriodeCotisation implements Identifiable
 	@Size(min = 0, max = 2048)
 	@Column(length = 2048)
 	// Texte qui sera affiché pour le paiement
-	public String textPaiement;
+	private String textPaiement;
 	
 	// Libellé du chéque 
 	@Size(min = 0, max = 100)
 	@Column(length = 100)
-	public String libCheque;
+	private String libCheque;
 	
+	// Date de remise des chéques
+	@Temporal(TemporalType.DATE)
+	private Date dateRemiseCheque;
 	
 	/**
 	 * Bulletin d'adhesion au format PDF
 	 * null si il n'y a pas de bulletin d'adhesion   
 	 */
 	@ManyToOne
-	public EditionSpecifique bulletinAdhesion;
+    private EditionSpecifique bulletinAdhesion;
 
 	public Long getId()
 	{
@@ -100,6 +112,117 @@ public class PeriodeCotisation implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+	public String getNom()
+	{
+		return nom;
+	}
+
+	public void setNom(String nom)
+	{
+		this.nom = nom;
+	}
+
+	public int getMontantMini()
+	{
+		return montantMini;
+	}
+
+	public void setMontantMini(int montantMini)
+	{
+		this.montantMini = montantMini;
+	}
+
+	public int getMontantConseille()
+	{
+		return montantConseille;
+	}
+
+	public void setMontantConseille(int montantConseille)
+	{
+		this.montantConseille = montantConseille;
+	}
+
+
+	public Date getDateFinInscription()
+	{
+		return dateFinInscription;
+	}
+
+	public void setDateFinInscription(Date dateFinInscription)
+	{
+		this.dateFinInscription = dateFinInscription;
+	}
+
+	public String getTextPaiement()
+	{
+		return textPaiement;
+	}
+
+	public void setTextPaiement(String textPaiement)
+	{
+		this.textPaiement = textPaiement;
+	}
+
+	public String getLibCheque()
+	{
+		return libCheque;
+	}
+
+	public void setLibCheque(String libCheque)
+	{
+		this.libCheque = libCheque;
+	}
+
+	public Date getDateRemiseCheque()
+	{
+		return dateRemiseCheque;
+	}
+
+	public void setDateRemiseCheque(Date dateRemiseCheque)
+	{
+		this.dateRemiseCheque = dateRemiseCheque;
+	}
+
+	public Date getDateDebut()
+	{
+		return dateDebut;
+	}
+
+	public void setDateDebut(Date dateDebut)
+	{
+		this.dateDebut = dateDebut;
+	}
+
+	public Date getDateFin()
+	{
+		return dateFin;
+	}
+
+	public void setDateFin(Date dateFin)
+	{
+		this.dateFin = dateFin;
+	}
+
+	public Date getDateDebutInscription()
+	{
+		return dateDebutInscription;
+	}
+
+	public void setDateDebutInscription(Date dateDebutInscription)
+	{
+		this.dateDebutInscription = dateDebutInscription;
+	}
+
+	public EditionSpecifique getBulletinAdhesion()
+	{
+		return bulletinAdhesion;
+	}
+
+	public void setBulletinAdhesion(EditionSpecifique bulletinAdhesion)
+	{
+		this.bulletinAdhesion = bulletinAdhesion;
 	}
 
 }

@@ -40,6 +40,7 @@ import javax.validation.constraints.Size;
 import fr.amapj.model.engine.Identifiable;
 import fr.amapj.model.engine.Mdm;
 import fr.amapj.model.models.fichierbase.Producteur;
+import fr.amapj.model.models.param.ChoixOuiNon;
 
 @Entity
 @Table( uniqueConstraints=
@@ -81,7 +82,13 @@ public class PeriodePermanence implements Identifiable
 	// Delai dans le cas des inscriptins flottantes 
 	public int flottantDelai;
 	
+	// Limiter strictement le nombre de permanances des utilisateurs ?
+	@Enumerated(EnumType.STRING)
+    private ChoixOuiNon limitNbPermanenceUtil;
 	
+
+
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	// Permet de savoir les controles réalisés lors des inscriptions 
@@ -99,6 +106,16 @@ public class PeriodePermanence implements Identifiable
 		this.id = id;
 	}
 	
+	public boolean getLimitNbPermanenceUtilBool() {
+		return ChoixOuiNon.OUI.equals(limitNbPermanenceUtil);
+	}
+
+	public ChoixOuiNon getLimitNbPermanenceUtil() {
+		return limitNbPermanenceUtil;
+	}
 	
+	public void setLimitNbPermanenceUtil(ChoixOuiNon limitNbPermanenceUtil) {
+		this.limitNbPermanenceUtil = limitNbPermanenceUtil;
+	}
 	
 }

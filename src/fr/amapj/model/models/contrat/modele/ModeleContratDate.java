@@ -65,5 +65,26 @@ public class ModeleContratDate implements Identifiable
 	{
 		this.id = id;
 	}
+
+	public ModeleContrat getModeleContrat()
+	{
+		return modeleContrat;
+	}
+
+	public void setModeleContrat(ModeleContrat modeleContrat)
+	{
+		this.modeleContrat = modeleContrat;
+	}
+
+	public Date getDateLiv()
+	{
+		return dateLiv;
+	}
+
+	public void setDateLiv(Date dateLiv)
+	{
+		this.dateLiv = dateLiv;
+	}
 	
+
 }

@@ -79,18 +79,18 @@ public class OffuscatedUtilisateur
 		List<Utilisateur> us = q.getResultList();
 		for (Utilisateur u : us)
 		{
-			u.nom = getNom();
-			u.prenom = getPrenom();
+			u.setNom(getNom());
+			u.setPrenom(getPrenom());
 
-			String email = (u.prenom + "." + u.nom + "@example.fr").toLowerCase();
+			String email = (u.getPrenom() + "." + u.getNom() + "@example.fr").toLowerCase();
 			email = StringUtils.sansAccent(email);
 			
-			u.email = email;
+			u.setEmail(email);
 			
 			
 			// Mot de passe : a 
-			u.password = "S3SDt6lhE40QpL/8QFZgLeJveys=";
-			u.salt = "EkCq0lok/zk=";
+			u.setPassword("S3SDt6lhE40QpL/8QFZgLeJveys=");
+			u.setSalt("EkCq0lok/zk=");
 			// System.out.println(u.getNom()+"=>"+getNom()+" "+getPrenom());
 
 		}

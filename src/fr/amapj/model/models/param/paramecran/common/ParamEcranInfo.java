@@ -21,12 +21,13 @@
  package fr.amapj.model.models.param.paramecran.common;
 
 import fr.amapj.common.AmapjRuntimeException;
-import fr.amapj.model.models.param.paramecran.PEGestionContratsVierges;
+import fr.amapj.model.models.param.paramecran.PEContratsASouscrire;
 import fr.amapj.model.models.param.paramecran.PEListeAdherent;
 import fr.amapj.model.models.param.paramecran.PELivraisonAmapien;
 import fr.amapj.model.models.param.paramecran.PELivraisonProducteur;
 import fr.amapj.model.models.param.paramecran.PEMesContrats;
 import fr.amapj.model.models.param.paramecran.PEMesLivraisons;
+import fr.amapj.model.models.param.paramecran.PEPermanences;
 import fr.amapj.model.models.param.paramecran.PEReceptionCheque;
 import fr.amapj.model.models.param.paramecran.PESaisiePaiement;
 import fr.amapj.model.models.param.paramecran.PESyntheseMultiContrat;
@@ -46,6 +47,9 @@ public class ParamEcranInfo
 		{
 		case MES_CONTRATS:
 			return PEMesContrats.class;
+		
+		case CONTRATS_A_SOUSCRIRE:
+			return PEContratsASouscrire.class;
 		
 		case MES_LIVRAISONS:
 			return PEMesLivraisons.class;
@@ -68,8 +72,8 @@ public class ParamEcranInfo
 		case OUT_SAISIE_PAIEMENT:
 			return PESaisiePaiement.class;
 		
-		case GESTION_CONTRAT:
-			return PEGestionContratsVierges.class;
+		case MES_PERMANENCES:
+			return PEPermanences.class;
 			
 		default:
 			throw new AmapjRuntimeException("Type non pris en compte");

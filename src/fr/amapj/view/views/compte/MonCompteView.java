@@ -20,21 +20,40 @@
  */
  package fr.amapj.view.views.compte;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import com.vaadin.data.Property;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
+import fr.amapj.model.engine.transaction.DbRead;
+import fr.amapj.model.engine.transaction.DbWrite;
+import fr.amapj.model.engine.transaction.TransactionHelper;
+import fr.amapj.model.models.fichierbase.PreferenceUtilisateur;
+import fr.amapj.model.models.fichierbase.Utilisateur;
 import fr.amapj.service.services.authentification.PasswordManager;
 import fr.amapj.service.services.moncompte.MonCompteService;
 import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.service.services.utilisateur.PreferenceUtilisateurEnum;
 import fr.amapj.service.services.utilisateur.UtilisateurDTO;
 import fr.amapj.service.services.utilisateur.UtilisateurService;
 import fr.amapj.view.engine.popup.PopupListener;
+import fr.amapj.view.engine.popup.formpopup.validator.EmailConjointValidator;
 import fr.amapj.view.engine.popup.formpopup.validator.EmailValidator;
 import fr.amapj.view.engine.template.FrontOfficeView;
 import fr.amapj.view.engine.tools.InLineFormHelper;
+import jdk.nashorn.internal.runtime.options.Options;
 
 
 /**
@@ -47,33 +66,45 @@ import fr.amapj.view.engine.tools.InLineFormHelper;
  */
 public class MonCompteView extends FrontOfficeView implements PopupListener
 {
-	
-	
-	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	static private String TEXTFIELD_COMPTEINPUT = "compteinput";
 	
 	static private String PANEL_COMPTEFORM = "compteform";
-	
-	
-	
 
 	UtilisateurDTO u;
 	
 	TextField nom;
 	TextField prenom;
 	TextField mail;
+	TextField mailConjoint;
 	TextField pwd;
 	
 	TextField numTel1;
 	TextField numTel2;
 	TextField adresse;
 	TextField codePostal;
-	TextField ville;	
+	TextField ville;
+	
+	CheckBox notifDistribution;
+	OptionGroup delai;
 	
 	FormLayout form1;
 	FormLayout form2;
 	FormLayout form3;
 	
+	Map<String, String> delaiOptions = createMap();
+
+	private static Map<String, String> createMap() {
+	    Map<String,String> myMap = new HashMap<String,String>();
+	    myMap.put("JOUR", "Le jour de la distribution");
+	    myMap.put("VEILLE", "La veille de la distribution");
+	    return myMap;
+	}	
 
 	public String getMainStyleName()
 	{
@@ -113,11 +144,12 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 		
 		
 		// Bloc Adresse mail  
-		InLineFormHelper formHelper = new InLineFormHelper("Votre mail", "Modifier votre adresse mail", this,  e->handleSaveMail());
+		InLineFormHelper formHelper = new InLineFormHelper("Vos mails", "Modifier vos adresses mail", this,  e->handleSaveMail());
 	    mail = addTextField("Votre mail",formHelper.getForm());
+	    mailConjoint = addTextField("Mail de votre conjoint",formHelper.getForm());
 	    formHelper.getValidatorManager().add(mail, "Votre mail", "mail", new EmailValidator());
+	    formHelper.getValidatorManager().add(mailConjoint, "Mail de votre conjoint", "mailCconjoint", new EmailConjointValidator());
 		formHelper.addIn(vl1);
-		
 		
 		// Bloc mot de passe
 		formHelper = new InLineFormHelper("Votre mot de passe", "Modifier votre mot de passe", this,  e->handleSavePassword());
@@ -133,7 +165,24 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 		codePostal = addTextField("Code Postal",formHelper.getForm());
 		ville = addTextField("Ville",formHelper.getForm());
 		formHelper.addIn(vl1);
-	
+
+		// Bloc préférences
+		formHelper = new InLineFormHelper("Vos préférences", "Modifier vos préférences", this,  e->handleSaveChangerPreferences());
+		notifDistribution = addCheckboxField("Recevoir un rappel des distributions par mail ?", formHelper.getForm());
+		delai = new OptionGroup("Délai :");
+		List<String> options = new ArrayList<>(delaiOptions.values());
+		delai.addItems(options);
+		delai.setNullSelectionAllowed(false);
+		delai.select(options.get(0));
+		delai.setImmediate(true);
+		notifDistribution.addValueChangeListener(new Property.ValueChangeListener() {
+			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event) {
+				delai.setEnabled(true);
+			}}
+		);
+		delai.setEnabled(false);
+		formHelper.getForm().addComponent(delai);
+		formHelper.addIn(vl1);
 		
 		refresh();
 		
@@ -142,8 +191,10 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 
 	private void handleSaveMail()
 	{
-		String newValue = mail.getValue();
-		new MonCompteService().setNewEmail(u.getId(),newValue);
+		String mailNewValue = mail.getValue();
+		String conjointNewValue = mailConjoint.getValue();
+		new MonCompteService().setNewEmail(u.getId(),mailNewValue);
+		new MonCompteService().setNewEmailConjoint(u.getId(),conjointNewValue);
 	}
 
 
@@ -153,9 +204,22 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 		new PasswordManager().setUserPassword(u.id,newValue);
 	}
 	
-	
-	
-	
+	private void handleSaveChangerPreferences() {
+		UtilisateurService us = new UtilisateurService();
+		boolean isChecked = notifDistribution.getValue();
+		Object selectedOption = delai.getValue();
+		if(isChecked) { 
+			String delai = null;
+			for(String o : delaiOptions.keySet()) { 
+				if( selectedOption.equals(delaiOptions.get(o)) )
+					delai = o;
+			}
+			us.addOrChangeUserPreference(u, PreferenceUtilisateurEnum.PREF_DELAI_NOTIF_DISTRI,delai);
+		} else {
+			us.removeUserPreference(u, PreferenceUtilisateurEnum.PREF_DELAI_NOTIF_DISTRI);
+		}
+		
+	}
 	
 	
 	private void handleSaveChangerCoordonnees()
@@ -170,11 +234,6 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 	}
 	
 	
-	
-
-	
-
-
 	@Override
 	public void onPopupClose()
 	{
@@ -184,6 +243,7 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 	private void refresh()
 	{
 		u = new UtilisateurService().loadUtilisateurDto(SessionManager.getUserId());
+		UtilisateurService us = new UtilisateurService();
 		
 		setValue(nom,u.getNom());
 		setValue(prenom,u.getPrenom());
@@ -193,7 +253,9 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 		setValue(numTel2,u.getNumTel2());
 		setValue(adresse,u.getLibAdr1());
 		setValue(codePostal,u.getCodePostal());
-		setValue(ville,u.getVille());		
+		setValue(ville,u.getVille());
+		setValue(mailConjoint,u.getEmailConjoint());
+		setDistribution(us.getUserPreferenceValue(u, PreferenceUtilisateurEnum.PREF_DELAI_NOTIF_DISTRI) );
 	}
 	
 	
@@ -207,7 +269,18 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 		tf.setReadOnly(true);
 	}
 	
-	
+	private void setDistribution(List<String> values)	{
+		if( values != null && values.size() == 1 ) {
+			String val = values.get(0);
+			notifDistribution.setReadOnly(false);
+			delai.setReadOnly(false);
+			notifDistribution.setValue(true);
+			delai.select(delaiOptions.get(val));
+			delai.setReadOnly(true);
+			notifDistribution.setReadOnly(true);
+		}
+	}
+		
 	private TextField addTextField(String lib,FormLayout form)
 	{
 		TextField name = new TextField(lib);
@@ -220,4 +293,16 @@ public class MonCompteView extends FrontOfficeView implements PopupListener
 		return name;
 	}
 
+	private CheckBox addCheckboxField(String lib,FormLayout form)
+	{
+		CheckBox name = new CheckBox(lib);
+		name.addStyleName(TEXTFIELD_COMPTEINPUT);
+		name.setWidth("100%");
+		name.setReadOnly(false);
+		form.addComponent(name);
+
+		return name;
+	}
+	
+	
 }

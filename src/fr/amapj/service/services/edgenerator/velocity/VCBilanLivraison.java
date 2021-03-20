@@ -142,14 +142,14 @@ public class VCBilanLivraison
 		for (Cell1<ModeleContrat, ContratCell> liv : livs)
 		{
 			// Nom du contrat 
-			buf.append("<p style=\"margin:0.1em\">"+s(liv.lig.nom)+"</p>");
+			buf.append("<p style=\"margin:0.1em\">"+s(liv.lig.getNom())+"</p>");
 			buf.append("<ul>");
 			
 			// Liste de produits commandés pour ce contrat
 			for (ContratCell cell : liv.values)
 			{
-				Produit p = cell.modeleContratProduit.produit;
-				String content = cell.qte+" x "+p.nom+" , "+p.conditionnement;
+				Produit p = cell.getModeleContratProduit().getProduit();
+				String content = cell.getQte()+" x "+p.getNom()+" , "+p.getConditionnement();
 				buf.append("<li>"+s(content)+"</li>");
 			}
 		

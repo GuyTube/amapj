@@ -94,9 +94,9 @@ public class ImportDonneesService
 		
 		
 		Produit pr = new Produit();
-		pr.conditionnement = dto.conditionnement;
-		pr.nom = dto.produit;
-		pr.producteur = p;
+		pr.setConditionnement(dto.conditionnement);
+		pr.setNom(dto.produit);
+		pr.setProducteur(p);
 		em.persist(pr);
 		
 	}
@@ -114,9 +114,9 @@ public class ImportDonneesService
 		for (Produit prod : prods)
 		{
 			ImportProduitProducteurDTO dto = new ImportProduitProducteurDTO();
-			dto.producteur = prod.producteur.nom;
-			dto.produit = prod.nom;
-			dto.conditionnement = prod.conditionnement;
+			dto.producteur = prod.getProducteur().nom;
+			dto.produit = prod.getNom();
+			dto.conditionnement = prod.getConditionnement();
 			
 			res.add(dto);
 		}

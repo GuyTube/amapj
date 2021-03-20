@@ -107,7 +107,7 @@ public class ExcelReader
 		{
 			String[] line = findLine(utilisateurDTO, res);
 
-			System.out.println("-- "+utilisateurDTO.nom+" - "+utilisateurDTO.prenom);
+			System.out.println("-- "+utilisateurDTO.getNom()+" - "+utilisateurDTO.getPrenom());
 			if (line != null)
 			{
 				String adr = "";
@@ -178,7 +178,7 @@ public class ExcelReader
 
 	private static boolean isMatching(Utilisateur utilisateurDTO, String[] line)
 	{
-		if (eq(utilisateurDTO.nom, line[1]) && (eq(utilisateurDTO.prenom, line[2])))
+		if (eq(utilisateurDTO.getNom(), line[1]) && (eq(utilisateurDTO.getPrenom(), line[2])))
 		{
 			return true;
 		}

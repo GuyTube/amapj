@@ -29,13 +29,21 @@ import javax.persistence.EntityManager;
 
 import fr.amapj.common.CollectionUtils;
 import fr.amapj.common.DateUtils;
+import fr.amapj.model.models.acces.RoleList;
+import fr.amapj.model.models.param.ChoixOuiNon;
+import fr.amapj.model.models.param.paramecran.PEPermanences;
 import fr.amapj.model.models.permanence.periode.PeriodePermanence;
 import fr.amapj.service.engine.generator.excel.AbstractExcelGenerator;
 import fr.amapj.service.engine.generator.excel.ExcelFormat;
 import fr.amapj.service.engine.generator.excel.ExcelGeneratorTool;
+import fr.amapj.service.services.parametres.ParametresService;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceDateDTO;
 import fr.amapj.service.services.permanence.periode.PeriodePermanenceService;
+import fr.amapj.service.services.permanence.periode.PermanenceCellDTO;
+import fr.amapj.service.services.session.SessionManager;
+import fr.amapj.view.engine.menu.MenuList;
+import fr.amapj.view.views.permanence.grille.BlocGrille.BlocGrilleLine;
 
 
 /**
@@ -101,6 +109,7 @@ public class EGPlanningPermanence extends AbstractExcelGenerator
 		// Ligne de titre
 		et.addRow();
 		int index =1;
+		
 		for (PeriodePermanenceDateDTO distributionDTO : line)
 		{
 			et.setCell(index, df.format(distributionDTO.datePerm), et.grasCentreBordure);
@@ -111,14 +120,36 @@ public class EGPlanningPermanence extends AbstractExcelGenerator
 		et.addRow();
 		index =1;
 		int maxLine = 1;
-		for (PeriodePermanenceDateDTO distributionDTO : line)
-		{
-			String str = distributionDTO.getNomInscrit("\n");
-			et.setCell(index, str, et.grasCentreBordure);
-			
-			maxLine = Math.max(maxLine, distributionDTO.getNbInscrit());
-			
-			index = index +2;
+		
+		ParametresService ps = new ParametresService();
+		PEPermanences ped = (PEPermanences) ps.loadParamEcran(MenuList.MES_PERMANENCES);
+		Long userId = SessionManager.getSessionParameters().userId;
+		List<RoleList> roles = SessionManager.getSessionParameters().userRole;
+
+		String str= "";
+		for (PeriodePermanenceDateDTO distributionDTO : line) {
+			for (PermanenceCellDTO pc : distributionDTO.permanenceCellDTOs) {
+				if (pc.idUtilisateur==userId && userId!=null) {
+					str = pc.nom+" "+pc.prenom;
+				} else if (pc.idUtilisateur!=null) {
+					if( ChoixOuiNon.NON.equals(ped.afficheNomPermanents) && ! roles.contains(RoleList.PRODUCTEUR) )
+						str = "Réservé";
+					else 
+						str = pc.nom+" "+pc.prenom;
+				}
+				else
+				{
+					str = "Place libre";
+				}
+
+				str = str+"\n";
+				//String str = distributionDTO.getNomInscrit("\n");
+				et.setCell(index, str, et.grasCentreBordure);
+				
+				maxLine = Math.max(maxLine, distributionDTO.getNbInscrit());
+				
+				index = index +2;
+			}
 		}
 		et.setRowHeigth(maxLine+1);
 		

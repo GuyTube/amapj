@@ -28,6 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import fr.amapj.model.engine.Identifiable;
+import fr.amapj.model.engine.Mdm;
 import fr.amapj.model.models.fichierbase.Produit;
 
 @Entity
@@ -36,24 +37,44 @@ public class ModeleContratProduit implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Long id;
+	private Long id;
 
 	@NotNull
 	@ManyToOne
-	public ModeleContrat modeleContrat;
+	private ModeleContrat modeleContrat;
 	
 	@NotNull
 	@ManyToOne
-	public Produit produit;
+	private Produit produit;
 	
 	@NotNull
 	// Numéro d'ordre 
-	public int indx;
+	private int indx;
 	
 	@NotNull
 	// Prix en centimes d'euros, dans l'unité du produit
-	public int prix;
+	private int prix;
 	
+	// Nombre maximum de produits que le producteur peut livrer à chaque livraison
+	private int nbMaxParLivraison;
+	
+	public enum P implements Mdm
+	{
+		ID("id") , MODELECONTRAT("modeleContrat") , PRODUIT("produit") , INDX("indx") ;
+		
+		private String propertyId;   
+		   
+	    P(String propertyId) 
+	    {
+	        this.propertyId = propertyId;
+	    }
+	    public String prop() 
+	    { 
+	    	return propertyId; 
+	    }
+		
+	} ;
+
 
 	public Long getId()
 	{
@@ -64,5 +85,64 @@ public class ModeleContratProduit implements Identifiable
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+
+	public ModeleContrat getModeleContrat()
+	{
+		return modeleContrat;
+	}
+
+
+	public void setModeleContrat(ModeleContrat modeleContrat)
+	{
+		this.modeleContrat = modeleContrat;
+	}
+
+
+	public Produit getProduit()
+	{
+		return produit;
+	}
+
+
+	public void setProduit(Produit produit)
+	{
+		this.produit = produit;
+	}
+
+
+	public int getPrix()
+	{
+		return prix;
+	}
+
+
+	public void setPrix(int prix)
+	{
+		this.prix = prix;
+	}
+
+
+	public int getNbMaxParLivraison()
+	{
+		return nbMaxParLivraison;
+	}
+
+
+	public void setNbMaxParLivraison(int nbMaxParLivraison)
+	{
+		this.nbMaxParLivraison = nbMaxParLivraison;
+	}
+
+	public int getIndx()
+	{
+		return indx;
+	}
+
+
+	public void setIndx(int indx)
+	{
+		this.indx = indx;
 	}
 }

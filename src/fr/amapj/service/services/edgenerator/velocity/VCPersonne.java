@@ -47,14 +47,14 @@ public class VCPersonne
 	{
 		if (u!=null)
 		{
-			nom = s(u.nom);
-			prenom = s(u.prenom);
-			email = s(u.email);
-			numTel1 = s(u.numTel1);
-			numTel2 = s(u.numTel2);
-			libAdr1 = s(u.libAdr1);
-			codePostal = s(u.codePostal);
-			ville = s(u.ville);
+			nom = s(u.getNom());
+			prenom = s(u.getPrenom());
+			email = s(u.getEmail());
+			numTel1 = s(u.getNumTel1());
+			numTel2 = s(u.getNumTel2());
+			libAdr1 = s(u.getLibAdr1());
+			codePostal = s(u.getCodePostal());
+			ville = s(u.getVille());
 		}
 		else
 		{

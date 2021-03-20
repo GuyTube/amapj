@@ -53,7 +53,7 @@ public class ArchivageContratListPart extends StandardListPart<ModeleContratSumm
 	public ArchivageContratListPart()
 	{
 		super(ModeleContratSummaryDTO.class,false);
-		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(),SessionManager.getUserId());
+		allowedProducteurs = new AccessManagementService().getAccessLivraisonProducteur(SessionManager.getUserRoles(),SessionManager.getUserId(),true);
 	}
 	
 	

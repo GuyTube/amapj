@@ -32,6 +32,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import fr.amapj.model.engine.Identifiable;
+import fr.amapj.model.engine.Mdm;
 import fr.amapj.model.models.contrat.modele.ModeleContratDatePaiement;
 import fr.amapj.model.models.remise.RemiseProducteur;
 
@@ -45,45 +46,69 @@ public class Paiement  implements Identifiable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Long id;
+	private Long id;
 
 	@NotNull
 	@ManyToOne
-	public Contrat contrat;
+	private Contrat contrat;
 	
 	@NotNull
 	@ManyToOne
-	public ModeleContratDatePaiement modeleContratDatePaiement;
+	private ModeleContratDatePaiement modeleContratDatePaiement;
 
 	// Montant du paiement en centimes
 	@NotNull
-	public int montant;
+	private int montant;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	// Permet de savoir l'état du modele de contrat
-	public EtatPaiement etat = EtatPaiement.A_FOURNIR;
+    private EtatPaiement etat = EtatPaiement.A_FOURNIR;
 	
 	@ManyToOne
-	public RemiseProducteur remise;
+	private RemiseProducteur remise;
 	
 
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	public String commentaire1;
+	private String commentaire1;
 
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	public String commentaire2;
+	private String commentaire2;
 	
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	public String commentaire3;
+	private String commentaire3;
 
 	@Size(min = 0, max = 255)
 	@Column(length = 255)
-	public String commentaire4;
+	private String commentaire4;
 		
+	
+	public enum P implements Mdm
+	{
+		ID("id") , CONTRAT("contrat") ,  MODELECONTRATDATEPAIEMENT("modeleContratDatePaiement") , MONTANT("montant") ;
+		
+		private String propertyId;   
+		   
+	    P(String propertyId) 
+	    {
+	        this.propertyId = propertyId;
+	    }
+	    public String prop() 
+	    { 
+	    	return propertyId; 
+	    }
+		
+	} ;
+	
+
+	public Paiement()
+	{
+		
+	}
+	
 
 	public Long getId()
 	{
@@ -94,4 +119,97 @@ public class Paiement  implements Identifiable
 	{
 		this.id = id;
 	}
+
+	public Contrat getContrat()
+	{
+		return contrat;
+	}
+
+	public void setContrat(Contrat contrat)
+	{
+		this.contrat = contrat;
+	}
+
+	public ModeleContratDatePaiement getModeleContratDatePaiement()
+	{
+		return modeleContratDatePaiement;
+	}
+
+	public void setModeleContratDatePaiement(ModeleContratDatePaiement modeleContratDatePaiement)
+	{
+		this.modeleContratDatePaiement = modeleContratDatePaiement;
+	}
+
+	public int getMontant()
+	{
+		return montant;
+	}
+
+	public void setMontant(int montant)
+	{
+		this.montant = montant;
+	}
+
+	public EtatPaiement getEtat()
+	{
+		return etat;
+	}
+
+	public void setEtat(EtatPaiement etat)
+	{
+		this.etat = etat;
+	}
+
+	public RemiseProducteur getRemise()
+	{
+		return remise;
+	}
+
+	public void setRemise(RemiseProducteur remise)
+	{
+		this.remise = remise;
+	}
+
+
+	public String getCommentaire1()
+	{
+		return commentaire1;
+	}
+
+	public void setCommentaire1(String commentaire1)
+	{
+		this.commentaire1 = commentaire1;
+	}
+
+	public String getCommentaire2()
+	{
+		return commentaire2;
+	}
+
+	public void setCommentaire2(String commentaire2)
+	{
+		this.commentaire2 = commentaire2;
+	}
+
+
+	public String getCommentaire3() {
+		return commentaire3;
+	}
+
+
+	public void setCommentaire3(String commentaire3) {
+		this.commentaire3 = commentaire3;
+	}
+
+
+	public String getCommentaire4() {
+		return commentaire4;
+	}
+
+
+	public void setCommentaire4(String commentaire4) {
+		this.commentaire4 = commentaire4;
+	}
+	
+	
 }

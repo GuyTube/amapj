@@ -21,6 +21,7 @@
  package fr.amapj.view.views.permanence.periode.update;
 
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.ui.ComboBox;
 
 import fr.amapj.model.models.permanence.periode.NaturePeriodePermanence;
 import fr.amapj.model.models.permanence.periode.PeriodePermanence;
@@ -90,13 +91,16 @@ public class PopupModifEnteteForPeriodePermanence extends WizardFormPopup
 		IValidator len_1_100 = new StringLengthValidator(1, 100);
 		IValidator len_1_255 = new StringLengthValidator(1, 255);
 		IValidator uniq = new UniqueInDatabaseValidator(PeriodePermanence.class,"nom",dto.id);
-	
+		IValidator notNull = new NotNullValidator();
+
 		// 
 		addTextField("Nom de la période de permanence", "nom",len_1_100,uniq);
 
 		// 
 		addTextField("Description de la période", "description",len_1_255);
 		
+		ComboBox limitBox = addComboEnumField("Limiter strictement le nombre de permanences par utilisateur", "limitNbPermanenceUtil", notNull);
+
 	}
 	
 	

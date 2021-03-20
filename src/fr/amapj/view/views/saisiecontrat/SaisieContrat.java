@@ -20,6 +20,9 @@
  */
  package fr.amapj.view.views.saisiecontrat;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.vaadin.shared.ui.label.ContentMode;
 
 import fr.amapj.common.AmapjRuntimeException;
@@ -35,12 +38,16 @@ import fr.amapj.view.engine.popup.corepopup.CorePopup;
 import fr.amapj.view.engine.popup.corepopup.CorePopup.ColorStyle;
 import fr.amapj.view.engine.popup.formpopup.OnSaveException;
 import fr.amapj.view.engine.popup.messagepopup.MessagePopup;
+import fr.amapj.view.views.saisiecontrat.SaisieContrat.ModeSaisie;
 
 public class SaisieContrat
 {
 	private SaisieContratData data;
 	private CascadingPopup cascading;
-	
+	private CorePopup popupSaisie;
+
+	private final static Logger logger = LogManager.getLogger();
+
 	public SaisieContrat(SaisieContratData data,PopupListener listener)
 	{
 		super();
@@ -50,48 +57,11 @@ public class SaisieContrat
 
 	public void doSaisie()
 	{
-		// On verifie d'abord si tout est OK 
-		String msg = checkInitialCondition();
-		if (msg!=null)
-		{
-			MessagePopup p = new MessagePopup("Impossible de continuer",ContentMode.HTML,ColorStyle.RED,msg);
-			CInfo info = new CInfo(p,null);
+		CorePopup popup = prepareSaisie();
+		if( popup != null ) {
+			CInfo info = new CInfo(popup,()->endOfSaisieQte());
 			cascading.start(info);
-			return;
-		}	
-		
-		
-		// Si cheque seul : on passe directement à la suite
-		if (data.modeSaisie==ModeSaisie.CHEQUE_SEUL)
-		{
-			cascading.start(getPopupPaiement());
-			return;
 		}
-		
-		
-		ContratPopupType popupType = computeContratPopupType();	
-		
-		CorePopup popup = null;
-		switch (popupType)
-		{
-		case POPUP_ABO:
-			popup = new PopupSaisieQteContratPanier(data); 
-			break;
-			
-		case POPUP_LIBRE:
-			popup = new PopupSaisieQteContrat(data);
-			break;
-			
-		case POPUP_CARTE_PREPAYEE:
-			popup = new PopupSaisieQteCartePrepayee(data);
-			break;
-
-		default:
-			throw new AmapjRuntimeException();
-		}
-				
-		CInfo info = new CInfo(popup,()->endOfSaisieQte());
-		cascading.start(info);
 	}
 	
 	
@@ -245,10 +215,67 @@ public class SaisieContrat
 			return null;
 		}
 		
-		 
+		 logger.info("ENDOFSAISIE");
 		 // Sinon on continue avec le popup de paiement 
 		return getPopupPaiement();
 	
+	}
+	public CorePopup prepareSaisie()
+	{
+		// On verifie d'abord si tout est OK 
+		String msg = checkInitialCondition();
+		if (msg!=null)
+		{
+			MessagePopup p = new MessagePopup("Impossible de continuer",ContentMode.HTML,ColorStyle.RED,msg);
+			CInfo info = new CInfo(p,null);
+			cascading.start(info);
+			return null;
+		}	
+		
+		
+		// Si cheque seul : on passe directement à la suite
+		if (data.modeSaisie==ModeSaisie.CHEQUE_SEUL)
+		{
+			logger.info("CHEQUE SEUL");
+			cascading.start(getPopupPaiement());
+			return null;
+		}
+		
+		
+		ContratPopupType popupType = computeContratPopupType();	
+		
+		CorePopup popup = null;
+		switch (popupType)
+		{
+		case POPUP_ABO:
+			popup = new PopupSaisieQteContratPanier(data); 
+			break;
+			
+		case POPUP_LIBRE:
+			popup = new PopupSaisieQteContrat(data);
+			break;
+			
+		case POPUP_CARTE_PREPAYEE:
+			popup = new PopupSaisieQteCartePrepayee(data);
+			break;
+
+		default:
+			throw new AmapjRuntimeException();
+		}
+				
+		return popup;
+	}
+	
+	private CInfo doRetour() {
+		CorePopup popup = prepareSaisie();
+		logger.info("DANS RETOUR");
+		if( popup != null ) {
+			logger.info("POPUP PAS NULL");
+			CInfo info = new CInfo(popup,()->endOfSaisieQte());
+			return info;
+		}
+		logger.info("RETOUR NULL");
+		return null;
 	}
 
 
@@ -260,11 +287,11 @@ public class SaisieContrat
 	{
 		if (data.contratDTO.paiement.gestionPaiement==GestionPaiement.GESTION_STANDARD)
 		{
-			return new CInfo(new PopupSaisiePaiement(data));
+			return new CInfo(new PopupSaisiePaiement(data), null, ()->doRetour());
 		}
 		else
 		{
-			return new CInfo(new PopupInfoPaiement(data));
+			return new CInfo(new PopupInfoPaiement(data), null, ()->doRetour());
 		}
 	}
 	

@@ -52,6 +52,10 @@ public class ContratDTO
 
 	public int nbLivraison;
 	
+	public int nbInscrits;
+	
+	public int nbMaxSouscription;
+	
 	// Caractéristiques des lignes
 	public List<ContratLigDTO> contratLigs = new ArrayList<ContratLigDTO>();
 

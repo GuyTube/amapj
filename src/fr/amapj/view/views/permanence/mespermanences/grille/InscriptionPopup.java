@@ -76,7 +76,7 @@ public class InscriptionPopup extends OKCancelPopup
 		UnePeriodePermanenceDTO periodePermanenceDTO = new MesPermanencesService().loadCompteurPeriodePermanence(idPeriodePermanence, userId);
 		
 		//
-		if (periodePermanenceDTO.nbInscription>=periodePermanenceDTO.nbSouhaite)
+		if (periodePermanenceDTO.limitNbPermanenceUtil && periodePermanenceDTO.nbInscription>=periodePermanenceDTO.nbSouhaite)
 		{
 			Label l = new Label("Il est impossible de vous inscrire car vous êtes déjà inscrit sur suffisamment de dates.");
 			contentLayout.addComponent(l);

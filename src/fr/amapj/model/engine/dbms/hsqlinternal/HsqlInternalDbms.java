@@ -159,6 +159,7 @@ public class HsqlInternalDbms implements DBMS
 		} 
 		catch (SQLException e)
 		{
+			e.printStackTrace();
 			throw new AmapjRuntimeException("Impossible de créer correctement la base de données url = "+url1,e);
 		}   	
 	}

@@ -37,9 +37,13 @@ public class NotificationHelper
 		notification.show(Page.getCurrent());
 	}
 	
-	
-	
-
+/*	static public void displayInfo(String message)
+	{
+		Notification notification = new Notification("Info",message,Type.ASSISTIVE_NOTIFICATION,true);
+		notification.setPosition(Position.TOP_CENTER);
+		notification.setDelayMsec(1000);
+		notification.show(Page.getCurrent());
+	}*/
 	static public void displayNotificationQte()
 	{
 		displayNotification("Erreur dans la saisie d'une quantité<br/>Merci de corriger les cases rouges");
@@ -51,6 +55,7 @@ public class NotificationHelper
 	{
 		displayNotification("Erreur dans la saisie d'un montant<br/>Merci de corriger les cases rouges");
 	}
+	
 	
 	
 	

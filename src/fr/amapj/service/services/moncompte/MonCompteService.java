@@ -36,9 +36,9 @@ public class MonCompteService
 
 
 	/**
-	 * Permet de changer le password
+	 * Permet de changer le mail
 	 * 
-	 * Retourne true si le mot de passe a pu être changé, 
+	 * Retourne true si le mail a pu être changé, 
 	 * false sinon 
 	 */
 	@DbWrite
@@ -53,7 +53,30 @@ public class MonCompteService
 			return false;
 		}
 
-		r.email = newEmail;
+		r.setEmail(newEmail);
+		return true;
+
+	}
+
+	/**
+	 * Permet de changer le mail du conjoint
+	 * 
+	 * Retourne true si le mail a pu être changé, 
+	 * false sinon 
+	 */
+	@DbWrite
+	public boolean setNewEmailConjoint(final Long userId, final String newEmailConjoint)
+	{
+		 EntityManager em = TransactionHelper.getEm();
+	
+		Utilisateur r = em.find(Utilisateur.class, userId);
+		if (r == null)
+		{
+			logger.warn("Impossible de retrouver l'utilisateur avec l'id " + userId);
+			return false;
+		}
+
+		r.setEmailConjoint(newEmailConjoint);
 		return true;
 
 	}
@@ -67,11 +90,11 @@ public class MonCompteService
 		
 		Utilisateur u = em.find(Utilisateur.class, dto.id);
 
-		u.numTel1 = dto.numTel1;
-		u.numTel2 = dto.numTel2;
-		u.libAdr1 = dto.libAdr1;
-		u.codePostal = dto.codePostal;
-		u.ville = dto.ville;
+		u.setNumTel1(dto.numTel1);
+		u.setNumTel2(dto.numTel2);
+		u.setLibAdr1(dto.libAdr1);
+		u.setCodePostal(dto.codePostal);
+		u.setVille(dto.ville);
 	}
 
 }

@@ -83,9 +83,9 @@ public class MiseEnFormeModeleContratEditorPart extends WizardFormPopup
 	{	
 		setStepTitle("Mise en forme du popup de paiement");
 	
-		if (modelecontratDto.gestionPaiement==GestionPaiement.NON_GERE)
+		if (modelecontratDto.gestionPaiement==GestionPaiement.NON_GERE || modelecontratDto.gestionPaiement==GestionPaiement.CARTE_PREPAYEE)
 		{
-			addLabel("Pas de parametrage possible en mode PAS DE GESTION DES PAIEMENTS", ContentMode.HTML);
+			addLabel("Pas de parametrage possible en mode PAS DE GESTION DES PAIEMENTS ou CARTE PREPAYEE", ContentMode.HTML);
 		}
 		else
 		{

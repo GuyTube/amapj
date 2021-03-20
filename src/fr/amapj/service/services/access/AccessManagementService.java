@@ -147,7 +147,7 @@ public class AccessManagementService
 	}
 	
 	
-	private boolean isMaster(EntityManager em, Utilisateur u)
+	public boolean isMaster(EntityManager em, Utilisateur u)
 	{
 		Query q = em.createQuery("select r.id from RoleMaster r  WHERE r.utilisateur=:u");
 		q.setParameter("u", u);
@@ -155,7 +155,7 @@ public class AccessManagementService
 	}
 	
 
-	private boolean isAdmin(EntityManager em, Utilisateur u)
+	public boolean isAdmin(EntityManager em, Utilisateur u)
 	{
 		Query q = em.createQuery("select r.id from RoleAdmin r  WHERE r.utilisateur=:u");
 		q.setParameter("u", u);
@@ -164,7 +164,7 @@ public class AccessManagementService
 
 
 
-	private boolean isTresorier(EntityManager em, Utilisateur u)
+	public boolean isTresorier(EntityManager em, Utilisateur u)
 	{
 		Query q = em.createQuery("select r.id from RoleTresorier r  WHERE r.utilisateur=:u");
 		q.setParameter("u", u);
@@ -173,7 +173,7 @@ public class AccessManagementService
 
 
 
-	private boolean isReferent(EntityManager em, Utilisateur u)
+	public boolean isReferent(EntityManager em, Utilisateur u)
 	{
 		Query q = em.createQuery("select r.id from ProducteurReferent r  WHERE r.referent=:u");
 		q.setParameter("u", u);
@@ -182,7 +182,7 @@ public class AccessManagementService
 
 
 
-	private boolean isProducteur(EntityManager em, Utilisateur u)
+	public boolean isProducteur(EntityManager em, Utilisateur u)
 	{
 		Query q = em.createQuery("select r.id from ProducteurUtilisateur r  WHERE r.utilisateur=:u");
 		q.setParameter("u", u);
@@ -209,8 +209,9 @@ public class AccessManagementService
 		Utilisateur user = em.find(Utilisateur.class, idUtilisateur);
 		TypedQuery<Producteur> q;
 		List<Producteur> res = new ArrayList<Producteur>();
-		
-		if ( (roles.contains(RoleList.ADMIN)) ||  (roles.contains(RoleList.TRESORIER)) )
+		// TODO PMO : WARNING : ADDED ADHERENT SO THAT THEY CAN VIEW A LIST OF PRODUCTEURS TO CHOOSE FROM(VIEW ONLY IN THE SCREEN)
+		// WILL BE BETTER TO SEPARATE THE COMPONENTS OR TO REFACTOR THIS SECTION
+		if ( (roles.contains(RoleList.ADMIN)) ||  (roles.contains(RoleList.TRESORIER)) ||  (roles.contains(RoleList.ADHERENT)) )
 		{
 			// Recherche tous les producteurs
 			if (actifOnly)
@@ -284,9 +285,9 @@ public class AccessManagementService
 		AdminTresorierDTO dto = new AdminTresorierDTO();
 		
 		dto.id = roleAdmin.getId();
-		dto.utilisateurId = roleAdmin.utilisateur.getId();
-		dto.nom = roleAdmin.utilisateur.nom;
-		dto.prenom = roleAdmin.utilisateur.prenom;
+		dto.utilisateurId = roleAdmin.getUtilisateur().getId();
+		dto.nom = roleAdmin.getUtilisateur().getNom();
+		dto.prenom = roleAdmin.getUtilisateur().getPrenom();
 		
 		return dto;		
 	}
@@ -299,7 +300,7 @@ public class AccessManagementService
 	{
 		EntityManager em = TransactionHelper.getEm();
 		RoleAdmin p =  new RoleAdmin();
-		p.utilisateur = em.find(Utilisateur.class, dto.utilisateurId);
+		p.setUtilisateur(em.find(Utilisateur.class, dto.utilisateurId));
 		em.persist(p);
 		
 	}
@@ -338,9 +339,9 @@ public class AccessManagementService
 		AdminTresorierDTO dto = new AdminTresorierDTO();
 		
 		dto.id = r.getId();
-		dto.utilisateurId = r.utilisateur.getId();
-		dto.nom = r.utilisateur.nom;
-		dto.prenom = r.utilisateur.prenom;
+		dto.utilisateurId = r.getUtilisateur().getId();
+		dto.nom = r.getUtilisateur().getNom();
+		dto.prenom = r.getUtilisateur().getPrenom();
 		
 		return dto;		
 	}
@@ -355,7 +356,7 @@ public class AccessManagementService
 	{
 		EntityManager em = TransactionHelper.getEm();
 		RoleTresorier p  = new RoleTresorier();
-		p.utilisateur = em.find(Utilisateur.class, dto.utilisateurId);
+		p.setUtilisateur(em.find(Utilisateur.class, dto.utilisateurId));
 		em.persist(p);
 	}	
 	

@@ -36,11 +36,17 @@ public enum MenuList
 	// Partie standard
 	
 	MES_CONTRATS("Mes contrats",FontAwesome.FILE_TEXT_O),
+
+//	CONTRATS("Mes contrats",FontAwesome.FILE_TEXT_O),
+	
+	CONTRATS_A_SOUSCRIRE("Contrats à souscrire",FontAwesome.FILE_TEXT_O),
 	
 	MES_LIVRAISONS("Mes livraisons",FontAwesome.CUTLERY),
 	
 	MES_PAIEMENTS("Mes paiements",FontAwesome.EURO),
 	
+	MES_CARTES_PREPAYEES("Mes cartes prépayées",FontAwesome.CREDIT_CARD),
+
 	MES_ADHESIONS("Mes adhésions",FontAwesome.CERTIFICATE),
 	
 	MON_COMPTE("Mon compte",FontAwesome.USER),
@@ -58,6 +64,13 @@ public enum MenuList
 	HISTORIQUE_PAIEMENTS("Historique de mes paiements",FontAwesome.EURO),
 	
 	
+	// Partie Messagerie
+	
+	ENVOI_MAIL_SOUSCRIPTEURS("Envoyer un mail",FontAwesome.ENVELOPE_O),
+
+	HISTORIQUE_MAIL("Historique des mails envoyés",FontAwesome.ENVELOPE_O),
+
+	
 	// Partie producteur
 	
 	LIVRAISONS_PRODUCTEUR("Livraisons d'un producteur",FontAwesome.TRUCK) ,
@@ -70,6 +83,8 @@ public enum MenuList
 	GESTION_CONTRAT("Gestion des contrats vierges",FontAwesome.FOLDER_OPEN_O),
 	
 	GESTION_CONTRAT_SIGNES("Gestion des contrats signés",FontAwesome.FILE_TEXT_O),
+	
+	CARTES_PREPAYEES_ADMIN("Gestion des cartes prépayées", FontAwesome.CREDIT_CARD),
 	
 	RECEPTION_CHEQUES("Réception des chèques",FontAwesome.EURO),
 	
@@ -99,6 +114,8 @@ public enum MenuList
 	UTILISATEUR("Gestion des utilisateurs",FontAwesome.USERS) , 
 	
 	PRODUCTEUR("Gestion des producteurs",FontAwesome.LEAF) ,
+	
+	TABLEAU_DE_BORD("Tableau de bord",FontAwesome.BAR_CHART_O),
 	
 	BILAN_COTISATION("Bilan des adhésions",FontAwesome.TABLE) ,
 	

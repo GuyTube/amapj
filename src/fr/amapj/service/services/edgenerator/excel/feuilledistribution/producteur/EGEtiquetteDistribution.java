@@ -64,7 +64,7 @@ public class EGEtiquetteDistribution
 		SimpleDateFormat df2 = new SimpleDateFormat("dd MMMMM");
 		
 		ModeleContratDate mcd = em.find(ModeleContratDate.class, modeleContratDateId);
-		EditionSpecifique editionSpe = mcd.modeleContrat.producteur.etiquette;
+		EditionSpecifique editionSpe = mcd.getModeleContrat().getProducteur().etiquette;
 		EtiquetteProducteurJson etiquette = (EtiquetteProducteurJson) new EditionSpeService().load(editionSpe.id);
 		
 		// Recherche de toutes les quantités à livrer 
@@ -74,7 +74,7 @@ public class EGEtiquetteDistribution
 		
 		// Il y a nbCol colonnes
 		int nbCol =  etiquette.getNbColonne();
-		et.addSheet(df2.format(mcd.dateLiv)+"-Etiquettes", nbCol, 10);
+		et.addSheet(df2.format(mcd.getDateLiv())+"-Etiquettes", nbCol, 10);
 		for (int i = 0; i < nbCol; i++)
 		{
 			et.setColumnWidthInMm(i, etiquette.getLargeurColonnes().get(i).getLargeur());	
@@ -117,7 +117,7 @@ public class EGEtiquetteDistribution
 		List<ContratCell> cells = q.getResultList();
 		for (ContratCell cell : cells)
 		{
-			int qte =  cell.qte;
+			int qte =  cell.getQte();
 			for (int i = 1; i <=qte; i++)
 			{
 				ContratCellNumber ccn = new ContratCellNumber();
@@ -157,15 +157,15 @@ public class EGEtiquetteDistribution
 		ContratCell cell = ccn.cell;
 		
 		// Ligne 1 : la date 
-		String str = df.format(cell.modeleContratDate.dateLiv) +"\n";
+		String str = df.format(cell.getModeleContratDate().getDateLiv()) +"\n";
 		
 		// Ligne 2 : nom et prénom
-		Utilisateur u = cell.contrat.utilisateur;
-		str = str + u.nom+" "+u.prenom+"\n";
+		Utilisateur u = cell.getContrat().getUtilisateur();
+		str = str + u.getNom()+" "+u.getPrenom()+"\n";
 		
 		// Ligne 3 : le nom du produit 
-		Produit p = cell.modeleContratProduit.produit;
-		str = str + p.nom+","+p.conditionnement+"\n";
+		Produit p = cell.getModeleContratProduit().getProduit();
+		str = str + p.getNom()+","+p.getConditionnement()+"\n";
 		
 		// Ligne 4 : les numéros d'ordre
 		str = str + ccn.number+" / "+ccn.totalNumber+"\n";
